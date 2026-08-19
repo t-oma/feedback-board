@@ -250,12 +250,16 @@ Required mutations are:
 
 - create the current user's product;
 - update the owned product's name, description, and slug;
-- create visible feedback for an existing product;
+- create visible feedback for an existing product, together with its author's vote;
 - edit feedback on an owned board;
 - change feedback status on an owned board;
 - hide and restore feedback on an owned board;
 - add the current user's vote;
 - remove the current user's vote.
+
+Creating feedback inserts the author's vote in the same transaction, so an item enters the board with a count of one rather than zero. Posting is itself an expression of wanting the thing, and an item that starts at zero reads as unwanted by its own author.
+
+That vote is an ordinary vote from the moment it exists. The author may remove it, and remove it again after re-adding, under exactly the rules that govern everyone else, including the close on `completed`. Nothing marks it as the author's; the row is identical to any other, and the only thing special about it is that creation seeded it. Locking it would need a rule, a way to detect it, and a vote control on the author's own item that is active for every visitor but dead for them — the disabled-control problem the interface section rules out. An item can therefore fall to zero votes when its author withdraws, which is honest rather than broken.
 
 `addVote` uses insert-on-conflict-do-nothing semantics, and `removeVote` succeeds when the row is already absent. These explicit operations are idempotent and replace a race-prone toggle mutation. Voting on feedback that is hidden or missing returns `NOT_FOUND`, and creating feedback for a product that does not exist returns the same code. Both operations return `CONFLICT` when the feedback is `completed`.
 
@@ -265,7 +269,11 @@ Status transitions are unrestricted between all four statuses. Entering `complet
 
 Hiding sets `hiddenAt` without deleting feedback or votes. Restoring clears `hiddenAt`, preserving the previous status and votes. The MVP has no permanent feedback deletion action.
 
-After feedback creation, the user is redirected to its detail page. After a slug update, the owner is redirected to a route using the new slug.
+Feedback creation does not navigate. The modal closes and the board it was opened over stays where it was, re-rendered by the tag expiration that ships with the action response, with the new item present and briefly highlighted. Redirecting to the detail page would spend exactly the context switch the modal exists to avoid, and would discard the filter, sort, and scroll position the visitor had chosen.
+
+The board does return to its default `status=all` and `sort=new` view as part of that close, because a filtered board can hide the item that was just written — posting from a board narrowed to `planned` would look like the write failed. Under the default view the new item sorts to the top, which is the clearest possible confirmation. This is a change of search parameters within the same route, not a navigation.
+
+After a slug update, the owner is redirected to a route using the new slug.
 
 ## Rendering and caching model
 
@@ -300,7 +308,7 @@ No Redis or remote application cache is introduced. Shipping with no `use cache`
 
 ## User interface layer
 
-The hi-fi design lives in the repository as `docs/desktop-design.dc.html` and `docs/mobile-design.dc.html`, which cover every route, both landing states, and a sheet of the eleven shared states. Those files are the source of truth for palette, type scale, spacing, and copy; this section fixes only what constrains implementation, so that tokens are not restated in two places and allowed to drift.
+The hi-fi design lives in the repository as `docs/desktop-design.dc.html` and `docs/mobile-design.dc.html`, which cover every route, both landing states, and a sheet of the eleven shared states. Those files are the source of truth for palette, type scale, spacing, and copy; this section fixes only what constrains implementation, so that tokens are not restated in two places and allowed to drift. Field bounds are the exception and belong to the data model here, since validation enforces them: where the design's helper text disagrees, as its feedback description label currently does, this document governs and the design is corrected on its next pass.
 
 Interface code is written against native elements and Tailwind directly, with headless primitives from Base UI reserved for the three widgets that need managed focus and keyboard behavior: the feedback modal, the sign-in popover, and the owner row menu. Base UI over a styled library because the design shares no visual vocabulary with any of them, so their defaults would be overridden rather than used; over React Aria because its advantage concentrates in complex widgets this application does not have, while its learning curve would draw on the same budget as the App Router itself.
 
@@ -362,6 +370,7 @@ Vitest covers inexpensive domain and database integration behavior:
 - one-product, unique-slug, and unique-vote constraints;
 - those same constraints under concurrent writes, issued as simultaneous statements rather than sequential ones: two product creations for one owner and two claims of one slug each leave a single row with the loser surfacing `CONFLICT`, while two `addVote` calls for the same user and feedback both report success and still leave one row;
 - idempotent add/remove vote behavior;
+- creation seeding the author's vote in the same transaction, and that vote then behaving as any other: removable by its author, re-addable, and closed once the item is completed;
 - vote count aggregation, asserting that a feedback row with no votes still appears under both orderings and reports a count of zero;
 - the per-user feedback creation cap, accepting writes up to the limit inside one window and returning `RATE_LIMITED` past it, with a separate user unaffected;
 - `NOT_FOUND` for votes on hidden or missing feedback, and exclusion of hidden feedback from public queries;
@@ -370,7 +379,7 @@ Vitest covers inexpensive domain and database integration behavior:
 Playwright covers four critical browser journeys:
 
 1. Register, receive a session automatically, create the only allowed product, update its slug, verify the old URL is not found, and open the new public board.
-2. Register a second user, create feedback on the owner's board, add a vote, remove it, and observe correct counts.
+2. Register a second user, create feedback on the owner's board from the modal, confirm the board stays put and the new item appears at the top of the default view carrying one vote, withdraw that vote and add it back, then vote on another item and observe correct counts throughout.
 3. As owner, edit feedback, change it to completed, verify changelog inclusion and a closed vote control with its count intact, leave completed and verify voting reopens, hide it, verify public absence, and restore it.
 4. As a visitor, read board/detail/changelog content, exercise URL-backed status and sort controls, open the sign-in popover from a protected control, reach sign-in from it, and land back on the originating board afterwards. The same journey asserts that the protected controls are reachable by keyboard and are never rendered disabled.
 
