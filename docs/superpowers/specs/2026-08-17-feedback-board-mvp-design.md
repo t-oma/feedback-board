@@ -191,7 +191,11 @@ Ordering is deterministic:
 - `top`: `voteCount DESC`, then `createdAt DESC`, then `id DESC`;
 - changelog: `completedAt DESC`, then `id DESC`.
 
-Hidden feedback is excluded from every public query. A missing or hidden feedback detail behaves as not found. Public list queries aggregate vote counts in the database and avoid per-row queries. Viewer-specific vote state is loaded separately when a session exists.
+Hidden feedback is excluded from every public query. A missing or hidden feedback detail behaves as not found. Viewer-specific vote state is loaded separately when a session exists.
+
+Public list queries aggregate vote counts in one database round trip rather than per row. The aggregation is a `LEFT JOIN` from feedback to vote grouped by the feedback row, counting the vote's user column rather than `*`. An inner join silently drops every feedback item that has no votes, and `COUNT(*)` over a left join counts the empty joined row and reports one vote where there are none. Neither mistake is visible on seeded data in which every item already has votes, so the fixtures for these queries include a feedback row with no votes at all.
+
+Every public list query carries a hard `LIMIT` of 100 rows. Pagination remains a non-goal and the demo board is not expected to approach that bound; the limit exists so that no unbounded query reaches production, and reaching it is the signal to add pagination after the MVP.
 
 ## Mutation contract
 
@@ -313,6 +317,7 @@ Vitest covers inexpensive domain and database integration behavior:
 - ownership rejection, including the `NOT_FOUND`/`FORBIDDEN` split for hidden versus visible targets;
 - one-product, unique-slug, and unique-vote constraints;
 - idempotent add/remove vote behavior;
+- vote count aggregation, asserting that a feedback row with no votes still appears under both orderings and reports a count of zero;
 - `NOT_FOUND` for votes on hidden or missing feedback, and exclusion of hidden feedback from public queries.
 
 Playwright covers four critical browser journeys:
