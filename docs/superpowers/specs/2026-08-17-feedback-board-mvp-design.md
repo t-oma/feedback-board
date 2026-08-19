@@ -266,6 +266,8 @@ After the core flows and their tests pass, a separate optimization task enables 
 
 Cached functions use finite, validated arguments, `cacheLife("max")`, and the tag formats `product:{productId}`, `product-slug:{slug}`, and `feedback:{feedbackId}`. Session data, viewer vote state, owner dashboard reads, and mutation results remain uncached. Server Actions use immediate tag expiration for read-your-own-writes behavior after creating feedback, voting, editing, changing status, hiding/restoring, or updating product settings.
 
+A slug update expires `product-slug:` under both the old and the new value. Only the new slug is reachable from the request, but the entry cached under the old one is what makes the previous URL resolve, and this specification requires it to become not found immediately. Expiring the new tag alone would leave the old URL serving a cached success response until its lifetime ran out, which contradicts the routing rule and would be caught by the first Playwright journey. The action reads the current slug before writing, so both values are available to it.
+
 This phase does not introduce Redis or a remote application cache. If it threatens the ten-day deadline, the tested dynamic implementation is deployed; caching is not a production-launch blocker.
 
 ## Error handling and states
