@@ -113,7 +113,7 @@ The dashboard validates the full session in its server layout or page. Every pro
 | -------------------------------------------- | ----------------- | ---------------------------- | --------------------------- |
 | Read visible boards, feedback, and changelog | Yes               | Yes                          | Yes                         |
 | Create feedback                              | No                | Yes                          | Yes, including on own board |
-| Add or remove own vote                       | No                | Yes                          | Yes, including on own board |
+| Add or remove own vote                       | No                | Yes, unless completed        | Yes, unless completed       |
 | Create a product                             | No                | Yes, once                    | Already owns one            |
 | Edit feedback                                | No                | No, including own submission | Yes, on owned board         |
 | Change feedback status                       | No                | No                           | Yes, on owned board         |
@@ -121,6 +121,8 @@ The dashboard validates the full session in its server layout or page. Every pro
 | Change product settings                      | No                | No                           | Yes, on owned board         |
 
 The owner role is additive: an owner retains ordinary registered-user capabilities. The application has no separate role column; ownership is derived from `product.ownerId`.
+
+Voting closes when feedback reaches `completed`. Existing votes are kept and still counted, in the changelog as well as on the board, but no vote may be added or removed while the item holds that status. The design shows this as a closed, greyed control with the count intact. Because status transitions are unrestricted in both directions, moving an item back out of `completed` reopens voting on it.
 
 ## Data model
 
@@ -235,7 +237,7 @@ Codes carry the following meaning:
 - `UNAUTHENTICATED`: the action requires a session and none is valid.
 - `NOT_FOUND`: the target row does not exist, or the caller could not have reached it through a public read.
 - `FORBIDDEN`: the target exists and is publicly readable, but the caller does not own it.
-- `CONFLICT`: a database uniqueness constraint rejected the write, such as a taken slug or a second product for one owner.
+- `CONFLICT`: the target's current state does not permit the write. A uniqueness constraint rejecting a taken slug or a second product for one owner is one case; a vote against feedback that has reached `completed` is the other.
 - `RATE_LIMITED`: the caller exceeded the per-user feedback creation cap. It is separate from `CONFLICT` because the request was well formed and permitted, and retrying it later succeeds.
 
 `NOT_FOUND` and `FORBIDDEN` are separated by what the caller can already observe, so an action never reveals more than the matching public read. Feedback that is hidden, or that belongs to a different product than the one addressed, is reported to a non-owner as `NOT_FOUND` rather than `FORBIDDEN`; the owner of that board instead receives the real outcome, because hidden items are part of owner management. Feedback that is visible to everyone but owned by another board returns `FORBIDDEN`, since its existence is already public.
@@ -255,7 +257,9 @@ Required mutations are:
 - add the current user's vote;
 - remove the current user's vote.
 
-`addVote` uses insert-on-conflict-do-nothing semantics, and `removeVote` succeeds when the row is already absent. These explicit operations are idempotent and replace a race-prone toggle mutation. Voting on feedback that is hidden or missing returns `NOT_FOUND`, and creating feedback for a product that does not exist returns the same code.
+`addVote` uses insert-on-conflict-do-nothing semantics, and `removeVote` succeeds when the row is already absent. These explicit operations are idempotent and replace a race-prone toggle mutation. Voting on feedback that is hidden or missing returns `NOT_FOUND`, and creating feedback for a product that does not exist returns the same code. Both operations return `CONFLICT` when the feedback is `completed`.
+
+That check lives in the Server Action rather than in PostgreSQL. The invariants this specification pushes into the database are structural — one product per owner, one vote per user and feedback, a completion timestamp that matches its status — and each is expressible as a constraint on the row being written. Closing votes on completed feedback is lifecycle policy that spans two tables, so enforcing it in the database would take a trigger. The race that buys is not worth one: an owner completing an item while someone votes can leave a single extra vote on a count the design keeps and displays either way.
 
 Status transitions are unrestricted between all four statuses. Entering `completed` sets `completedAt` with PostgreSQL `now()` in the same update. Leaving `completed` clears `completedAt`. Re-entering `completed` records a new completion time.
 
@@ -356,13 +360,14 @@ Vitest covers inexpensive domain and database integration behavior:
 - idempotent add/remove vote behavior;
 - vote count aggregation, asserting that a feedback row with no votes still appears under both orderings and reports a count of zero;
 - the per-user feedback creation cap, accepting writes up to the limit inside one window and returning `RATE_LIMITED` past it, with a separate user unaffected;
-- `NOT_FOUND` for votes on hidden or missing feedback, and exclusion of hidden feedback from public queries.
+- `NOT_FOUND` for votes on hidden or missing feedback, and exclusion of hidden feedback from public queries;
+- `CONFLICT` for adding or removing a vote on completed feedback, with existing votes still counted, and voting reopening once the item leaves that status.
 
 Playwright covers four critical browser journeys:
 
 1. Register, receive a session automatically, create the only allowed product, update its slug, verify the old URL is not found, and open the new public board.
 2. Register a second user, create feedback on the owner's board, add a vote, remove it, and observe correct counts.
-3. As owner, edit feedback, change it to completed, verify changelog inclusion, leave completed, hide it, verify public absence, and restore it.
+3. As owner, edit feedback, change it to completed, verify changelog inclusion and a closed vote control with its count intact, leave completed and verify voting reopens, hide it, verify public absence, and restore it.
 4. As a visitor, read board/detail/changelog content, exercise URL-backed status and sort controls, get sent to sign-in when attempting protected interactions, and land back on the originating board after signing in.
 
 Tests use a dedicated database named `feedback_board_test`, served by the local PostgreSQL container rather than by a managed provider. Any reset utility must still first query and verify that exact database name and require an explicit test-reset environment flag, and it refuses to run against development or production. A local container narrows what the utility can destroy but does not remove the need for the guard, since `DATABASE_URL` is what decides where it points and nothing stops that variable from holding a production value. Test data uses unique emails and slugs and does not depend on spec execution order.
