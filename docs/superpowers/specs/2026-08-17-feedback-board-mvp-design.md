@@ -89,7 +89,18 @@ The MVP behavior is:
 - sign-out returns the user to `/`;
 - a validated internal `returnTo` path returns a user to the public page that prompted authentication.
 
-`returnTo` accepts only same-origin relative paths beginning with one `/`; protocol-relative paths and external URLs are rejected. Auth forms may call Better Auth's server API through Server Actions with its Next.js cookie integration. The Better Auth Route Handler remains mounted as required by the library.
+`returnTo` is validated by parsing rather than by pattern matching, because the dangerous inputs are the ones that only a URL parser normalizes correctly. Two checks run in order:
+
+1. The raw value is rejected unless it begins with exactly one `/` that is not followed by `/` or `\`. This removes protocol-relative and backslash-prefixed forms, along with anything carrying a scheme or leading whitespace, before a parser is involved.
+2. The value is resolved with `new URL(returnTo, origin)` against the deployment origin and accepted only when the parsed `origin` is identical to it.
+
+The two checks overlap deliberately. The first rejects `//evil.com` and `/\evil.com` outright, and it names `\` because a URL parser treats that character as `/` in HTTP schemes, which would otherwise resolve the value to `https://evil.com`. The second catches what a prefix check cannot see: a parser strips tab, newline, and carriage-return characters from the input entirely, so a tab placed between the leading `/` and a second `/` survives the first check and then collapses to `//evil.com`, while a `javascript:` value parses with the origin `"null"`. Both end up cross-origin and are rejected. A percent-encoded form such as `/%2F%2Fevil.com` stays same-origin and is accepted, which is correct: browsers do not decode `%2F` before resolving, so the value remains an internal path.
+
+The redirect then uses the parsed URL's `pathname + search + hash`, never the raw input. Validating one string and redirecting with another is the usual way this check is defeated. Paths under `/api` are rejected because no user-facing page lives there, and any rejected or absent value falls back to `/` rather than surfacing an error.
+
+Because `returnTo` reaches the server as untrusted form data on a Server Action POST, it is validated inside the action that performs the redirect, not only at the point where a sign-in link is rendered.
+
+Auth forms may call Better Auth's server API through Server Actions with its Next.js cookie integration. The Better Auth Route Handler remains mounted as required by the library.
 
 The dashboard validates the full session in its server layout or page. Every protected Server Action independently validates the full session again. The MVP does not depend on `proxy.ts` for security.
 
@@ -280,7 +291,7 @@ Next.js `redirect()` and `notFound()` control-flow signals are not swallowed by 
 - Client-provided owner IDs, author IDs, vote counts, statuses outside the enum, and completion timestamps are ignored.
 - Database uniqueness constraints protect owner/product, slug, and vote invariants under concurrency.
 - Feedback and descriptions render as React text; arbitrary HTML is not accepted or rendered.
-- Redirect destinations are restricted to safe internal paths.
+- Redirect destinations are restricted to internal paths by origin comparison after URL parsing, and the redirect uses the parsed path rather than the submitted string.
 - Secrets exist only in local/Vercel environment configuration and never in client bundles or git.
 - Drizzle parameterization is used for database queries.
 - Custom anti-spam classification, AI moderation, and application-wide rate limiting are outside the MVP; feedback creation and voting still require authentication and bounded inputs.
@@ -290,6 +301,7 @@ Next.js `redirect()` and `notFound()` control-flow signals are not swallowed by 
 Vitest covers inexpensive domain and database integration behavior:
 
 - slug normalization and validation boundaries;
+- `returnTo` validation, accepting internal paths with query and hash while rejecting `//evil.com`, `/\evil.com`, `\/evil.com`, a tab-prefixed variant that normalizes to `//`, `https://evil.com`, `javascript:alert(1)`, and `/api` paths, each falling back to the default destination;
 - field-length validation boundaries;
 - status values and `completedAt` transitions;
 - database conflict mapping;
@@ -303,7 +315,7 @@ Playwright covers four critical browser journeys:
 1. Register, receive a session automatically, create the only allowed product, update its slug, verify the old URL is not found, and open the new public board.
 2. Register a second user, create feedback on the owner's board, add a vote, remove it, and observe correct counts.
 3. As owner, edit feedback, change it to completed, verify changelog inclusion, leave completed, hide it, verify public absence, and restore it.
-4. As a visitor, read board/detail/changelog content, exercise URL-backed status and sort controls, and get sent to sign-in when attempting protected interactions.
+4. As a visitor, read board/detail/changelog content, exercise URL-backed status and sort controls, get sent to sign-in when attempting protected interactions, and land back on the originating board after signing in.
 
 Tests use a dedicated Neon test database named `feedback_board_test`. Any reset utility must first query and verify that exact database name and require an explicit test-reset environment flag. It refuses to run against development or production. Test data uses unique emails and slugs and does not depend on spec execution order.
 
