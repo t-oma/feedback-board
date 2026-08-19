@@ -300,7 +300,7 @@ No Redis or remote application cache is introduced. Shipping with no `use cache`
 
 ## User interface layer
 
-The hi-fi design lives in the repository as `docs/Feedback Board Desktop-3.dc.html` and `docs/Feedback Board Mobile-2.dc.html`, which cover every route, both landing states, and a sheet of the eleven shared states. Those files are the source of truth for palette, type scale, spacing, and copy; this section fixes only what constrains implementation, so that tokens are not restated in two places and allowed to drift.
+The hi-fi design lives in the repository as `docs/desktop-design.dc.html` and `docs/mobile-design.dc.html`, which cover every route, both landing states, and a sheet of the eleven shared states. Those files are the source of truth for palette, type scale, spacing, and copy; this section fixes only what constrains implementation, so that tokens are not restated in two places and allowed to drift.
 
 Interface code is written against native elements and Tailwind directly, with headless primitives from Base UI reserved for the three widgets that need managed focus and keyboard behavior: the feedback modal, the sign-in popover, and the owner row menu. Base UI over a styled library because the design shares no visual vocabulary with any of them, so their defaults would be overridden rather than used; over React Aria because its advantage concentrates in complex widgets this application does not have, while its learning curve would draw on the same budget as the App Router itself.
 
