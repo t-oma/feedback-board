@@ -30,20 +30,37 @@ The visual design and page composition are owned by a separate UI workstream. Th
 
 ## System architecture
 
-The application has one Next.js deployment and one PostgreSQL database. Server Components call feature query functions directly; they do not call the application's own HTTP endpoints. Server Actions validate and authorize mutations before calling feature mutation functions. The only Route Handler required by the MVP is Better Auth's catch-all handler at `/api/auth/[...all]`.
+The application has one Next.js deployment and one PostgreSQL database. Server Components call feature query functions directly; they do not call the application's own HTTP endpoints. Server Actions are the client-callable interface for mutations: they validate input, resolve the session, authorize the operation, perform or delegate the database change, and refresh affected server-rendered data. A separate mutation module is extracted only when its implementation becomes complex or is reused outside one action. The only Route Handler required by the MVP is Better Auth's catch-all handler at `/api/auth/[...all]`.
 
 The code is organized feature-first:
 
-- `src/db` owns the Drizzle client, schema, relations, and migration-facing exports.
-- `src/lib/auth` owns Better Auth configuration and server-side session helpers.
-- `src/lib/action-result` owns the shared expected-error contract for forms and interactive controls.
+- `src/server/db` owns the Drizzle client, schema, relations, and migration-facing exports.
+- `src/server/auth` owns Better Auth configuration and server-side session helpers.
+- `src/server/env.ts` owns validated server environment variables.
+- `src/shared/action-result.ts` owns the client-safe expected-error contract for forms and interactive controls.
 - `src/features/auth` owns sign-up, sign-in, and sign-out actions.
 - `src/features/products` owns product validation, queries, creation, and settings mutations.
 - `src/features/feedback` owns public and owner queries, creation, editing, status changes, and hide/restore.
 - `src/features/votes` owns viewer vote reads and idempotent add/remove mutations.
 - `src/app` owns routing, Server Component composition, loading boundaries, error boundaries, and not-found UI.
 
-Feature query and mutation modules are server-only. Client Components may import only Server Action entry points, serializable types, and presentation-safe schemas/constants.
+Feature modules use file names to communicate their allowed import direction. The suffix is a project convention rather than special Next.js syntax:
+
+- `*.server.ts` contains implementation that ordinary Client Components must not import, such as database queries. Every such module also imports `server-only` so the restriction is enforced at build time.
+- `actions.ts` starts with the file-level `"use server"` directive. Client Components may import its exported async functions as Server Action references, while their implementation continues to execute only on the server.
+- `contracts.ts`, and any deliberately shared schemas or constants, remain client-safe and must not import server-only dependencies. A schema that depends on server-only code instead uses the `*.server.ts` suffix.
+
+A representative feature remains flat at the MVP scale:
+
+```text
+src/features/feedback/
+├── actions.ts
+├── contracts.ts
+├── queries.server.ts
+└── schemas.ts
+```
+
+Additional folders inside a feature are introduced only after the number or responsibilities of its files make the flat layout harder to navigate.
 
 ## Routes and route behavior
 
