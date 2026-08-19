@@ -124,7 +124,7 @@ The owner role is additive: an owner retains ordinary registered-user capabiliti
 
 ## Data model
 
-Better Auth owns its generated `user`, `session`, `account`, and `verification` tables. Its user ID format remains unchanged and domain foreign keys use the corresponding text type.
+Better Auth owns its generated `user`, `session`, `account`, `verification`, and `rateLimit` tables; the last one exists because its limiter is configured with database storage, which is what makes counters survive the ephemeral instances of a serverless deployment. Its user ID format remains unchanged and domain foreign keys use the corresponding text type.
 
 ### Product
 
@@ -216,7 +216,12 @@ The serializable expected-result shape is:
 type ActionError = {
   ok: false;
   code:
-    "VALIDATION" | "UNAUTHENTICATED" | "FORBIDDEN" | "NOT_FOUND" | "CONFLICT";
+    | "VALIDATION"
+    | "UNAUTHENTICATED"
+    | "FORBIDDEN"
+    | "NOT_FOUND"
+    | "CONFLICT"
+    | "RATE_LIMITED";
   message: string;
   fieldErrors?: Record<string, string[]>;
 };
@@ -231,6 +236,7 @@ Codes carry the following meaning:
 - `NOT_FOUND`: the target row does not exist, or the caller could not have reached it through a public read.
 - `FORBIDDEN`: the target exists and is publicly readable, but the caller does not own it.
 - `CONFLICT`: a database uniqueness constraint rejected the write, such as a taken slug or a second product for one owner.
+- `RATE_LIMITED`: the caller exceeded the per-user feedback creation cap. It is separate from `CONFLICT` because the request was well formed and permitted, and retrying it later succeeds.
 
 `NOT_FOUND` and `FORBIDDEN` are separated by what the caller can already observe, so an action never reveals more than the matching public read. Feedback that is hidden, or that belongs to a different product than the one addressed, is reported to a non-owner as `NOT_FOUND` rather than `FORBIDDEN`; the owner of that board instead receives the real outcome, because hidden items are part of owner management. Feedback that is visible to everyone but owned by another board returns `FORBIDDEN`, since its existence is already public.
 
@@ -317,7 +323,11 @@ Next.js `redirect()` and `notFound()` control-flow signals are not swallowed by 
 - Redirect destinations are restricted to internal paths by origin comparison after URL parsing, and the redirect uses the parsed path rather than the submitted string.
 - Secrets exist only in local/Vercel environment configuration and never in client bundles or git.
 - Drizzle parameterization is used for database queries.
-- Custom anti-spam classification, AI moderation, and application-wide rate limiting are outside the MVP; feedback creation and voting still require authentication and bounded inputs.
+- Two abuse limits ship, both of them portable application code rather than platform configuration. Better Auth's own rate limiting is enabled with database storage and a stricter rule on the sign-in and sign-up paths. Feedback creation is additionally capped per user per time window by a count in the Server Action.
+- Platform-level rate limiting, such as a Vercel firewall rule, is deliberately not used. It would not survive the planned move to self-hosting, no local test can exercise it, and it requires dashboard state that the repository cannot describe.
+- The two limits cover different surfaces on purpose. Better Auth's limiter only sees requests reaching the mounted `/api/auth/[...all]` handler, which is publicly addressable whether or not the application's own forms use it, and it does not apply to server-side `auth.api` calls made from Server Actions. The per-user cap is what protects the public demo board, because feedback creation never touches that handler.
+- Application code uses no platform-specific runtime API, so changing where the application is deployed stays a deployment change rather than a code change.
+- Custom anti-spam classification and AI moderation are outside the MVP; feedback creation and voting still require authentication and bounded inputs.
 
 ## Test strategy
 
@@ -333,6 +343,7 @@ Vitest covers inexpensive domain and database integration behavior:
 - those same constraints under concurrent writes, issued as simultaneous statements rather than sequential ones: two product creations for one owner and two claims of one slug each leave a single row with the loser surfacing `CONFLICT`, while two `addVote` calls for the same user and feedback both report success and still leave one row;
 - idempotent add/remove vote behavior;
 - vote count aggregation, asserting that a feedback row with no votes still appears under both orderings and reports a count of zero;
+- the per-user feedback creation cap, accepting writes up to the limit inside one window and returning `RATE_LIMITED` past it, with a separate user unaffected;
 - `NOT_FOUND` for votes on hidden or missing feedback, and exclusion of hidden feedback from public queries.
 
 Playwright covers four critical browser journeys:
@@ -352,6 +363,8 @@ The pre-deploy verification sequence is formatting check, ESLint, TypeScript che
 - Automated tests use the isolated `feedback_board_test` database.
 - Vercel production uses a separate Neon production branch/database.
 - The MVP has no staging environment.
+
+Self-hosting on a VPS is a planned follow-up rather than part of this MVP, and it is sequenced after the deployed application is complete so that the two learning goals do not compete for the same budget. It changes the deployment target only. Should it later grow past a single instance, three requirements appear that a single instance does not have: a shared `NEXT_SERVER_ACTIONS_ENCRYPTION_KEY`, a `deploymentId` to survive rolling deployments, and a shared cache handler implementing `refreshTags()`. Without the third, `updateTag()` invalidates only the instance that served the mutation, which silently breaks the read-your-own-writes guarantee this specification relies on and reintroduces the Redis dependency the non-goals exclude. A single container behind a reverse proxy has none of these requirements.
 
 Environment configuration uses `DATABASE_URL`, `BETTER_AUTH_SECRET`, `BETTER_AUTH_URL`, and the task-specific `FEEDBACK_BOARD_ENV` marker. Test database reset additionally requires `ALLOW_FEEDBACK_BOARD_TEST_RESET=true`. A committed `.env.example` documents these names without values.
 
