@@ -1,3 +1,6 @@
 .next
 coverage
 pnpm-lock.yaml
+
+# Design artifacts exported from the design tool, not hand-edited source.
+*.dc.html
