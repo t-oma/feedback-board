@@ -353,16 +353,22 @@ Playwright covers four critical browser journeys:
 3. As owner, edit feedback, change it to completed, verify changelog inclusion, leave completed, hide it, verify public absence, and restore it.
 4. As a visitor, read board/detail/changelog content, exercise URL-backed status and sort controls, get sent to sign-in when attempting protected interactions, and land back on the originating board after signing in.
 
-Tests use a dedicated Neon test database named `feedback_board_test`. Any reset utility must first query and verify that exact database name and require an explicit test-reset environment flag. It refuses to run against development or production. Test data uses unique emails and slugs and does not depend on spec execution order.
+Tests use a dedicated database named `feedback_board_test`, served by the local PostgreSQL container rather than by a managed provider. Any reset utility must still first query and verify that exact database name and require an explicit test-reset environment flag, and it refuses to run against development or production. A local container narrows what the utility can destroy but does not remove the need for the guard, since `DATABASE_URL` is what decides where it points and nothing stops that variable from holding a production value. Test data uses unique emails and slugs and does not depend on spec execution order.
 
 The pre-deploy verification sequence is formatting check, ESLint, TypeScript check, Vitest, production build, and Playwright E2E. The production build is where prerender violations surface, so it stays in the sequence even when nothing about the build output has changed.
 
 ## Environments and deployment
 
-- Local Next.js development uses a Neon development branch/database.
-- Automated tests use the isolated `feedback_board_test` database.
-- Vercel production uses a separate Neon production branch/database.
+- Local development runs PostgreSQL in a Docker container described by a committed `compose.yaml`.
+- Automated tests use the isolated `feedback_board_test` database in that same local container, and CI provides it as a service container.
+- Vercel production uses a Neon database.
 - The MVP has no staging environment.
+
+The database is local for development and managed in production on purpose. Keeping it local removes a network round trip from every query in a database-heavy test suite, removes the network as a source of flaky tests, and shrinks the blast radius of the reset utility to a container. Keeping production managed means backups, point-in-time recovery, and upgrades are not a standing obligation on a portfolio project, where losing the database means losing the artifact itself.
+
+Database access uses an ordinary PostgreSQL driver over TCP rather than a provider-specific driver such as Neon's HTTP client. The same connection code then works against the local container, the managed production database, and any later self-hosted instance, which is the same portability rule the security section applies to platform APIs. The container image pins the same PostgreSQL major version as production.
+
+Hosting the database next to the application is a question that only opens if the application itself moves to a VPS, and it may well stay answered no. It is specifically not worth doing while the application runs on Vercel: Vercel deployments egress from arbitrary IP addresses unless the project buys Static IPs or Secure Compute, neither of which exists on the Hobby plan, so a self-hosted database would have to accept connections from the entire internet and defend itself with credentials alone. Serverless instances also multiply connections against a fixed `max_connections`, which a managed provider absorbs with its own pooler.
 
 Self-hosting on a VPS is a planned follow-up rather than part of this MVP, and it is sequenced after the deployed application is complete so that the two learning goals do not compete for the same budget. It changes the deployment target only. Should it later grow past a single instance, three requirements appear that a single instance does not have: a shared `NEXT_SERVER_ACTIONS_ENCRYPTION_KEY`, a `deploymentId` to survive rolling deployments, and a shared cache handler implementing `refreshTags()`. Without the third, `updateTag()` invalidates only the instance that served the mutation, which silently breaks the read-your-own-writes guarantee this specification relies on and reintroduces the Redis dependency the non-goals exclude. A single container behind a reverse proxy has none of these requirements.
 
@@ -384,7 +390,7 @@ The MVP is complete when:
 - migrations and setup documentation are committed;
 - secrets are absent from the repository;
 - the app is deployed to a stable Vercel URL backed by the production Neon database;
-- README documents the demo URL, capabilities, stack, architecture, local setup, migrations, and test commands;
+- README documents the demo URL, capabilities, stack, architecture, local setup including starting the database container, migrations, and test commands;
 - a realistic public demo board is available to recruiters.
 
 Changelog is the first feature removed if the core is not stable by day nine. Deployment, responsive behavior, authorization, and critical tests are never traded away for changelog or caching.
