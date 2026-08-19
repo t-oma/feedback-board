@@ -95,16 +95,16 @@ The dashboard validates the full session in its server layout or page. Every pro
 
 ## Access model
 
-| Capability | Anonymous visitor | Registered user | Board owner |
-| --- | --- | --- | --- |
-| Read visible boards, feedback, and changelog | Yes | Yes | Yes |
-| Create feedback | No | Yes | Yes, including on own board |
-| Add or remove own vote | No | Yes | Yes, including on own board |
-| Create a product | No | Yes, once | Already owns one |
-| Edit feedback | No | No, including own submission | Yes, on owned board |
-| Change feedback status | No | No | Yes, on owned board |
-| Hide or restore feedback | No | No | Yes, on owned board |
-| Change product settings | No | No | Yes, on owned board |
+| Capability                                   | Anonymous visitor | Registered user              | Board owner                 |
+| -------------------------------------------- | ----------------- | ---------------------------- | --------------------------- |
+| Read visible boards, feedback, and changelog | Yes               | Yes                          | Yes                         |
+| Create feedback                              | No                | Yes                          | Yes, including on own board |
+| Add or remove own vote                       | No                | Yes                          | Yes, including on own board |
+| Create a product                             | No                | Yes, once                    | Already owns one            |
+| Edit feedback                                | No                | No, including own submission | Yes, on owned board         |
+| Change feedback status                       | No                | No                           | Yes, on owned board         |
+| Hide or restore feedback                     | No                | No                           | Yes, on owned board         |
+| Change product settings                      | No                | No                           | Yes, on owned board         |
 
 The owner role is additive: an owner retains ordinary registered-user capabilities. The application has no separate role column; ownership is derived from `product.ownerId`.
 
@@ -197,11 +197,26 @@ type ActionResult<T = undefined> =
   | { ok: true; data?: T }
   | {
       ok: false;
-      code: "VALIDATION" | "UNAUTHENTICATED" | "FORBIDDEN" | "CONFLICT";
+      code:
+        | "VALIDATION"
+        | "UNAUTHENTICATED"
+        | "FORBIDDEN"
+        | "NOT_FOUND"
+        | "CONFLICT";
       message: string;
       fieldErrors?: Record<string, string[]>;
     };
 ```
+
+Codes carry the following meaning:
+
+- `VALIDATION`: parsing or normalization rejected the input. `fieldErrors` carries the per-field messages.
+- `UNAUTHENTICATED`: the action requires a session and none is valid.
+- `NOT_FOUND`: the target row does not exist, or the caller could not have reached it through a public read.
+- `FORBIDDEN`: the target exists and is publicly readable, but the caller does not own it.
+- `CONFLICT`: a database uniqueness constraint rejected the write, such as a taken slug or a second product for one owner.
+
+`NOT_FOUND` and `FORBIDDEN` are separated by what the caller can already observe, so an action never reveals more than the matching public read. Feedback that is hidden, or that belongs to a different product than the one addressed, is reported to a non-owner as `NOT_FOUND` rather than `FORBIDDEN`; the owner of that board instead receives the real outcome, because hidden items are part of owner management. Feedback that is visible to everyone but owned by another board returns `FORBIDDEN`, since its existence is already public.
 
 Redirecting actions redirect instead of returning their success variant. Passwords, raw database errors, and internal stack details are never returned.
 
@@ -216,7 +231,7 @@ Required mutations are:
 - add the current user's vote;
 - remove the current user's vote.
 
-`addVote` uses insert-on-conflict-do-nothing semantics, and `removeVote` succeeds when the row is already absent. These explicit operations are idempotent and replace a race-prone toggle mutation. Voting is rejected when the feedback is hidden or missing.
+`addVote` uses insert-on-conflict-do-nothing semantics, and `removeVote` succeeds when the row is already absent. These explicit operations are idempotent and replace a race-prone toggle mutation. Voting on feedback that is hidden or missing returns `NOT_FOUND`, and creating feedback for a product that does not exist returns the same code.
 
 Status transitions are unrestricted between all four statuses. Entering `completed` sets `completedAt` with PostgreSQL `now()` in the same update. Leaving `completed` clears `completedAt`. Re-entering `completed` records a new completion time.
 
@@ -241,7 +256,7 @@ This phase does not introduce Redis or a remote application cache. If it threate
 
 ## Error handling and states
 
-Expected operational failures are values, not thrown exceptions. Zod issues appear next to fields. A conflicting slug maps to the slug field. Invalid credentials use one generic message. Missing authentication prompts sign-in. Failed ownership checks return a generic unavailable-operation message.
+Expected operational failures are values, not thrown exceptions. Zod issues appear next to fields. A conflicting slug maps to the slug field. Invalid credentials use one generic message. Missing authentication prompts sign-in. Failed ownership checks return a generic unavailable-operation message. A `NOT_FOUND` result renders next to the control that produced it; only Server Component reads call `notFound()`, so route-level not-found UI is never swapped in underneath an interaction that merely addressed a stale row.
 
 Unexpected failures such as database outages or programming errors are logged on the server and bubble to the nearest route `error.tsx`. The UI shows a neutral message and retry control without exposing database or stack details. Vercel runtime logs are sufficient for the MVP; external monitoring is not required.
 
@@ -278,10 +293,10 @@ Vitest covers inexpensive domain and database integration behavior:
 - field-length validation boundaries;
 - status values and `completedAt` transitions;
 - database conflict mapping;
-- ownership rejection;
+- ownership rejection, including the `NOT_FOUND`/`FORBIDDEN` split for hidden versus visible targets;
 - one-product, unique-slug, and unique-vote constraints;
 - idempotent add/remove vote behavior;
-- rejection of votes for hidden feedback and exclusion of hidden feedback from public queries.
+- `NOT_FOUND` for votes on hidden or missing feedback, and exclusion of hidden feedback from public queries.
 
 Playwright covers four critical browser journeys:
 
