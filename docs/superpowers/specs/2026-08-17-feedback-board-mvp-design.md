@@ -7,7 +7,7 @@
 
 Feedback Board is a small multi-tenant SaaS-style application for a frontend or full-stack portfolio. A registered product owner creates one public feedback board. Other registered users submit suggestions and vote, while anonymous visitors can read public content. The project is intentionally scoped for a seven-to-ten-day implementation and is also a vehicle for learning the current Next.js App Router.
 
-The visual design and page composition are owned by a separate UI workstream. This document defines routes, behavior, server boundaries, data rules, error semantics, tests, and completion criteria that the UI consumes.
+The visual design is owned by a separate UI workstream and now exists as the hi-fi files in `docs/`. This document defines routes, behavior, server boundaries, data rules, error semantics, tests, and completion criteria that the design is built against. Page composition is shared: the design decides what a screen looks like, while this document fixes the streaming boundaries, because under Cache Components their placement decides whether a route prerenders at all.
 
 ## Goals
 
@@ -293,6 +293,18 @@ Cached functions use finite, validated arguments, `cacheLife("max")`, and the ta
 A slug update calls `updateTag()` for `product-slug:` under both the old and the new value. Only the new slug is reachable from the request, but the entry cached under the old one is what makes the previous URL resolve, and this specification requires it to become not found immediately. Expiring the new tag alone would leave the old URL serving a cached success response until its lifetime ran out, which contradicts the routing rule and would be caught by the first Playwright journey. The action reads the current slug before writing, so both values are available to it.
 
 No Redis or remote application cache is introduced. Shipping with no `use cache` at all stays acceptable: the flag costs nothing at runtime, the application is correct without it, and at portfolio traffic the cache is a learning exercise rather than a performance requirement. Deferring the flag itself is what is not acceptable, because that moves a composition change to the point where the UI is already built.
+
+## User interface layer
+
+The hi-fi design lives in the repository as `docs/Feedback Board Desktop-3.dc.html` and `docs/Feedback Board Mobile-2.dc.html`, which cover every route, both landing states, and a sheet of the eleven shared states. Those files are the source of truth for palette, type scale, spacing, and copy; this section fixes only what constrains implementation, so that tokens are not restated in two places and allowed to drift.
+
+Interface code is written against native elements and Tailwind directly, with headless primitives from Base UI reserved for the three widgets that need managed focus and keyboard behavior: the feedback modal, the sign-in popover, and the owner row menu. Base UI over a styled library because the design shares no visual vocabulary with any of them, so their defaults would be overridden rather than used; over React Aria because its advantage concentrates in complex widgets this application does not have, while its learning curve would draw on the same budget as the App Router itself.
+
+The owner dashboard's hidden-items disclosure uses `<details>` and `<summary>` rather than a primitive. It needs no JavaScript, works before hydration, and is one of the two widgets in the design that the platform already implements correctly.
+
+Status filters and the sort toggle are links, not scripted controls. They are URL-backed, so rendering them as anchors keeps them in the prerendered shell, costs no client JavaScript, and needs no Suspense boundary of its own; a scripted select reading `searchParams` would require all three.
+
+Web fonts are self-hosted through the framework's font pipeline rather than fetched from a third-party host, which keeps the deployment free of an external runtime dependency and matches the portability rule the rest of this document applies. The design's body face falls back to Arial away from macOS; the implementation either accepts that or ships a body web font, and the choice is recorded in the design files rather than left to the reader.
 
 ## Error handling and states
 
