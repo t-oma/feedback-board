@@ -202,7 +202,7 @@ Each Server Action performs the following sequence:
 3. Load the target relationship needed for authorization.
 4. Apply the mutation in PostgreSQL.
 5. Return a typed expected result or redirect on success.
-6. Refresh affected server-rendered data; cache tag invalidation is added during the later caching phase.
+6. Refresh affected server-rendered data with `refresh()`, which refetches the current route's payload without invalidating any cache. Actions that end in `redirect()` need no separate refresh, because the redirect response already streams the destination. Tag invalidation takes over this role during the later caching phase.
 
 The serializable expected-result shape is:
 
@@ -264,9 +264,9 @@ After the core flows and their tests pass, a separate optimization task enables 
 - visible feedback detail;
 - changelog entries.
 
-Cached functions use finite, validated arguments, `cacheLife("max")`, and the tag formats `product:{productId}`, `product-slug:{slug}`, and `feedback:{feedbackId}`. Session data, viewer vote state, owner dashboard reads, and mutation results remain uncached. Server Actions use immediate tag expiration for read-your-own-writes behavior after creating feedback, voting, editing, changing status, hiding/restoring, or updating product settings.
+Cached functions use finite, validated arguments, `cacheLife("max")`, and the tag formats `product:{productId}`, `product-slug:{slug}`, and `feedback:{feedbackId}`. Session data, viewer vote state, owner dashboard reads, and mutation results remain uncached. Server Actions call `updateTag()` for read-your-own-writes behavior after creating feedback, voting, editing, changing status, hiding/restoring, or updating product settings. It expires the tag immediately, is available only inside Server Actions, and makes the route re-render that ships with the action response wait for fresh data. `revalidateTag()` is not a substitute here: it serves the stale value and deliberately omits that immediate re-render, so a user would see their own vote or edit one navigation late.
 
-A slug update expires `product-slug:` under both the old and the new value. Only the new slug is reachable from the request, but the entry cached under the old one is what makes the previous URL resolve, and this specification requires it to become not found immediately. Expiring the new tag alone would leave the old URL serving a cached success response until its lifetime ran out, which contradicts the routing rule and would be caught by the first Playwright journey. The action reads the current slug before writing, so both values are available to it.
+A slug update calls `updateTag()` for `product-slug:` under both the old and the new value. Only the new slug is reachable from the request, but the entry cached under the old one is what makes the previous URL resolve, and this specification requires it to become not found immediately. Expiring the new tag alone would leave the old URL serving a cached success response until its lifetime ran out, which contradicts the routing rule and would be caught by the first Playwright journey. The action reads the current slug before writing, so both values are available to it.
 
 This phase does not introduce Redis or a remote application cache. If it threatens the ten-day deadline, the tested dynamic implementation is deployed; caching is not a production-launch blocker.
 
