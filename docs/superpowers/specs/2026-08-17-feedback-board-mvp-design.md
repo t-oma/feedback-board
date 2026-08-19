@@ -70,7 +70,7 @@ Additional folders inside a feature are introduced only after the number or resp
 - `/` is the portfolio/marketing entry point defined by the UI workstream.
 - `/sign-in` contains sign-in and account-creation modes. A separate `/sign-up` route is not required.
 - `/dashboard` requires a valid session. A user without a product sees onboarding; a user with a product sees owner management.
-- `/dashboard/settings` requires a valid session and an existing owned product.
+- `/dashboard/settings` requires a valid session and an existing owned product. A signed-in user without a product is redirected to `/dashboard`, where onboarding is the correct destination; having no product yet is a stage of the flow, not a missing page, so this route never renders not-found UI for that case.
 - `/p/[productSlug]` is the public board with URL-backed filtering and sorting.
 - `/p/[productSlug]/feedback/[feedbackId]` is the public feedback detail page.
 - `/p/[productSlug]/changelog` lists completed, visible feedback.
