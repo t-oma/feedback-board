@@ -132,7 +132,7 @@ Better Auth owns its generated `user`, `session`, `account`, and `verification` 
 - `ownerId`: required Better Auth user ID, unique, foreign key to user.
 - `name`: required string, 2–80 characters.
 - `slug`: required lowercase string, 3–48 characters, unique.
-- `description`: required string with an empty default, maximum 500 characters.
+- `description`: `NOT NULL`, defaults to `''`, maximum 500 characters.
 - `createdAt`, `updatedAt`: timestamps with timezone.
 
 The unique constraint on `ownerId` enforces one product per owner. The unique constraint on the normalized lowercase `slug` enforces global public URL uniqueness.
@@ -143,7 +143,7 @@ The unique constraint on `ownerId` enforces one product per owner. The unique co
 - `productId`: required UUID foreign key to product.
 - `authorId`: required Better Auth user ID foreign key to user.
 - `title`: required string, 5–120 characters.
-- `body`: required plain text, 20–2000 characters.
+- `body`: required plain text, 10–2000 characters.
 - `status`: PostgreSQL enum `open | planned | in_progress | completed`, default `open`.
 - `completedAt`: nullable timestamp with timezone.
 - `hiddenAt`: nullable timestamp with timezone.
@@ -152,6 +152,8 @@ The unique constraint on `ownerId` enforces one product per owner. The unique co
 Indexes support public listing by product, visibility, status, and creation time, plus changelog listing by product and completion time.
 
 A database check constraint enforces that `completedAt` is non-null exactly when status is `completed`.
+
+Every write to a feedback row sets `updatedAt`, including status changes and hide/restore, and the same holds for a product settings update. The column records when the row last changed rather than when its text last changed; no query orders by it, so the distinction only matters for reading the data directly.
 
 ### Vote
 
