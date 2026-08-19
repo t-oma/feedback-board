@@ -90,7 +90,7 @@ The MVP behavior is:
 - automatic sign-in after successful registration;
 - redirect to `/dashboard` after normal registration;
 - sign-out returns the user to `/`;
-- a validated internal `returnTo` path returns a user to the public page that prompted authentication.
+- a validated internal `returnTo` path returns a user to the public page that prompted authentication, whether they arrived by following the guest control's link or through the popover that enhances it.
 
 `returnTo` is validated by parsing rather than by pattern matching, because the dangerous inputs are the ones that only a URL parser normalizes correctly. Two checks run in order:
 
@@ -306,6 +306,10 @@ Interface code is written against native elements and Tailwind directly, with he
 
 The owner dashboard's hidden-items disclosure uses `<details>` and `<summary>` rather than a primitive. It needs no JavaScript, works before hydration, and is one of the two widgets in the design that the platform already implements correctly.
 
+Controls that require a session are never rendered disabled to a signed-out visitor. For a guest, the vote and add-feedback controls render as links to `/sign-in` carrying the validated `returnTo`, and client JavaScript upgrades that link into the sign-in popover the design shows, cancelling the navigation and explaining in place. The link is the base layer and the popover is the enhancement, so both behaviors in the design are correct rather than one replacing the other. The popover carries a sentence naming the action and that same link, not a copy of the sign-in form: an inline form would duplicate the authentication surface and move `returnTo` handling to the client, where this document deliberately does not put it.
+
+Disabling those controls instead would hide the explanation from the people most likely to need it. A disabled button leaves the tab order and receives no pointer events, so a keyboard user never reaches it and never learns why it is dead, which contradicts the keyboard access this document requires. Carrying the explanation in a hover tooltip fails twice more: a tooltip may not hold a link, since it dismisses as the pointer travels toward it, and touch devices have no hover at all, so the mobile design would lose the explanation entirely. A live control that explains on activation teaches; a dead one teaches nothing until it is pointed at.
+
 Status filters and the sort toggle are links, not scripted controls. They are URL-backed, so rendering them as anchors keeps them in the prerendered shell, costs no client JavaScript, and needs no Suspense boundary of its own; a scripted select reading `searchParams` would require all three.
 
 Web fonts are self-hosted through the framework's font pipeline rather than fetched from a third-party host, which keeps the deployment free of an external runtime dependency and matches the portability rule the rest of this document applies. The design's body face falls back to Arial away from macOS; the implementation either accepts that or ships a body web font, and the choice is recorded in the design files rather than left to the reader.
@@ -368,7 +372,7 @@ Playwright covers four critical browser journeys:
 1. Register, receive a session automatically, create the only allowed product, update its slug, verify the old URL is not found, and open the new public board.
 2. Register a second user, create feedback on the owner's board, add a vote, remove it, and observe correct counts.
 3. As owner, edit feedback, change it to completed, verify changelog inclusion and a closed vote control with its count intact, leave completed and verify voting reopens, hide it, verify public absence, and restore it.
-4. As a visitor, read board/detail/changelog content, exercise URL-backed status and sort controls, get sent to sign-in when attempting protected interactions, and land back on the originating board after signing in.
+4. As a visitor, read board/detail/changelog content, exercise URL-backed status and sort controls, open the sign-in popover from a protected control, reach sign-in from it, and land back on the originating board afterwards. The same journey asserts that the protected controls are reachable by keyboard and are never rendered disabled.
 
 Tests use a dedicated database named `feedback_board_test`, served by the local PostgreSQL container rather than by a managed provider. Any reset utility must still first query and verify that exact database name and require an explicit test-reset environment flag, and it refuses to run against development or production. A local container narrows what the utility can destroy but does not remove the need for the guard, since `DATABASE_URL` is what decides where it points and nothing stops that variable from holding a production value. Test data uses unique emails and slugs and does not depend on spec execution order.
 
