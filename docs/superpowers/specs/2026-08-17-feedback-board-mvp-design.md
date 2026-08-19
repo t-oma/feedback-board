@@ -213,19 +213,15 @@ Each Server Action performs the following sequence:
 The serializable expected-result shape is:
 
 ```ts
-type ActionResult<T = undefined> =
-  | { ok: true; data?: T }
-  | {
-      ok: false;
-      code:
-        | "VALIDATION"
-        | "UNAUTHENTICATED"
-        | "FORBIDDEN"
-        | "NOT_FOUND"
-        | "CONFLICT";
-      message: string;
-      fieldErrors?: Record<string, string[]>;
-    };
+type ActionError = {
+  ok: false;
+  code:
+    "VALIDATION" | "UNAUTHENTICATED" | "FORBIDDEN" | "NOT_FOUND" | "CONFLICT";
+  message: string;
+  fieldErrors?: Record<string, string[]>;
+};
+
+type ActionResult<T = undefined> = { ok: true; data: T } | ActionError;
 ```
 
 Codes carry the following meaning:
@@ -238,7 +234,9 @@ Codes carry the following meaning:
 
 `NOT_FOUND` and `FORBIDDEN` are separated by what the caller can already observe, so an action never reveals more than the matching public read. Feedback that is hidden, or that belongs to a different product than the one addressed, is reported to a non-owner as `NOT_FOUND` rather than `FORBIDDEN`; the owner of that board instead receives the real outcome, because hidden items are part of owner management. Feedback that is visible to everyone but owned by another board returns `FORBIDDEN`, since its existence is already public.
 
-Redirecting actions redirect instead of returning their success variant. Passwords, raw database errors, and internal stack details are never returned.
+`data` is required rather than optional, so a caller that narrows on `ok` reaches the payload without also handling `undefined`. The cost lands on the producing side: an action with no payload returns `{ ok: true, data: undefined }` rather than `{ ok: true }`. That trade is deliberate, because the omission is written once per action and the check would otherwise be written at every call site.
+
+Redirecting actions redirect instead of returning their success variant, so they are declared as `Promise<ActionError>`. Typing them as `ActionResult` would leave every caller with a success branch that can never run. `ActionError` is a named type for exactly this reason; it also keeps the error shape from being restated wherever only failures are possible. Passwords, raw database errors, and internal stack details are never returned.
 
 Required mutations are:
 
