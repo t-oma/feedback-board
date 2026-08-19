@@ -16,7 +16,7 @@ The visual design and page composition are owned by a separate UI workstream. Th
 - Use PostgreSQL through Drizzle ORM and Better Auth for authentication.
 - Enforce permissions in server code and invariants in PostgreSQL.
 - Produce a responsive, deployed portfolio application with critical automated tests.
-- Introduce modern Next.js caching only after the uncached core is correct and tested.
+- Build on Cache Components from the first commit, and add `use cache` per slice once that slice's uncached behavior is correct and tested.
 
 ## Non-goals
 
@@ -206,7 +206,7 @@ Each Server Action performs the following sequence:
 3. Load the target relationship needed for authorization.
 4. Apply the mutation in PostgreSQL.
 5. Return a typed expected result or redirect on success.
-6. Refresh affected server-rendered data with `refresh()`, which refetches the current route's payload without invalidating any cache. Actions that end in `redirect()` need no separate refresh, because the redirect response already streams the destination. Tag invalidation takes over this role during the later caching phase.
+6. Refresh affected server-rendered data with `refresh()`, which refetches the current route's payload without invalidating any cache. Actions that end in `redirect()` need no separate refresh, because the redirect response already streams the destination. Tag invalidation takes over this role for any read that has been cached.
 
 The serializable expected-result shape is:
 
@@ -257,11 +257,25 @@ Hiding sets `hiddenAt` without deleting feedback or votes. Restoring clears `hid
 
 After feedback creation, the user is redirected to its detail page. After a slug update, the owner is redirected to a route using the new slug.
 
-## Caching rollout
+## Rendering and caching model
 
-The first complete vertical implementation uses direct Drizzle reads with no shared application data cache. This keeps authentication, permissions, queries, and UI states easy to debug.
+Cache Components is enabled from the first commit through `cacheComponents: true` in `next.config.ts`. Turning the flag on and caching data are separate decisions. With the flag on and no `use cache` anywhere, nothing is cached and the application is fully dynamic, which is exactly the uncached core this specification wants correct first. What the flag changes is composition, and composition is the expensive thing to change late.
 
-After the core flows and their tests pass, a separate optimization task enables Next.js Cache Components and adds caching only to viewer-neutral public reads:
+Under this model every route prerenders a static shell at build time and streams the rest at request time. Any component that reads `cookies()`, `headers()`, `searchParams`, or an uncached database result must sit inside a `<Suspense>` boundary; outside one it blocks the shell and raises a blocking-prerender insight in development. Boundary placement is therefore a behavioral contract rather than a visual choice, so this document fixes where the boundaries go and the UI workstream supplies their fallbacks:
+
+- the viewer-dependent part of the site header, meaning the sign-in control or the account menu, streams separately on every page;
+- the public board's feedback list streams, because it reads `searchParams` for status and sort;
+- viewer vote state streams, because it depends on the session;
+- dashboard and settings pages stream their owner-scoped content;
+- product name, description, and changelog entries depend on the route params but not on the viewer, which is what makes them the reads worth caching; until they are cached they stream like any other uncached database read.
+
+The shell carries layout, static headings, filter controls, and the skeletons for everything above, so these fallbacks are the same loading states the UI workstream already owns.
+
+Product slugs are not known at build time, so the board routes declare no `generateStaticParams`; under Cache Components that function may not return an empty list. Their `params` promise is passed into a boundary instead of being awaited at the top of the component, which lets the shell prerender for slugs the build has never seen.
+
+Synchronous non-deterministic calls such as `new Date()`, `Math.random()`, and `crypto.randomUUID()` fail the prerender with a build error that no opt-out clears. The data model already avoids this by generating UUIDs and completion timestamps in PostgreSQL, and application code preserves that property. A route not yet ready for its boundary work may set `instant = false` on its segment as a temporary opt-out, but no route ships that way.
+
+Caching is then added per slice, once that slice's uncached behavior is correct and its tests pass, rather than in one pass at the end. Only viewer-neutral public reads are cached:
 
 - public product data;
 - visible feedback lists and vote counts;
@@ -272,7 +286,7 @@ Cached functions use finite, validated arguments, `cacheLife("max")`, and the ta
 
 A slug update calls `updateTag()` for `product-slug:` under both the old and the new value. Only the new slug is reachable from the request, but the entry cached under the old one is what makes the previous URL resolve, and this specification requires it to become not found immediately. Expiring the new tag alone would leave the old URL serving a cached success response until its lifetime ran out, which contradicts the routing rule and would be caught by the first Playwright journey. The action reads the current slug before writing, so both values are available to it.
 
-This phase does not introduce Redis or a remote application cache. If it threatens the ten-day deadline, the tested dynamic implementation is deployed; caching is not a production-launch blocker.
+No Redis or remote application cache is introduced. Shipping with no `use cache` at all stays acceptable: the flag costs nothing at runtime, the application is correct without it, and at portfolio traffic the cache is a learning exercise rather than a performance requirement. Deferring the flag itself is what is not acceptable, because that moves a composition change to the point where the UI is already built.
 
 ## Error handling and states
 
@@ -282,7 +296,7 @@ Unexpected failures such as database outages or programming errors are logged on
 
 Route behavior includes:
 
-- route-level or local loading fallbacks for navigation and slow reads;
+- a loading fallback at every streaming boundary named in the rendering model, plus route-level `loading.tsx` where a whole segment is replaced during navigation;
 - not-found UI for unknown product slugs, mismatched feedback IDs, and hidden feedback;
 - onboarding instead of an error when a signed-in user has no product;
 - a first-feedback empty state for an empty board;
@@ -329,7 +343,7 @@ Playwright covers four critical browser journeys:
 
 Tests use a dedicated Neon test database named `feedback_board_test`. Any reset utility must first query and verify that exact database name and require an explicit test-reset environment flag. It refuses to run against development or production. Test data uses unique emails and slugs and does not depend on spec execution order.
 
-The pre-deploy verification sequence is formatting check, ESLint, TypeScript check, Vitest, production build, and Playwright E2E.
+The pre-deploy verification sequence is formatting check, ESLint, TypeScript check, Vitest, production build, and Playwright E2E. The production build is where prerender violations surface, so it stays in the sequence even when nothing about the build output has changed.
 
 ## Environments and deployment
 
@@ -363,4 +377,4 @@ Changelog is the first feature removed if the core is not stable by day nine. De
 
 ## Delivery boundary
 
-This specification is one implementation unit because all features share the same authentication, product ownership, and feedback lifecycle. The implementation plan will deliver vertical, independently testable slices: foundation/auth, onboarding/product, public feedback, voting, owner management, changelog, hardening/deploy, and finally the isolated caching pass.
+This specification is one implementation unit because all features share the same authentication, product ownership, and feedback lifecycle. The implementation plan will deliver vertical, independently testable slices: foundation/auth, onboarding/product, public feedback, voting, owner management, changelog, and hardening/deploy. Caching is not a slice of its own; each slice adds `use cache` to its own viewer-neutral reads once its uncached behavior is tested.
