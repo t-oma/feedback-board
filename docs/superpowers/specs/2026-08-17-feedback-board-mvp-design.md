@@ -48,7 +48,10 @@ Feature modules use file names to communicate their allowed import direction. Th
 
 - `*.server.ts` contains implementation that ordinary Client Components must not import, such as database queries. Every such module also imports `server-only` so the restriction is enforced at build time.
 - `actions.ts` starts with the file-level `"use server"` directive. Client Components may import its exported async functions as Server Action references, while their implementation continues to execute only on the server.
-- `contracts.ts`, and any deliberately shared schemas or constants, remain client-safe and must not import server-only dependencies. A schema that depends on server-only code instead uses the `*.server.ts` suffix.
+- `schemas.ts` owns the feature's Zod schemas and the types inferred from them, so an inferred type always sits beside the schema it comes from.
+- `contracts.ts` owns hand-written constants and types that carry no validation logic, such as the feedback status values, the sort and filter keys, and the mapping between URL and database spellings.
+
+Both are client-safe and must not import server-only dependencies. A schema that depends on server-only code uses the `*.server.ts` suffix instead. The dependency between the two runs one way: `schemas.ts` may import `contracts.ts`, never the reverse. Without that rule the two files form a cycle, because schemas need the shared constants while inferred types need the schemas.
 
 A representative feature remains flat at the MVP scale:
 
