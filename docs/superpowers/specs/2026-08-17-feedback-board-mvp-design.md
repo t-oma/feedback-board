@@ -330,6 +330,7 @@ Vitest covers inexpensive domain and database integration behavior:
 - database conflict mapping;
 - ownership rejection, including the `NOT_FOUND`/`FORBIDDEN` split for hidden versus visible targets;
 - one-product, unique-slug, and unique-vote constraints;
+- those same constraints under concurrent writes, issued as simultaneous statements rather than sequential ones: two product creations for one owner and two claims of one slug each leave a single row with the loser surfacing `CONFLICT`, while two `addVote` calls for the same user and feedback both report success and still leave one row;
 - idempotent add/remove vote behavior;
 - vote count aggregation, asserting that a feedback row with no votes still appears under both orderings and reports a count of zero;
 - `NOT_FOUND` for votes on hidden or missing feedback, and exclusion of hidden feedback from public queries.
