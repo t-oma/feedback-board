@@ -1,4 +1,5 @@
 .next
+drizzle/
 coverage
 pnpm-lock.yaml
 
