@@ -2,8 +2,9 @@ import "server-only";
 
 import { drizzle } from "drizzle-orm/node-postgres";
 import { env } from "../env";
+import { relations } from "./relations";
 
-const createDb = () => drizzle(env.DATABASE_URL);
+const createDb = () => drizzle(env.DATABASE_URL, { relations });
 
 const globalForDb = globalThis as unknown as {
   db?: ReturnType<typeof createDb>;
