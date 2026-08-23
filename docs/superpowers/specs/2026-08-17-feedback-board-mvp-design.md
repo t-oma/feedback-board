@@ -128,9 +128,11 @@ Voting closes when feedback reaches `completed`. Existing votes are kept and sti
 
 Better Auth owns its generated `user`, `session`, `account`, `verification`, and `rateLimit` tables; the last one exists because its limiter is configured with database storage, which is what makes counters survive the ephemeral instances of a serverless deployment. Its user ID format remains unchanged and domain foreign keys use the corresponding text type.
 
+Domain primary keys use PostgreSQL's native `uuid` type and a database default of `uuidv7()`. UUIDv7 keeps the identifiers portable without reducing them to enumerable counters, while its time-ordered layout gives B-tree indexes better insertion locality than fully random UUIDv4 values. It exposes an approximate generation time, which is acceptable because feedback is public and identifiers are never authorization credentials. PostgreSQL, rather than application code, generates these values.
+
 ### Product
 
-- `id`: UUID primary key.
+- `id`: PostgreSQL-generated UUIDv7 primary key.
 - `ownerId`: required Better Auth user ID, unique, foreign key to user.
 - `name`: required string, 2–80 characters.
 - `slug`: required lowercase string, 3–48 characters, unique.
@@ -141,7 +143,7 @@ The unique constraint on `ownerId` enforces one product per owner. The unique co
 
 ### Feedback
 
-- `id`: UUID primary key.
+- `id`: PostgreSQL-generated UUIDv7 primary key.
 - `productId`: required UUID foreign key to product.
 - `authorId`: required Better Auth user ID foreign key to user.
 - `title`: required string, 5–120 characters.
@@ -291,7 +293,7 @@ The shell carries layout, static headings, filter controls, and the skeletons fo
 
 Product slugs are not known at build time, so the board routes declare no `generateStaticParams`; under Cache Components that function may not return an empty list. Their `params` promise is passed into a boundary instead of being awaited at the top of the component, which lets the shell prerender for slugs the build has never seen.
 
-Synchronous non-deterministic calls such as `new Date()`, `Math.random()`, and `crypto.randomUUID()` fail the prerender with a build error that no opt-out clears. The data model already avoids this by generating UUIDs and completion timestamps in PostgreSQL, and application code preserves that property. A route not yet ready for its boundary work may set `instant = false` on its segment as a temporary opt-out, but no route ships that way.
+Synchronous non-deterministic calls such as `new Date()`, `Math.random()`, and `crypto.randomUUID()` fail the prerender with a build error that no opt-out clears. The data model already avoids this by generating UUIDv7 identifiers and completion timestamps in PostgreSQL, and application code preserves that property. A route not yet ready for its boundary work may set `instant = false` on its segment as a temporary opt-out, but no route ships that way.
 
 Caching is then added per slice, once that slice's uncached behavior is correct and its tests pass, rather than in one pass at the end. Only viewer-neutral public reads are cached:
 
@@ -398,7 +400,7 @@ The database is local for development and managed in production on purpose. Keep
 
 Node 24 runs everywhere, declared once as `engines.node` in `package.json` and mirrored in `.nvmrc` for local version managers and in any later container base image. Vercel reads that field to pick the runtime, so the same declaration covers development and production rather than leaving the deployed version to a dashboard default. Twenty-four is the active LTS line and is supported until April 2028; Node 26 becomes the natural successor once it reaches LTS, which is a version bump and not a decision to revisit. `@types/node` tracks the same major, since types describing a different runtime than the one executing is a silent source of wrong answers. The package manager is already pinned through `packageManager`.
 
-Database access uses `pg`, the node-postgres driver, over TCP in every environment. The same connection code then works against the local container, the managed production database, and any later self-hosted instance, which is the same portability rule the security section applies to platform APIs. PostgreSQL 18 runs in both places: it is what a Neon project created today provisions by default, and the container pins that major version so development and production never diverge across a release boundary.
+Database access uses `pg`, the node-postgres driver, over TCP in every environment. The same connection code then works against the local container, the managed production database, and any later self-hosted instance, which is the same portability rule the security section applies to platform APIs. PostgreSQL 18 runs in both places: it is what a Neon project created today provisions by default, and the container pins that major version so development and production never diverge across a release boundary. That major also provides the built-in `uuidv7()` function used by domain primary-key defaults without requiring an extension.
 
 Neon's HTTP driver is specifically not used, even in production only. It cannot open a transaction, and Better Auth opens one to create a user, so a split configuration would leave registration working locally and failing in production — a defect no local test could reach, since the tests would exercise the other driver. The constraint that motivates an HTTP driver is the Edge runtime's lack of TCP sockets, and Cache Components requires the Node.js runtime, so this application never runs there. What remains of the TCP objection on Node is connection count and handshake latency, and both are addressed below rather than by changing drivers.
 
