@@ -1,7 +1,7 @@
 # Feedback Board MVP Technical Design
 
 **Date:** 2026-08-17
-**Status:** Approved in design discussion; awaiting written-spec review
+**Status:** Approved; implementation in progress
 
 ## Purpose
 
@@ -27,6 +27,17 @@ The visual design is owned by a separate UI workstream and now exists as the hi-
 - Account deletion, email verification, password reset, or OAuth.
 - A separate API server, Fastify service, Redis instance, queue, or worker.
 - Pagination or full-text search in the MVP.
+
+## Deferred after MVP
+
+Rate limiting is deliberately deferred rather than dropped. It is not part of the MVP Definition of Done: the current implementation does not add a Better Auth `rateLimit` table, a `RATE_LIMITED` action result, a feedback-creation time window, or tests for either limiter.
+
+The first post-MVP hardening pass must revisit two independent controls:
+
+- Better Auth rate limiting with database storage for requests that reach the public `/api/auth/[...all]` handler.
+- A per-user feedback-creation cap enforced by the Server Action, because Better Auth's route limiter does not cover feedback creation or server-side `auth.api` calls.
+
+Platform-specific firewall rules remain optional and out of scope unless the deployment-portability requirements change.
 
 ## System architecture
 
@@ -68,7 +79,7 @@ Additional folders inside a feature are introduced only after the number or resp
 ## Routes and route behavior
 
 - `/` is the portfolio/marketing entry point defined by the UI workstream.
-- `/sign-in` contains sign-in and account-creation modes. A separate `/sign-up` route is not required.
+- `/sign-in` contains sign-in and account-creation modes. A separate `/sign-up` route is not required. It accepts the independently validated `returnTo` and `intent` query parameters described below.
 - `/dashboard` requires a valid session. A user without a product sees onboarding; a user with a product sees owner management.
 - `/dashboard/settings` requires a valid session and an existing owned product. A signed-in user without a product is redirected to `/dashboard`, where onboarding is the correct destination; having no product yet is a stage of the flow, not a missing page, so this route never renders not-found UI for that case.
 - `/p/[productSlug]` is the public board with URL-backed filtering and sorting.
@@ -80,7 +91,7 @@ Changing a slug makes the new URL active immediately. The old slug returns not f
 
 ## Authentication
 
-Better Auth uses its email-and-password provider with the Drizzle PostgreSQL adapter. Registration requires `name`, `email`, and `password`. Passwords use Better Auth's standard minimum of 8 and maximum of 128 characters.
+Better Auth uses its email-and-password provider with the Drizzle PostgreSQL adapter. Registration requires `name`, `email`, and `password`. The trimmed name contains 1–80 characters, the trimmed email is valid and contains at most 254 characters, and passwords use Better Auth's standard minimum of 8 and maximum of 128 characters.
 
 The MVP behavior is:
 
@@ -92,6 +103,8 @@ The MVP behavior is:
 - sign-out returns the user to `/`;
 - a validated internal `returnTo` path returns a user to the public page that prompted authentication, whether they arrived by following the guest control's link or through the popover that enhances it.
 
+An auth-entry link may separately carry `intent=vote|feedback|board`. The value selects only the supporting sentence on `/sign-in`: sign in to vote, add feedback, or create a board. It never changes authorization, form behavior, or the redirect destination, and it is never inferred from `returnTo`, because the same board URL can prompt more than one action. An absent or unknown value produces the neutral heading with no supporting sentence. Switching between sign-in and account-creation modes preserves both query parameters.
+
 `returnTo` is validated by parsing rather than by pattern matching, because the dangerous inputs are the ones that only a URL parser normalizes correctly. Two checks run in order:
 
 1. The raw value is rejected unless it begins with exactly one `/` that is not followed by `/` or `\`. This removes protocol-relative and backslash-prefixed forms, along with anything carrying a scheme or leading whitespace, before a parser is involved.
@@ -99,7 +112,7 @@ The MVP behavior is:
 
 The two checks overlap deliberately. The first rejects `//evil.com` and `/\evil.com` outright, and it names `\` because a URL parser treats that character as `/` in HTTP schemes, which would otherwise resolve the value to `https://evil.com`. The second catches what a prefix check cannot see: a parser strips tab, newline, and carriage-return characters from the input entirely, so a tab placed between the leading `/` and a second `/` survives the first check and then collapses to `//evil.com`, while a `javascript:` value parses with the origin `"null"`. Both end up cross-origin and are rejected. A percent-encoded form such as `/%2F%2Fevil.com` stays same-origin and is accepted, which is correct: browsers do not decode `%2F` before resolving, so the value remains an internal path.
 
-The redirect then uses the parsed URL's `pathname + search + hash`, never the raw input. Validating one string and redirecting with another is the usual way this check is defeated. Paths under `/api` are rejected because no user-facing page lives there, and any rejected or absent value falls back to `/` rather than surfacing an error.
+The redirect then uses the parsed URL's `pathname + search + hash`, never the raw input. Validating one string and redirecting with another is the usual way this check is defeated. Paths under `/api` are rejected because no user-facing page lives there. A rejected or absent value never surfaces an error: normal sign-in falls back to `/`, while account creation follows its explicit post-registration default of `/dashboard`.
 
 Because `returnTo` reaches the server as untrusted form data on a Server Action POST, it is validated inside the action that performs the redirect, not only at the point where a sign-in link is rendered.
 
@@ -126,7 +139,7 @@ Voting closes when feedback reaches `completed`. Existing votes are kept and sti
 
 ## Data model
 
-Better Auth owns its generated `user`, `session`, `account`, `verification`, and `rateLimit` tables; the last one exists because its limiter is configured with database storage, which is what makes counters survive the ephemeral instances of a serverless deployment. Its user ID format remains unchanged and domain foreign keys use the corresponding text type.
+Better Auth owns its generated `user`, `session`, `account`, and `verification` tables. Its user ID format remains unchanged and domain foreign keys use the corresponding text type.
 
 Domain primary keys use PostgreSQL's native `uuid` type and a database default of `uuidv7()`. UUIDv7 keeps the identifiers portable without reducing them to enumerable counters, while its time-ordered layout gives B-tree indexes better insertion locality than fully random UUIDv4 values. It exposes an approximate generation time, which is acceptable because feedback is public and identifiers are never authorization credentials. PostgreSQL, rather than application code, generates these values.
 
@@ -220,12 +233,7 @@ The serializable expected-result shape is:
 type ActionError = {
   ok: false;
   code:
-    | "VALIDATION"
-    | "UNAUTHENTICATED"
-    | "FORBIDDEN"
-    | "NOT_FOUND"
-    | "CONFLICT"
-    | "RATE_LIMITED";
+    "VALIDATION" | "UNAUTHENTICATED" | "FORBIDDEN" | "NOT_FOUND" | "CONFLICT";
   message: string;
   fieldErrors?: Record<string, string[]>;
 };
@@ -236,11 +244,10 @@ type ActionResult<T = undefined> = { ok: true; data: T } | ActionError;
 Codes carry the following meaning:
 
 - `VALIDATION`: parsing or normalization rejected the input. `fieldErrors` carries the per-field messages.
-- `UNAUTHENTICATED`: the action requires a session and none is valid.
+- `UNAUTHENTICATED`: a protected action has no valid session, or a sign-in attempt supplied credentials that Better Auth rejected. The latter uses one form-level message and never identifies which credential was wrong.
 - `NOT_FOUND`: the target row does not exist, or the caller could not have reached it through a public read.
 - `FORBIDDEN`: the target exists and is publicly readable, but the caller does not own it.
 - `CONFLICT`: the target's current state does not permit the write. A uniqueness constraint rejecting a taken slug or a second product for one owner is one case; a vote against feedback that has reached `completed` is the other.
-- `RATE_LIMITED`: the caller exceeded the per-user feedback creation cap. It is separate from `CONFLICT` because the request was well formed and permitted, and retrying it later succeeds.
 
 `NOT_FOUND` and `FORBIDDEN` are separated by what the caller can already observe, so an action never reveals more than the matching public read. Feedback that is hidden, or that belongs to a different product than the one addressed, is reported to a non-owner as `NOT_FOUND` rather than `FORBIDDEN`; the owner of that board instead receives the real outcome, because hidden items are part of owner management. Feedback that is visible to everyone but owned by another board returns `FORBIDDEN`, since its existence is already public.
 
@@ -353,9 +360,6 @@ Next.js `redirect()` and `notFound()` control-flow signals are not swallowed by 
 - Redirect destinations are restricted to internal paths by origin comparison after URL parsing, and the redirect uses the parsed path rather than the submitted string.
 - Secrets exist only in local/Vercel environment configuration and never in client bundles or git.
 - Drizzle parameterization is used for database queries.
-- Two abuse limits ship, both of them portable application code rather than platform configuration. Better Auth's own rate limiting is enabled with database storage and a stricter rule on the sign-in and sign-up paths. Feedback creation is additionally capped per user per time window by a count in the Server Action.
-- Platform-level rate limiting, such as a Vercel firewall rule, is deliberately not used. It would not survive the planned move to self-hosting, no local test can exercise it, and it requires dashboard state that the repository cannot describe.
-- The two limits cover different surfaces on purpose. Better Auth's limiter only sees requests reaching the mounted `/api/auth/[...all]` handler, which is publicly addressable whether or not the application's own forms use it, and it does not apply to server-side `auth.api` calls made from Server Actions. The per-user cap is what protects the public demo board, because feedback creation never touches that handler.
 - Application code uses no platform-specific runtime API, so changing where the application is deployed stays a deployment change rather than a code change.
 - Custom anti-spam classification and AI moderation are outside the MVP; feedback creation and voting still require authentication and bounded inputs.
 
@@ -365,6 +369,7 @@ Vitest covers inexpensive domain and database integration behavior:
 
 - slug normalization and validation boundaries;
 - `returnTo` validation, accepting internal paths with query and hash while rejecting `//evil.com`, `/\evil.com`, `\/evil.com`, a tab-prefixed variant that normalizes to `//`, `https://evil.com`, `javascript:alert(1)`, and `/api` paths, each falling back to the default destination;
+- auth intent validation, accepting only `vote`, `feedback`, and `board`, while unknown or absent values produce no contextual supporting sentence and never affect `returnTo`;
 - field-length validation boundaries;
 - status values and `completedAt` transitions;
 - database conflict mapping;
@@ -374,7 +379,6 @@ Vitest covers inexpensive domain and database integration behavior:
 - idempotent add/remove vote behavior;
 - creation seeding the author's vote in the same transaction, and that vote then behaving as any other: removable by its author, re-addable, and closed once the item is completed;
 - vote count aggregation, asserting that a feedback row with no votes still appears under both orderings and reports a count of zero;
-- the per-user feedback creation cap, accepting writes up to the limit inside one window and returning `RATE_LIMITED` past it, with a separate user unaffected;
 - `NOT_FOUND` for votes on hidden or missing feedback, and exclusion of hidden feedback from public queries;
 - `CONFLICT` for adding or removing a vote on completed feedback, with existing votes still counted, and voting reopening once the item leaves that status.
 
@@ -435,4 +439,4 @@ Changelog is the first feature removed if the core is not stable by day nine. De
 
 ## Delivery boundary
 
-This specification is one implementation unit because all features share the same authentication, product ownership, and feedback lifecycle. The implementation plan will deliver vertical, independently testable slices: foundation/auth, onboarding/product, public feedback, voting, owner management, changelog, and hardening/deploy. Caching is not a slice of its own; each slice adds `use cache` to its own viewer-neutral reads once its uncached behavior is tested.
+This specification is one product boundary because all features share the same authentication, product ownership, and feedback lifecycle. Implementation is split into vertical, independently testable slices: authentication, onboarding/product, public board, feedback detail, feedback creation, voting, owner management, changelog, and hardening/deploy. The authentication slice also establishes only the shared test and action infrastructure needed by that first working journey; later infrastructure is introduced by the slice that first needs it. Caching is not a slice of its own; each slice adds `use cache` to its own viewer-neutral reads once its uncached behavior is tested.
