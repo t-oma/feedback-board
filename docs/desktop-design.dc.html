@@ -797,15 +797,15 @@
 </div>
 
 <div style="width:430px;display:flex;flex-direction:column;gap:10px">
-<div style="font:500 12px/1 'JetBrains Mono',ui-monospace,monospace;letter-spacing:.08em;text-transform:uppercase;color:#8c877c">Heading is fixed, the line under it is not</div>
+<div style="font:500 12px/1 'JetBrains Mono',ui-monospace,monospace;letter-spacing:.08em;text-transform:uppercase;color:#8c877c">Supporting copy keeps a two-line minimum</div>
 <div style="background:#fffefb;border:1px solid #ddd7cb;border-radius:9px;padding:20px;display:flex;flex-direction:column;gap:14px">
-<div style="display:flex;flex-direction:column;gap:5px;padding-bottom:12px;border-bottom:1px solid #eeeae1"><span style="font:600 18px/1.2 'Source Serif 4',Georgia,serif;color:#1a1917">Sign in</span><span style="font:400 11px/1.5 'JetBrains Mono',ui-monospace,monospace;color:#8c877c">default · arriving from the landing page, the header or a bookmark, with no supporting line</span></div>
+<div style="display:flex;flex-direction:column;gap:5px;padding-bottom:12px;border-bottom:1px solid #eeeae1"><span style="font:600 18px/1.2 'Source Serif 4',Georgia,serif;color:#1a1917">Sign in</span><span style="font:400 11px/1.5 'JetBrains Mono',ui-monospace,monospace;color:#8c877c">default · Sign in to vote, add feedback, or manage your board.</span></div>
 <div style="display:flex;flex-direction:column;gap:11px">
 <div style="display:flex;flex-direction:column;gap:3px"><span style="font:400 13.5px/1.5 'Helvetica Neue',Helvetica,Arial,sans-serif;color:#3d3a35">Sign in to vote.</span><span style="font:400 12px/1.4 'JetBrains Mono',ui-monospace,monospace;color:#8c877c">returnTo=/p/[slug] or a feedback item</span></div>
 <div style="display:flex;flex-direction:column;gap:3px"><span style="font:400 13.5px/1.5 'Helvetica Neue',Helvetica,Arial,sans-serif;color:#3d3a35">Sign in to add feedback.</span><span style="font:400 12px/1.4 'JetBrains Mono',ui-monospace,monospace;color:#8c877c">returnTo=/p/[slug] from the Add feedback popover</span></div>
 <div style="display:flex;flex-direction:column;gap:3px"><span style="font:400 13.5px/1.5 'Helvetica Neue',Helvetica,Arial,sans-serif;color:#3d3a35">Sign in to create your board.</span><span style="font:400 12px/1.4 'JetBrains Mono',ui-monospace,monospace;color:#8c877c">returnTo=/dashboard from the landing CTA</span></div>
 </div>
-<p style="margin:0;font:400 11px/1.5 'JetBrains Mono',ui-monospace,monospace;color:#6f6b62">The intent comes from where the user pressed, not from parsing returnTo. Anything unrecognised falls back to the bare heading — never a line that guesses wrong.</p>
+<p style="margin:0;font:400 11px/1.5 'JetBrains Mono',ui-monospace,monospace;color:#6f6b62">The intent comes from where the user pressed, not from parsing returnTo. Anything unrecognised uses the neutral default instead of guessing a specific action. The supporting-copy area reserves two lines and may grow.</p>
 </div>
 </div>
 
