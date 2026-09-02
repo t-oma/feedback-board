@@ -49,7 +49,7 @@ The code is organized feature-first:
 - `src/server/auth` owns Better Auth configuration and server-side session helpers.
 - `src/server/env.ts` owns validated server environment variables.
 - `src/shared/action-result.ts` owns the client-safe expected-error contract for forms and interactive controls.
-- `src/features/auth` owns sign-up, sign-in, and sign-out actions.
+- `src/features/auth` owns account-creation, sign-in, and sign-out actions.
 - `src/features/products` owns product validation, queries, creation, and settings mutations.
 - `src/features/feedback` owns public and owner queries, creation, editing, status changes, and hide/restore.
 - `src/features/votes` owns viewer vote reads and idempotent add/remove mutations.
@@ -79,7 +79,7 @@ Additional folders inside a feature are introduced only after the number or resp
 ## Routes and route behavior
 
 - `/` is the portfolio/marketing entry point defined by the UI workstream.
-- `/sign-in` contains sign-in and account-creation modes. A separate `/sign-up` route is not required. It accepts the independently validated `returnTo` and `intent` query parameters described below.
+- `/sign-in` contains sign-in and account-creation modes. A separate `/sign-up` route is not required. It accepts the independently validated `returnTo`, `intent`, and `mode` query parameters described below.
 - `/dashboard` requires a valid session. A user without a product sees onboarding; a user with a product sees owner management.
 - `/dashboard/settings` requires a valid session and an existing owned product. A signed-in user without a product is redirected to `/dashboard`, where onboarding is the correct destination; having no product yet is a stage of the flow, not a missing page, so this route never renders not-found UI for that case.
 - `/p/[productSlug]` is the public board with URL-backed filtering and sorting.
@@ -103,7 +103,9 @@ The MVP behavior is:
 - sign-out returns the user to `/`;
 - a validated internal `returnTo` path returns a user to the public page that prompted authentication, whether they arrived by following the guest control's link or through the popover that enhances it.
 
-An auth-entry link may separately carry `intent=vote|feedback|board`. The value selects only the supporting sentence on `/sign-in`: sign in to vote, add feedback, or create a board. It never changes authorization, form behavior, or the redirect destination, and it is never inferred from `returnTo`, because the same board URL can prompt more than one action. An absent or unknown value produces the neutral heading with no supporting sentence. Switching between sign-in and account-creation modes preserves both query parameters.
+An auth-entry link may separately carry `intent=vote|feedback|board`. In sign-in mode the value selects only the contextual supporting sentence: sign in to vote, add feedback, or create a board. It never changes authorization, form behavior, or the redirect destination, and it is never inferred from `returnTo`, because the same board URL can prompt more than one action. An absent or unknown value produces no contextual intent; the UI then shows the neutral default, "Sign in to vote, add feedback, or manage your board." Account-creation mode always uses its fixed privacy explanation. The supporting-text area reserves at least two lines and may grow, so changing mode or intent does not move the form when the copy occupies one or two lines.
+
+The same link may carry `mode=sign-in|create-account`. Missing, empty, unknown, or repeated values resolve to `sign-in`. Sign-in is the canonical mode and is omitted from generated URLs; only account creation serializes `mode=create-account`. The mode selector uses Base UI tab semantics rendered as Next.js links, making the URL the source of truth and preserving a valid `intent` plus an explicitly supplied `returnTo` when the visitor switches modes. Hydrated tabs provide the standard arrow-key behavior. The links still expose real destinations before hydration and when JavaScript is unavailable; improving sequential-keyboard access to the inactive no-JavaScript tab remains a possible post-MVP enhancement.
 
 `returnTo` is validated by parsing rather than by pattern matching, because the dangerous inputs are the ones that only a URL parser normalizes correctly. Two checks run in order:
 
@@ -319,7 +321,7 @@ No Redis or remote application cache is introduced. Shipping with no `use cache`
 
 The hi-fi design lives in the repository as `docs/desktop-design.dc.html` and `docs/mobile-design.dc.html`, which cover every route, both landing states, and a sheet of the eleven shared states. Those files are the source of truth for palette, type scale, spacing, and copy; this section fixes only what constrains implementation, so that tokens are not restated in two places and allowed to drift. Field bounds are the exception and belong to the data model here, since validation enforces them: where the design's helper text disagrees, as its feedback description label currently does, this document governs and the design is corrected on its next pass.
 
-Interface code is written against native elements and Tailwind directly, with headless primitives from Base UI reserved for the three widgets that need managed focus and keyboard behavior: the feedback modal, the sign-in popover, and the owner row menu. Base UI over a styled library because the design shares no visual vocabulary with any of them, so their defaults would be overridden rather than used; over React Aria because its advantage concentrates in complex widgets this application does not have, while its learning curve would draw on the same budget as the App Router itself.
+Interface code uses native elements and Tailwind for its rendered structure and styling. Headless Base UI primitives provide semantics and interaction behavior for the feedback modal, sign-in popover, owner row menu, auth mode tabs, and auth forms and fields. The auth tabs render as links rather than button-only client state. Base UI does not own domain validation, form state, or submission: Zod schemas and Server Actions remain responsible for those concerns. Base UI is used instead of a styled library because the design shares no visual vocabulary with one, so packaged visual defaults would be overridden rather than reused; React Aria's broader abstraction and learning cost are unnecessary for these widgets.
 
 The owner dashboard's hidden-items disclosure uses `<details>` and `<summary>` rather than a primitive. It needs no JavaScript, works before hydration, and is one of the two widgets in the design that the platform already implements correctly.
 
@@ -369,7 +371,8 @@ Vitest covers inexpensive domain and database integration behavior:
 
 - slug normalization and validation boundaries;
 - `returnTo` validation, accepting internal paths with query and hash while rejecting `//evil.com`, `/\evil.com`, `\/evil.com`, a tab-prefixed variant that normalizes to `//`, `https://evil.com`, `javascript:alert(1)`, and `/api` paths, each falling back to the default destination;
-- auth intent validation, accepting only `vote`, `feedback`, and `board`, while unknown or absent values produce no contextual supporting sentence and never affect `returnTo`;
+- auth intent validation, accepting only `vote`, `feedback`, and `board`, while unknown or absent values produce no contextual supporting sentence and never affect `returnTo`; the neutral default sentence is a UI fallback rather than parser output;
+- auth mode parsing and URL canonicalization, accepting `sign-in` and `create-account`, defaulting untrusted values to `sign-in`, omitting the default mode from generated URLs, and preserving valid `intent` and explicit `returnTo` values when modes are combined;
 - field-length validation boundaries;
 - status values and `completedAt` transitions;
 - database conflict mapping;
@@ -387,7 +390,7 @@ Playwright covers four critical browser journeys:
 1. Register, receive a session automatically, create the only allowed product, update its slug, verify the old URL is not found, and open the new public board.
 2. Register a second user, create feedback on the owner's board from the modal, confirm the board stays put and the new item appears at the top of the default view carrying one vote, withdraw that vote and add it back, then vote on another item and observe correct counts throughout.
 3. As owner, edit feedback, change it to completed, verify changelog inclusion and a closed vote control with its count intact, leave completed and verify voting reopens, hide it, verify public absence, and restore it.
-4. As a visitor, read board/detail/changelog content, exercise URL-backed status and sort controls, open the sign-in popover from a protected control, reach sign-in from it, and land back on the originating board afterwards. The same journey asserts that the protected controls are reachable by keyboard and are never rendered disabled.
+4. As a visitor, read board/detail/changelog content, exercise URL-backed status and sort controls, open the sign-in popover from a protected control, reach sign-in from it, switch to account creation and back while preserving `intent` and `returnTo`, and land back on the originating board afterwards. The same journey asserts that the protected controls and hydrated auth tabs are reachable by keyboard and that protected controls are never rendered disabled.
 
 Tests use a dedicated database named `feedback_board_test`, served by the local PostgreSQL container rather than by a managed provider. Any reset utility must still first query and verify that exact database name and require an explicit test-reset environment flag, and it refuses to run against development or production. A local container narrows what the utility can destroy but does not remove the need for the guard, since `DATABASE_URL` is what decides where it points and nothing stops that variable from holding a production value. Test data uses unique emails and slugs and does not depend on spec execution order.
 
@@ -422,7 +425,7 @@ Drizzle migration files are committed. Production migrations run as an explicit 
 
 The MVP is complete when:
 
-- sign-up, sign-in, sign-out, onboarding, and one-product enforcement work;
+- account creation, sign-in, sign-out, onboarding, and one-product enforcement work;
 - public board, detail, status filtering, sorting, feedback creation, voting, and vote removal work;
 - owner editing, status changes, hide/restore, and product settings work;
 - authorization and database constraints are enforced server-side;

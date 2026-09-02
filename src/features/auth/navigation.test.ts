@@ -31,6 +31,33 @@ describe("buildSignInHref", () => {
   it("omits an empty returnTo", () => {
     expect(buildSignInHref({ returnTo: "" })).toBe("/sign-in");
   });
+
+  it("adds mode correctly", () => {
+    expect(buildSignInHref()).toBe("/sign-in");
+    expect(buildSignInHref({ mode: "sign-in" })).toBe("/sign-in");
+    expect(buildSignInHref({ mode: "create-account" })).toBe(
+      "/sign-in?mode=create-account",
+    );
+
+    expect(buildSignInHref({ mode: undefined })).toBe("/sign-in");
+  });
+
+  it("combines all query parameters", () => {
+    const returnTo = "/p/orbit-cli?sort=top&status=open#vote";
+    const targetUrl = new URL(
+      buildSignInHref({
+        returnTo,
+        intent: "feedback",
+        mode: "create-account",
+      }),
+      origin,
+    );
+
+    expect(targetUrl.pathname).toBe("/sign-in");
+    expect(targetUrl.searchParams.get("returnTo")).toBe(returnTo);
+    expect(targetUrl.searchParams.get("intent")).toBe("feedback");
+    expect(targetUrl.searchParams.get("mode")).toBe("create-account");
+  });
 });
 
 describe("parseAuthNavigation", () => {
@@ -101,5 +128,42 @@ describe("parseAuthNavigation", () => {
     );
 
     expect(targets).toEqual(["/p/orbit-cli", "/p/orbit-cli", "/p/orbit-cli"]);
+  });
+
+  it.each([
+    ["sign-in", "sign-in"],
+    ["create-account", "create-account"],
+    [undefined, "sign-in"],
+    ["", "sign-in"],
+    ["admin", "sign-in"],
+    [["create-account"], "sign-in"],
+  ])("parses auth mode %j as %s", (mode, expected) => {
+    expect(
+      parseAuthNavigation({
+        mode,
+        origin,
+        fallback: "/",
+      }),
+    ).toMatchObject({ mode: expected });
+  });
+
+  it("parses all navigation parameters together", () => {
+    const returnTo = "/p/orbit-cli?sort=top#vote";
+
+    expect(
+      parseAuthNavigation({
+        returnTo,
+        intent: "feedback",
+        mode: "create-account",
+        origin,
+        fallback: "/",
+      }),
+    ).toEqual({
+      returnTo,
+      hasExplicitReturnTo: true,
+      intent: "feedback",
+      mode: "create-account",
+      supportingText: "Sign in to add feedback.",
+    });
   });
 });
