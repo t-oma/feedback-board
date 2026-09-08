@@ -19,24 +19,24 @@ No raw hexadecimal color should appear in feature markup when an existing theme 
 
 The first theme exposes the stable roles already repeated across the desktop and mobile designs:
 
-| Token | Value | Role |
-| --- | --- | --- |
-| `background` | `#f7f5f1` | Application canvas |
-| `surface` | `#fffefb` | Cards, headers, controls |
-| `surface-muted` | `#f2efe8` | Segmented controls and quiet insets |
-| `foreground` | `#1a1917` | Headings and primary values |
-| `foreground-secondary` | `#3d3a35` | Labels and strong supporting text |
-| `foreground-muted` | `#57544e` | Body supporting copy |
-| `foreground-subtle` | `#6f6b62` | Helpers, links, and secondary controls |
-| `foreground-faint` | `#8c877c` | Metadata and low-emphasis utility text |
-| `foreground-disabled` | `#c9c3b6` | Disabled and placeholder-like content |
-| `border` | `#ddd7cb` | Default control and surface borders |
-| `border-subtle` | `#e2ddd3` | Dividers and low-emphasis borders |
-| `accent` | `#7a5f33` | Primary actions and focus treatment |
-| `accent-muted` | `#9e8659` | Pending primary actions |
-| `danger` | `#8a3a2e` | Error text, icons, and invalid borders |
-| `danger-surface` | `#fdf8f6` | Error backgrounds |
-| `danger-border` | `#d9b4ab` | Error callout borders |
+| Token                  | Value     | Role                                   |
+| ---------------------- | --------- | -------------------------------------- |
+| `background`           | `#f7f5f1` | Application canvas                     |
+| `surface`              | `#fffefb` | Cards, headers, controls               |
+| `surface-muted`        | `#f2efe8` | Segmented controls and quiet insets    |
+| `foreground`           | `#1a1917` | Headings and primary values            |
+| `foreground-secondary` | `#3d3a35` | Labels and strong supporting text      |
+| `foreground-muted`     | `#57544e` | Body supporting copy                   |
+| `foreground-subtle`    | `#6f6b62` | Helpers, links, and secondary controls |
+| `foreground-faint`     | `#8c877c` | Metadata and low-emphasis utility text |
+| `foreground-disabled`  | `#c9c3b6` | Disabled and placeholder-like content  |
+| `border`               | `#ddd7cb` | Default control and surface borders    |
+| `border-subtle`        | `#e2ddd3` | Dividers and low-emphasis borders      |
+| `accent`               | `#7a5f33` | Primary actions and focus treatment    |
+| `accent-muted`         | `#9e8659` | Pending primary actions                |
+| `danger`               | `#8a3a2e` | Error text, icons, and invalid borders |
+| `danger-surface`       | `#fdf8f6` | Error backgrounds                      |
+| `danger-border`        | `#d9b4ab` | Error callout borders                  |
 
 This is a semantic interface, not a complete transcription of every color in the design files. Neutral notice surfaces, domain statuses, and vote states are introduced by the first feature that owns and reuses them.
 
