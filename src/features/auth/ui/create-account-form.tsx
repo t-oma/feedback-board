@@ -27,8 +27,7 @@ export function CreateAccountForm() {
 
       <Field.Root name="password">
         <Field.Label>Password</Field.Label>
-        <Field.Control
-          type="password"
+        <Field.PasswordControl
           required
           placeholder="••••••••"
           autoComplete="new-password"

@@ -45,8 +45,7 @@ export const Password: Story = {
   render: () => (
     <Field.Root name="password">
       <Field.Label>Password</Field.Label>
-      <Field.Control
-        type="password"
+      <Field.PasswordControl
         required
         placeholder="••••••••"
         autoComplete="current-password"
