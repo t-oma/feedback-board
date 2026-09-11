@@ -1,14 +1,11 @@
-import { Tabs } from "@/components/tabs";
 import {
+  AuthForms,
   AuthHeader,
   buildSignInHref,
-  CreateAccountForm,
   parseAuthNavigation,
-  SignInForm,
 } from "@/features/auth";
 import { env } from "@/server/env";
 import type { SearchParams } from "@/types";
-import Link from "next/link";
 import { Suspense } from "react";
 
 type SignInPageProps = {
@@ -52,6 +49,22 @@ async function AuthContent({ searchParams }: SignInPageProps) {
       ? signInSupportingText
       : "Your name is shown next to anything you post. Nothing else is public.";
 
+  const returnTo = navigation.hasExplicitReturnTo
+    ? navigation.returnTo
+    : undefined;
+  const intent = navigation.intent ?? undefined;
+
+  const signInHref = buildSignInHref({
+    returnTo,
+    intent,
+    mode: "sign-in",
+  });
+  const createAccountHref = buildSignInHref({
+    returnTo,
+    intent,
+    mode: "create-account",
+  });
+
   return (
     <>
       <div className="flex flex-col gap-y-2">
@@ -61,54 +74,12 @@ async function AuthContent({ searchParams }: SignInPageProps) {
         </p>
       </div>
 
-      <Tabs.Root value={navigation.mode} className="w-full">
-        <Tabs.List>
-          <Tabs.Tab
-            value="sign-in"
-            nativeButton={false}
-            render={
-              <Link
-                href={buildSignInHref({
-                  returnTo: navigation.hasExplicitReturnTo
-                    ? navigation.returnTo
-                    : undefined,
-                  intent: navigation.intent ?? undefined,
-                  mode: "sign-in",
-                })}
-              />
-            }
-          >
-            Sign in
-          </Tabs.Tab>
-          <Tabs.Tab
-            value="create-account"
-            nativeButton={false}
-            render={
-              <Link
-                href={buildSignInHref({
-                  returnTo: navigation.hasExplicitReturnTo
-                    ? navigation.returnTo
-                    : undefined,
-                  intent: navigation.intent ?? undefined,
-                  mode: "create-account",
-                })}
-              />
-            }
-          >
-            Create account
-          </Tabs.Tab>
-          <Tabs.Indicator renderBeforeHydration />
-        </Tabs.List>
-
-        <Tabs.Content>
-          <Tabs.Panel keepMounted value="sign-in">
-            <SignInForm />
-          </Tabs.Panel>
-          <Tabs.Panel keepMounted value="create-account">
-            <CreateAccountForm />
-          </Tabs.Panel>
-        </Tabs.Content>
-      </Tabs.Root>
+      <AuthForms
+        mode={navigation.mode}
+        returnTo={returnTo}
+        signInHref={signInHref}
+        createAccountHref={createAccountHref}
+      />
     </>
   );
 }
