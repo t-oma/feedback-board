@@ -1,5 +1,4 @@
-export { SignInForm } from "./ui/sign-in-form";
-export { CreateAccountForm } from "./ui/create-account-form";
+export { AuthForms } from "./ui/auth-forms";
 export { AuthHeader } from "./ui/auth-header";
 
 export { createAccountAction, signInAction } from "./actions";

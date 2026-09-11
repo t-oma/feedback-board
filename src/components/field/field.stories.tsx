@@ -1,4 +1,5 @@
 import { Field } from "@/components/field";
+import { Form } from "@base-ui/react/form";
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 
 const meta = {
@@ -48,6 +49,36 @@ export const Password: Story = {
       <Field.PasswordControl
         required
         placeholder="••••••••"
+        autoComplete="current-password"
+      />
+    </Field.Root>
+  ),
+};
+
+export const Invalid: Story = {
+  render: () => (
+    <Form errors={{ email: ["Enter a complete email address"] }}>
+      <Field.Root name="email">
+        <Field.Label>Email</Field.Label>
+        <Field.Control
+          type="text"
+          inputMode="email"
+          placeholder="you@example.com"
+          autoComplete="email"
+        />
+        <Field.Error />
+      </Field.Root>
+    </Form>
+  ),
+};
+
+export const ReadOnlyPassword: Story = {
+  render: () => (
+    <Field.Root name="password">
+      <Field.Label>Password</Field.Label>
+      <Field.PasswordControl
+        readOnly
+        value="correct horse battery staple"
         autoComplete="current-password"
       />
     </Field.Root>
