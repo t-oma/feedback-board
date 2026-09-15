@@ -14,9 +14,11 @@
 - Name the session module `src/features/auth/session.server.ts` and import `server-only` inside it.
 - Do not export the session module through `src/features/auth/index.ts`; Client Components must not be able to reach it through the mixed feature barrel.
 - Protect `/dashboard` in its page component. Do not add a layout-only guard or `proxy.ts`.
+- Mark `/dashboard` with `export const instant = false`; the whole protected page intentionally waits for its request-bound session result instead of streaming a placeholder shell.
 - Keep sign-out idempotent. It does not call `requireSession()` and redirects to `/` only after `auth.api.signOut()` resolves.
 - Keep the dashboard to a `Dashboard` heading and sign-out form. Product onboarding and final dashboard styling remain out of scope.
 - E2E runs only when both database URLs decode to the exact path `/feedback_board_test` and `FEEDBACK_BOARD_ENV` is `test`.
+- Use `.next-e2e` as the Next.js `distDir` only when `FEEDBACK_BOARD_ENV` is `test`, so the Playwright server can run beside the regular development server without sharing its lock or cache.
 - Never create, drop, reset, or truncate a database from the E2E runner. The test database must already exist.
 - Apply checked-in Drizzle migrations before browser tests and use unique account emails so tests do not depend on database cleanup or execution order.
 - Keep browser tests in `e2e/*.e2e.ts`. Vitest tests retain the `.test.ts` suffix.
@@ -31,7 +33,7 @@
 - Create `e2e/global-setup.ts` to apply Drizzle migrations to the validated test database.
 - Create `e2e/README.md` with exact local setup and execution commands.
 - Create `playwright.config.ts` for one isolated Chromium project and its Next.js web server.
-- Modify `.gitignore`, `package.json`, and `pnpm-lock.yaml` for Playwright, `@next/env`, scripts, examples, and generated artifacts.
+- Modify `.gitignore`, `next.config.ts`, `package.json`, and `pnpm-lock.yaml` for Playwright, `@next/env`, scripts, examples, and generated artifacts.
 - Create `src/features/auth/session.server.ts` and `src/features/auth/session.server.test.ts` for the reusable session boundary.
 - Create `src/app/dashboard/page.tsx` for page-level protection and the placeholder UI.
 - Modify `src/features/auth/actions.ts` and `src/features/auth/actions.test.ts` for sign-out.
@@ -53,6 +55,9 @@
 - Create: `e2e/README.md`
 - Create: `playwright.config.ts`
 - Modify: `.gitignore:13-15,35-38`
+- Modify: `eslint.config.mjs:8-17`
+- Modify: `next.config.ts:1-7`
+- Modify: `tsconfig.json:24-37` (Next.js adds the isolated development type paths when the E2E server first starts)
 - Modify: `package.json:6-22,39-58`
 - Modify: `pnpm-lock.yaml`
 
@@ -240,6 +245,28 @@ Update `.gitignore` so the testing and env sections contain:
 !.env.test.example
 ```
 
+Also ignore the isolated Next.js output beside the existing `.next` entry:
+
+```gitignore
+# next.js
+/.next/
+/.next-e2e/
+/out/
+```
+
+Add the same generated directory to the global ignores in `eslint.config.mjs`:
+
+```js
+globalIgnores([
+  ".next/**",
+  ".next-e2e/**",
+  "out/**",
+  "build/**",
+  "storybook-static/**",
+  "next-env.d.ts",
+]);
+```
+
 `loadEnvConfig()` now loads `.env.test.local` before `.env.test` and `.env`, while process variables supplied by CI keep precedence. The parser rejects any development values that fill missing test variables from `.env`.
 
 - [ ] **Step 7: Add migration setup and Playwright configuration**
@@ -275,6 +302,19 @@ export default async function globalSetup() {
 ```
 
 The one-connection pool belongs only to the short-lived migration process. It is not the application pool deployed to Vercel.
+
+Update `next.config.ts`:
+
+```ts
+import type { NextConfig } from "next";
+
+const nextConfig: NextConfig = {
+  cacheComponents: true,
+  distDir: process.env.FEEDBACK_BOARD_ENV === "test" ? ".next-e2e" : ".next",
+};
+
+export default nextConfig;
+```
 
 Create `playwright.config.ts`:
 
@@ -350,6 +390,8 @@ pnpm test:e2e
 ```
 
 The runner refuses to start unless both database URLs point to `feedback_board_test`. It applies migrations but does not create, reset, truncate, or drop the database.
+
+The Playwright server uses `.next-e2e`, so it can run while the regular development server is active on port `3000`.
 ````
 
 - [ ] **Step 9: Install Chromium and verify the harness types and safety tests**
@@ -368,7 +410,7 @@ Expected: Chromium installs or reports an existing cached installation, all 5 en
 - [ ] **Step 10: Commit the isolated harness**
 
 ```bash
-git add .env.test.example .gitignore e2e/environment.ts e2e/environment.test.ts e2e/load-environment.ts e2e/global-setup.ts e2e/README.md playwright.config.ts package.json pnpm-lock.yaml
+git add .env.test.example .gitignore e2e/environment.ts e2e/environment.test.ts e2e/load-environment.ts e2e/global-setup.ts e2e/README.md eslint.config.mjs next.config.ts playwright.config.ts package.json pnpm-lock.yaml tsconfig.json
 git commit -m "test(e2e): add isolated Playwright harness"
 ```
 
@@ -570,6 +612,8 @@ Create `src/app/dashboard/page.tsx`:
 ```tsx
 import { requireSession } from "@/features/auth/session.server";
 
+export const instant = false;
+
 export default async function Dashboard() {
   await requireSession({ returnTo: "/dashboard" });
 
@@ -595,7 +639,7 @@ pnpm typecheck
 git diff --check
 ```
 
-Expected: 9 Vitest tests pass, the one Chromium test passes, ESLint and TypeScript exit with code 0, and Git reports no whitespace errors.
+Expected: 8 Vitest tests pass, the one Chromium test passes, ESLint and TypeScript exit with code 0, and Git reports no whitespace errors.
 
 - [ ] **Step 9: Commit dashboard protection**
 
@@ -660,7 +704,9 @@ test("completes the credential session lifecycle", async ({ page }) => {
   });
   await createAccountPanel.getByLabel("Name").fill("Auth E2E User");
   await createAccountPanel.getByLabel("Email").fill(email);
-  await createAccountPanel.getByLabel("Password").fill(password);
+  await createAccountPanel
+    .getByLabel("Password", { exact: true })
+    .fill(password);
   await createAccountPanel
     .getByRole("button", { name: "Create account" })
     .click();
@@ -685,6 +731,8 @@ test("completes the credential session lifecycle", async ({ page }) => {
   });
 
   const signOutButton = page.getByRole("button", { name: "Sign out" });
+  await expect(signOutButton).toBeVisible();
+
   const signOutSubmission = signOutButton.click();
   await signOutPaused.promise;
 
@@ -705,15 +753,19 @@ test("completes the credential session lifecycle", async ({ page }) => {
 
   const signInPanel = page.getByRole("tabpanel", { name: "Sign in" });
   await signInPanel.getByLabel("Email").fill(email);
-  await signInPanel.getByLabel("Password").fill("wrong password");
+  await signInPanel
+    .getByLabel("Password", { exact: true })
+    .fill("wrong password");
   await signInPanel.getByRole("button", { name: "Sign in" }).click();
 
-  await expect(page.getByRole("alert")).toHaveText(
+  await expect(signInPanel.getByRole("alert")).toHaveText(
     "That email and password do not match an account.",
   );
-  await expect(signInPanel.getByLabel("Password")).toHaveValue("");
+  await expect(signInPanel.getByLabel("Password", { exact: true })).toHaveValue(
+    "",
+  );
 
-  await signInPanel.getByLabel("Password").fill(password);
+  await signInPanel.getByLabel("Password", { exact: true }).fill(password);
   await signInPanel.getByRole("button", { name: "Sign in" }).click();
 
   await expectPath(page, "/dashboard");
@@ -897,6 +949,8 @@ Replace `src/app/dashboard/page.tsx` with:
 ```tsx
 import { SignOutButton, signOutAction } from "@/features/auth";
 import { requireSession } from "@/features/auth/session.server";
+
+export const instant = false;
 
 export default async function Dashboard() {
   await requireSession({ returnTo: "/dashboard" });

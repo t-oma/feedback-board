@@ -22,6 +22,8 @@ Consumers import this module directly rather than through `src/features/auth/ind
 
 Add `/dashboard` as a Server Component page. The page calls `requireSession({ returnTo: "/dashboard" })` before rendering any protected content.
 
+Set `export const instant = false` on the page. Session lookup reads request headers and the entire protected route depends on its result, so `/dashboard` intentionally blocks until the server can either return the authenticated content or redirect the guest. The route does not stream a public fallback merely to satisfy Cache Components static-shell validation. A future dashboard with a useful loading shell may revisit this choice with a `Suspense` boundary.
+
 An authenticated user sees only:
 
 - a `Dashboard` heading;
@@ -76,6 +78,8 @@ The shared Button already documents its spinner and disabled states in Storybook
 ## Playwright setup and browser coverage
 
 Add a minimal Playwright configuration and a `test:e2e` package script. Keep browser tests in a dedicated `e2e` directory with an `.e2e.ts` suffix so Vitest does not collect them.
+
+When `FEEDBACK_BOARD_ENV` is `test`, Next.js writes development output to the ignored `.next-e2e` directory instead of `.next`. The isolated Playwright server can therefore run on port `3100` while the regular development server remains active on port `3000`, without sharing a Next.js lock or build cache.
 
 The suite runs against the real Next.js app, Better Auth handler, and PostgreSQL database. The E2E process must receive explicit test values for the existing `DATABASE_URL` and `DATABASE_URL_UNPOOLED` variables. Test setup parses both URLs and aborts unless each names a database whose decoded path is exactly `/feedback_board_test`. It performs this check before applying migrations or starting the Next.js server. A missing test database is a setup error rather than permission to create, reset, or reuse the development database.
 

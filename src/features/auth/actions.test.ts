@@ -3,9 +3,15 @@ import { BASE_ERROR_CODES } from "better-auth";
 import { APIError } from "better-auth/api";
 
 const mocks = vi.hoisted(() => ({
+  headers: vi.fn(),
   redirect: vi.fn(),
   signInEmail: vi.fn(),
+  signOut: vi.fn(),
   signUpEmail: vi.fn(),
+}));
+
+vi.mock("next/headers", () => ({
+  headers: mocks.headers,
 }));
 
 vi.mock("next/navigation", () => ({
@@ -16,6 +22,7 @@ vi.mock("@/server/auth", () => ({
   auth: {
     api: {
       signInEmail: mocks.signInEmail,
+      signOut: mocks.signOut,
       signUpEmail: mocks.signUpEmail,
     },
   },
@@ -27,7 +34,7 @@ vi.mock("@/server/env", () => ({
   },
 }));
 
-import { createAccountAction, signInAction } from "./actions";
+import { createAccountAction, signInAction, signOutAction } from "./actions";
 
 const redirectSignal = new Error("NEXT_REDIRECT");
 
@@ -216,6 +223,37 @@ describe("createAccountAction", () => {
     await expect(createAccountAction(null, formData)).rejects.toBe(
       unexpectedError,
     );
+    expect(mocks.redirect).not.toHaveBeenCalled();
+  });
+});
+
+describe("signOutAction", () => {
+  const requestHeaders = new Headers({ cookie: "session=test" });
+
+  beforeEach(() => {
+    vi.clearAllMocks();
+    mocks.headers.mockResolvedValue(requestHeaders);
+    mocks.signOut.mockResolvedValue({ success: true });
+    mocks.redirect.mockImplementation(() => {
+      throw redirectSignal;
+    });
+  });
+
+  it("signs out the current request and redirects home", async () => {
+    await expect(signOutAction()).rejects.toBe(redirectSignal);
+
+    expect(mocks.headers).toHaveBeenCalledExactlyOnceWith();
+    expect(mocks.signOut).toHaveBeenCalledExactlyOnceWith({
+      headers: requestHeaders,
+    });
+    expect(mocks.redirect).toHaveBeenCalledExactlyOnceWith("/");
+  });
+
+  it("rethrows an unexpected sign-out failure without redirecting", async () => {
+    const unexpectedError = new Error("Database unavailable");
+    mocks.signOut.mockRejectedValueOnce(unexpectedError);
+
+    await expect(signOutAction()).rejects.toBe(unexpectedError);
     expect(mocks.redirect).not.toHaveBeenCalled();
   });
 });
