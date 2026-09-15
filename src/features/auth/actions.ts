@@ -6,6 +6,7 @@ import {
   type ActionError,
   toValidationActionError,
 } from "@/shared/action-result";
+import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { classifyAuthError } from "./errors";
 import { parseAuthNavigation } from "./navigation";
@@ -85,4 +86,9 @@ export async function createAccountAction(
   }
 
   redirect(navigation.returnTo);
+}
+
+export async function signOutAction() {
+  await auth.api.signOut({ headers: await headers() });
+  redirect("/");
 }
