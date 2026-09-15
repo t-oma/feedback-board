@@ -205,11 +205,11 @@ Expected: PASS with 5 tests. The parameterized database case runs once for each 
 Create `e2e/load-environment.ts`:
 
 ```ts
-import { loadEnvConfig } from "@next/env";
+import nextEnv from "@next/env";
 import { parseE2EEnvironment } from "./environment";
 
 Object.assign(process.env, { NODE_ENV: "test" });
-loadEnvConfig(process.cwd(), false);
+nextEnv.loadEnvConfig(process.cwd(), false);
 
 export const e2eEnvironment = parseE2EEnvironment(process.env);
 ```
