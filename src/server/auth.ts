@@ -1,11 +1,12 @@
 import "server-only";
 
-import { betterAuth } from "better-auth";
-import { db } from "./db";
 import { drizzleAdapter } from "@better-auth/drizzle-adapter/relations-v2";
-import { env } from "./env";
+import { betterAuth } from "better-auth";
 import { nextCookies } from "better-auth/next-js";
+
+import { db } from "./db";
 import { schema } from "./db/relations";
+import { env } from "./env";
 
 export const auth = betterAuth({
   baseURL: env.BETTER_AUTH_URL,

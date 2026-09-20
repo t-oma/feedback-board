@@ -1,4 +1,4 @@
-import { SignOutButton, signOutAction } from "@/features/auth";
+import { signOutAction, SignOutButton } from "@/features/auth";
 import { requireSession } from "@/features/auth/session.server";
 
 export const instant = false;

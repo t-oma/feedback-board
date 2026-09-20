@@ -1,4 +1,5 @@
 import { describe, expect, it } from "vitest";
+
 import { buildSignInHref, parseAuthNavigation } from "./navigation";
 
 const origin = "https://feedback.example";

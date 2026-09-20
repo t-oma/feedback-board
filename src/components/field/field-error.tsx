@@ -1,6 +1,7 @@
-import { WithoutClassName } from "@/types";
 import { Field } from "@base-ui/react/field";
-import { ComponentProps } from "react";
+import type { ComponentProps } from "react";
+
+import type { WithoutClassName } from "@/types";
 
 export function FieldError(
   props: WithoutClassName<ComponentProps<typeof Field.Error>>,

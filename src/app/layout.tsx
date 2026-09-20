@@ -1,6 +1,7 @@
+import "./globals.css";
+
 import type { Metadata } from "next";
 import { JetBrains_Mono, Source_Serif_4 } from "next/font/google";
-import "./globals.css";
 
 const sourceSerif = Source_Serif_4({
   variable: "--font-source-serif",

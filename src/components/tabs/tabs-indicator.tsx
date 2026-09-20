@@ -1,6 +1,7 @@
-import { WithoutClassName } from "@/types";
 import { Tabs } from "@base-ui/react/tabs";
-import { ComponentProps } from "react";
+import type { ComponentProps } from "react";
+
+import type { WithoutClassName } from "@/types";
 
 export function TabsIndicator({
   children,

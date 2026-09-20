@@ -1,8 +1,9 @@
 import { defineRelations } from "drizzle-orm";
+
 import { accounts, sessions, users, verifications } from "./schema/auth";
+import { feedbacks } from "./schema/feedbacks";
 import { products } from "./schema/products";
 import { votes } from "./schema/votes";
-import { feedbacks } from "./schema/feedbacks";
 
 export const schema = {
   users,

@@ -1,5 +1,6 @@
 import { getTableConfig, type PgTable } from "drizzle-orm/pg-core";
 import { describe, expect, it } from "vitest";
+
 import { schema } from "./relations";
 
 // This file sits beside `relations.ts` rather than in `schema/`, because

@@ -1,6 +1,8 @@
-import type { ActionError } from "@/shared/action-result";
 import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it } from "vitest";
+
+import type { ActionError } from "@/shared/action-result";
+
 import { AuthFormMessage } from "./auth-form-message";
 
 describe("AuthFormMessage", () => {

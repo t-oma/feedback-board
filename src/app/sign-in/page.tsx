@@ -1,3 +1,5 @@
+import { Suspense } from "react";
+
 import {
   AuthForms,
   AuthHeader,
@@ -6,7 +8,6 @@ import {
 } from "@/features/auth";
 import { env } from "@/server/env";
 import type { SearchParams } from "@/types";
-import { Suspense } from "react";
 
 type SignInPageProps = {
   searchParams: Promise<SearchParams>;

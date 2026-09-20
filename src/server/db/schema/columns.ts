@@ -1,5 +1,6 @@
 import { sql } from "drizzle-orm";
-import { PgTimestampConfig, timestamp, uuid } from "drizzle-orm/pg-core";
+import type { PgTimestampConfig } from "drizzle-orm/pg-core";
+import { timestamp, uuid } from "drizzle-orm/pg-core";
 
 export function timestamptz<TMode extends PgTimestampConfig["mode"] & {}>(
   name: string,

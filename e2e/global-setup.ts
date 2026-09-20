@@ -1,7 +1,9 @@
+import { resolve } from "node:path";
+
 import { drizzle } from "drizzle-orm/node-postgres";
 import { migrate } from "drizzle-orm/node-postgres/migrator";
-import { resolve } from "node:path";
 import { Pool } from "pg";
+
 import { e2eEnvironment } from "./load-environment";
 
 export default async function globalSetup() {

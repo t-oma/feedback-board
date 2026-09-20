@@ -1,9 +1,11 @@
 import "server-only";
 
-import { auth } from "@/server/auth";
-import { cache } from "react";
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
+import { cache } from "react";
+
+import { auth } from "@/server/auth";
+
 import { buildSignInHref } from "./navigation";
 
 type RequireSessionInput = {

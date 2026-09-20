@@ -1,9 +1,9 @@
 import {
+  type AuthIntent,
   authIntentSchema,
   type AuthMode,
   authModeSchema,
   authReturnToSchema,
-  type AuthIntent,
 } from "./schemas";
 
 export type AuthNavigation = {

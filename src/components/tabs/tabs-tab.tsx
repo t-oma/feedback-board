@@ -1,12 +1,19 @@
-import { WithoutClassName } from "@/types";
 import { Tabs } from "@base-ui/react/tabs";
-import { ComponentProps } from "react";
+import type { ComponentProps } from "react";
 
-export function TabsTab({
-  children,
-  value,
-  ...props
-}: WithoutClassName<ComponentProps<typeof Tabs.Tab>>) {
+import type { WithoutClassName } from "@/types";
+
+// Base UI declares a tab value as `any`, so a typo in one would pass every
+// check in the project. These wrappers narrow it to the strings the
+// application actually uses.
+type TabsTabProps = Omit<
+  WithoutClassName<ComponentProps<typeof Tabs.Tab>>,
+  "value"
+> & {
+  value: string;
+};
+
+export function TabsTab({ children, value, ...props }: TabsTabProps) {
   return (
     <Tabs.Tab
       {...props}

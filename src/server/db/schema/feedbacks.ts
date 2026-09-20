@@ -1,3 +1,4 @@
+import { sql } from "drizzle-orm";
 import {
   check,
   pgEnum,
@@ -6,10 +7,10 @@ import {
   uuid,
   varchar,
 } from "drizzle-orm/pg-core";
-import { products } from "./products";
+
 import { users } from "./auth";
-import { sql } from "drizzle-orm";
 import { timestamptz, uuidv7 } from "./columns";
+import { products } from "./products";
 
 export const MAX_FEEDBACK_TITLE_LENGTH = 120;
 export const MAX_FEEDBACK_BODY_LENGTH = 2000;

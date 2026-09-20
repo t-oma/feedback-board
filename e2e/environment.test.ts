@@ -1,4 +1,5 @@
 import { describe, expect, it } from "vitest";
+
 import { E2E_BASE_URL, parseE2EEnvironment } from "./environment";
 
 const validEnvironment = {
