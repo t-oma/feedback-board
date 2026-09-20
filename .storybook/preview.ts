@@ -7,6 +7,12 @@ const preview: Preview = {
     nextjs: {
       appDirectory: true,
     },
+    // axe violations are defects, not suggestions. The addon panel reports them
+    // while developing; this setting is what a story runner would fail on, and
+    // the project has no such runner yet.
+    a11y: {
+      test: "error",
+    },
   },
 };
 
