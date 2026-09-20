@@ -15,9 +15,9 @@ export type AuthNavigation = {
 };
 
 type BuildSignInHrefInput = {
-  returnTo?: string;
-  intent?: AuthIntent;
-  mode?: AuthMode;
+  returnTo?: string | undefined;
+  intent?: AuthIntent | undefined;
+  mode?: AuthMode | undefined;
 };
 
 type ParseAuthNavigationInput = {
