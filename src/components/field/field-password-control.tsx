@@ -1,7 +1,9 @@
 "use client";
 
 import { EyeIcon, EyeOffIcon } from "lucide-react";
-import { ComponentProps, useId, useState } from "react";
+import type { ComponentProps } from "react";
+import { useId, useState } from "react";
+
 import { FieldControl } from "./field-control";
 
 type FieldPasswordControlProps = Omit<
@@ -36,7 +38,9 @@ export function FieldPasswordControl({
         type="button"
         aria-controls={controlId}
         aria-label={toggleLabel}
-        onClick={() => setIsPasswordVisible((isVisible) => !isVisible)}
+        onClick={() => {
+          setIsPasswordVisible((isVisible) => !isVisible);
+        }}
         className="absolute inset-y-px right-px inline-flex w-12 cursor-pointer items-center justify-center rounded-r-[7px] text-foreground-subtle outline-none focus-visible:ring-3 focus-visible:ring-accent/20 focus-visible:ring-inset enabled:hover:bg-surface-muted enabled:hover:text-accent motion-safe:transition-colors"
       >
         <VisibilityIcon aria-hidden="true" size={20} />

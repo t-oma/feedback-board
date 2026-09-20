@@ -1,5 +1,6 @@
-import type { ActionError } from "@/shared/action-result";
 import { CircleAlert } from "lucide-react";
+
+import type { ActionError } from "@/shared/action-result";
 
 type AuthFormMessageProps = {
   error: ActionError | null;

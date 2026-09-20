@@ -1,4 +1,4 @@
-import { expect, test, type Page } from "@playwright/test";
+import { expect, type Page, test } from "@playwright/test";
 
 async function expectPath(page: Page, pathname: string) {
   await expect.poll(() => new URL(page.url()).pathname).toBe(pathname);
@@ -41,8 +41,8 @@ test("completes the credential session lifecycle", async ({ page }) => {
     page.getByRole("heading", { level: 1, name: "Dashboard" }),
   ).toBeVisible();
 
-  const signOutPaused = Promise.withResolvers<void>();
-  const signOutRelease = Promise.withResolvers<void>();
+  const signOutPaused: PromiseWithResolvers<void> = Promise.withResolvers();
+  const signOutRelease: PromiseWithResolvers<void> = Promise.withResolvers();
 
   await page.route("**/dashboard", async (route) => {
     if (route.request().method() !== "POST") {

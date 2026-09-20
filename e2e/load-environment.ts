@@ -1,4 +1,5 @@
 import nextEnv from "@next/env";
+
 import { parseE2EEnvironment } from "./environment";
 
 Object.assign(process.env, { NODE_ENV: "test" });

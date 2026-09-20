@@ -1,4 +1,5 @@
 import { defineConfig, devices } from "@playwright/test";
+
 import { e2eEnvironment } from "./e2e/load-environment";
 
 export default defineConfig({

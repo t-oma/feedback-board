@@ -1,6 +1,7 @@
-import { Field } from "@/components/field";
 import { Form } from "@base-ui/react/form";
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
+
+import { Field } from "@/components/field";
 
 const meta = {
   title: "Components/Field",

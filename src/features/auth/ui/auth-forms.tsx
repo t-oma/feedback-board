@@ -1,8 +1,10 @@
 "use client";
 
-import { Tabs } from "@/components/tabs";
 import Link from "next/link";
 import { useState } from "react";
+
+import { Tabs } from "@/components/tabs";
+
 import type { AuthMode } from "../schemas";
 import { CreateAccountForm } from "./create-account-form";
 import { SignInForm } from "./sign-in-form";

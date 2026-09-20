@@ -1,5 +1,6 @@
-import { Tabs } from "@/components/tabs";
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
+
+import { Tabs } from "@/components/tabs";
 
 type AuthMode = "sign-in" | "create-account";
 

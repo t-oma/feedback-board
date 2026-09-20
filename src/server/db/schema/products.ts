@@ -1,4 +1,5 @@
 import { pgTable, text, varchar } from "drizzle-orm/pg-core";
+
 import { users } from "./auth";
 import { timestamptz, uuidv7 } from "./columns";
 

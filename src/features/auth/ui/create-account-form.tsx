@@ -1,9 +1,11 @@
 "use client";
 
-import { Button } from "@/components/button";
-import { Field } from "@/components/field";
 import { Form } from "@base-ui/react/form";
 import { useActionState } from "react";
+
+import { Button } from "@/components/button";
+import { Field } from "@/components/field";
+
 import { createAccountAction } from "../actions";
 import { AuthFormMessage } from "./auth-form-message";
 

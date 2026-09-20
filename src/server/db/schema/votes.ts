@@ -1,7 +1,8 @@
 import { pgTable, primaryKey, text, uuid } from "drizzle-orm/pg-core";
+
 import { users } from "./auth";
-import { feedbacks } from "./feedbacks";
 import { timestamptz } from "./columns";
+import { feedbacks } from "./feedbacks";
 
 export const votes = pgTable(
   "votes",

@@ -1,5 +1,6 @@
-import * as z from "zod";
 import { describe, expect, it } from "vitest";
+import * as z from "zod";
+
 import { createAccountSchema, signInSchema } from "./schemas";
 
 const maxLengthEmail = `${"a".repeat(64)}@${"b".repeat(63)}.${"c".repeat(63)}.${"d".repeat(57)}.com`;

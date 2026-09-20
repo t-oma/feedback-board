@@ -1,11 +1,45 @@
 import { defineConfig, globalIgnores } from "eslint/config";
 import nextVitals from "eslint-config-next/core-web-vitals";
-import nextTs from "eslint-config-next/typescript";
 import prettierConfig from "eslint-config-prettier/flat";
+import simpleImportSort from "eslint-plugin-simple-import-sort";
+import tseslint from "typescript-eslint";
 
 const eslintConfig = defineConfig([
   ...nextVitals,
-  ...nextTs,
+
+  // Replaces `eslint-config-next/typescript`, which is typescript-eslint's
+  // untyped `recommended`. The rules worth having here are the ones that read
+  // types: a dropped promise in a Server Action still type-checks.
+  ...tseslint.configs.strictTypeChecked,
+  {
+    languageOptions: {
+      parserOptions: {
+        projectService: true,
+        tsconfigRootDir: import.meta.dirname,
+      },
+    },
+  },
+
+  // The config files below are not part of the TypeScript program, so there are
+  // no types to check them against.
+  {
+    files: ["**/*.{js,mjs,cjs}"],
+    extends: [tseslint.configs.disableTypeChecked],
+  },
+
+  {
+    plugins: { "simple-import-sort": simpleImportSort },
+    rules: {
+      "simple-import-sort/imports": "error",
+      "simple-import-sort/exports": "error",
+      // Every type import is marked, which `verbatimModuleSyntax` then enforces
+      // at the compiler level. Both spellings satisfy the rule, so a module that
+      // also supplies values keeps one import with an inline `type`, while a
+      // type-only module gets its own `import type` line.
+      "@typescript-eslint/consistent-type-imports": "error",
+    },
+  },
+
   prettierConfig,
   // Override default ignores of eslint-config-next.
   globalIgnores([

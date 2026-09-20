@@ -1,7 +1,8 @@
 "use client";
 
-import { Button } from "@/components/button";
 import { useFormStatus } from "react-dom";
+
+import { Button } from "@/components/button";
 
 export function SignOutButton() {
   const { pending } = useFormStatus();
