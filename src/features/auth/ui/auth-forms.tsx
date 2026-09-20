@@ -11,7 +11,7 @@ import { SignInForm } from "./sign-in-form";
 
 type AuthFormsProps = {
   mode: AuthMode;
-  returnTo?: string;
+  returnTo?: string | undefined;
   signInHref: string;
   createAccountHref: string;
 };

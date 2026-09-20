@@ -12,7 +12,7 @@ import { AuthFormMessage } from "./auth-form-message";
 type CreateAccountFormProps = {
   email: string;
   onEmailChange: (value: string) => void;
-  returnTo?: string;
+  returnTo?: string | undefined;
 };
 
 export function CreateAccountForm({
