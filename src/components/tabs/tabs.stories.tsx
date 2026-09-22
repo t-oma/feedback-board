@@ -1,4 +1,5 @@
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
+import { expect, userEvent } from "storybook/test";
 
 import { Tabs } from "@/components/tabs";
 
@@ -48,6 +49,25 @@ function AuthTabs({ defaultValue }: { defaultValue: AuthMode }) {
 
 export const SignInActive: Story = {
   render: () => <AuthTabs defaultValue="sign-in" />,
+  play: async ({ canvas }) => {
+    await expect(canvas.getByRole("tab", { name: "Sign in" })).toHaveAttribute(
+      "aria-selected",
+      "true",
+    );
+
+    await userEvent.click(canvas.getByRole("tab", { name: "Create account" }));
+
+    // Queried by name rather than by role alone: the panel being left stays
+    // mounted and `inert` until its exit transition finishes, so both are in
+    // the DOM for a moment.
+    const createAccountPanel = await canvas.findByRole("tabpanel", {
+      name: "Create account",
+    });
+
+    await expect(createAccountPanel).toHaveTextContent(
+      "Create an account to start posting feedback.",
+    );
+  },
 };
 
 export const CreateAccountActive: Story = {
