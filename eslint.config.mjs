@@ -11,6 +11,7 @@ const eslintConfig = defineConfig([
   // untyped `recommended`. The rules worth having here are the ones that read
   // types: a dropped promise in a Server Action still type-checks.
   ...tseslint.configs.strictTypeChecked,
+  ...tseslint.configs.stylisticTypeChecked,
   {
     languageOptions: {
       parserOptions: {
@@ -37,6 +38,12 @@ const eslintConfig = defineConfig([
       // also supplies values keeps one import with an inline `type`, while a
       // type-only module gets its own `import type` line.
       "@typescript-eslint/consistent-type-imports": "error",
+      // Flipped from the stylistic default, which asks for `interface`. Roughly
+      // half of the types here cannot be one -- unions, `z.infer` results and
+      // `Omit<...>` aliases -- so a rule with exceptions would cost more than it
+      // settles. `interface` is still the only option for module augmentation,
+      // and there it reads as the deliberate exception it is.
+      "@typescript-eslint/consistent-type-definitions": ["error", "type"],
     },
   },
 
