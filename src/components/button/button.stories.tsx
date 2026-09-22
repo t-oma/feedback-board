@@ -1,5 +1,6 @@
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 import { ArrowRight } from "lucide-react";
+import { expect } from "storybook/test";
 
 import { Button } from "@/components/button";
 
@@ -47,5 +48,14 @@ export const Pending: Story = {
     children: "Submitting…",
     disabled: true,
     showSpinner: true,
+  },
+  play: async ({ canvas }) => {
+    // Naming the button asserts the label survives: the spinner is added
+    // beside the text, not in place of it. The spinner itself is aria-hidden,
+    // so it is found through the DOM rather than a role.
+    const button = canvas.getByRole("button", { name: "Submitting…" });
+
+    await expect(button).toBeDisabled();
+    await expect(button.querySelector("svg")).toBeInTheDocument();
   },
 };

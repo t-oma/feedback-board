@@ -62,10 +62,11 @@ test("completes the credential session lifecycle", async ({ page }) => {
   await signOutPaused.promise;
 
   try {
+    // What only a real submission can show: `useFormStatus` is wired, so the
+    // button reads the pending state. What that state looks like is the
+    // Button's own contract and is asserted in its `Pending` story.
     await expect(signOutButton).toBeDisabled();
     await expect(signOutButton).toHaveAttribute("aria-busy", "true");
-    await expect(signOutButton).toHaveText("Sign out");
-    await expect(signOutButton.locator("svg")).toBeVisible();
   } finally {
     signOutRelease.resolve();
   }
