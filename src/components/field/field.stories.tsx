@@ -1,5 +1,6 @@
 import { Form } from "@base-ui/react/form";
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
+import { expect, userEvent } from "storybook/test";
 
 import { Field } from "@/components/field";
 
@@ -54,6 +55,20 @@ export const Password: Story = {
       />
     </Field.Root>
   ),
+  play: async ({ canvas }) => {
+    const control = canvas.getByLabelText("Password");
+    await expect(control).toHaveAttribute("type", "password");
+
+    await userEvent.click(
+      canvas.getByRole("button", { name: "Show password" }),
+    );
+    await expect(control).toHaveAttribute("type", "text");
+
+    await userEvent.click(
+      canvas.getByRole("button", { name: "Hide password" }),
+    );
+    await expect(control).toHaveAttribute("type", "password");
+  },
 };
 
 export const Invalid: Story = {
