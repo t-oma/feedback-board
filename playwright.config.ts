@@ -22,9 +22,24 @@ export default defineConfig({
     },
   ],
   webServer: {
-    command: "pnpm exec next dev --hostname 127.0.0.1 --port 3100",
+    // The suite runs against the production server rather than `next dev`, and
+    // with `cacheComponents` that is not a cosmetic difference: the static
+    // shell of a partially prerendered route is produced by the build, so what
+    // a browser receives first -- and with it every Suspense boundary these
+    // tests observe -- only behaves as it ships once the app has been built.
+    //
+    // The build runs here rather than in the `test:e2e` script because this
+    // config is what loads the test environment. Everything Playwright spawns
+    // inherits that environment; a shell running `pnpm build` beforehand would
+    // build against `.env` and point the production bundle at the dev database.
+    command:
+      "pnpm exec next build && pnpm exec next start --hostname 127.0.0.1 --port 3100",
     url: e2eEnvironment.BETTER_AUTH_URL,
     reuseExistingServer: false,
-    timeout: 120_000,
+    timeout: 180_000,
+    // A server-side failure is the only record of why a server action did not
+    // do what the test expected, and the default swallows it.
+    stdout: "pipe",
+    stderr: "pipe",
   },
 });
