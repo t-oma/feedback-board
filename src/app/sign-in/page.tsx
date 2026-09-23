@@ -1,6 +1,7 @@
 import { Suspense } from "react";
 
 import {
+  AuthContentSkeleton,
   AuthForms,
   AuthHeader,
   buildSignInHref,
@@ -14,7 +15,7 @@ export default function SignIn({ searchParams }: PageProps<"/sign-in">) {
       <AuthHeader goBackText="Feedback Board" />
 
       <main className="flex flex-1 flex-col gap-y-5 overflow-x-clip bg-surface px-5 py-6">
-        <Suspense fallback={<div aria-busy="true" />}>
+        <Suspense fallback={<AuthContentSkeleton />}>
           <AuthContent searchParams={searchParams} />
         </Suspense>
       </main>
