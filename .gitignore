@@ -28,6 +28,10 @@
 .DS_Store
 *.pem
 /.superpowers/
+# A git worktree checked out inside the repository it belongs to. It is a full
+# second copy of the source, so anything that walks the tree finds it: Prettier
+# reads this file, which is what keeps it out of `pnpm format`.
+/.claude/worktrees/
 
 # debug
 npm-debug.log*

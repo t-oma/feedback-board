@@ -57,6 +57,10 @@ const eslintConfig = defineConfig([
     "build/**",
     "storybook-static/**",
     "next-env.d.ts",
+    // A git worktree checked out inside the repository. Unlike Prettier, flat
+    // config does not read `.gitignore`, so it has to be named again here --
+    // otherwise linting this checkout also lints every other one.
+    ".claude/worktrees/**",
   ]),
 ]);
 
