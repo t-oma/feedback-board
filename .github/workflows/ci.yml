@@ -1,0 +1,106 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+# A branch is only ever merged at its newest commit, so a run for a commit that
+# has already been replaced is answering a question nobody is asking any more.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  static:
+    name: Format, lint, types
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v7
+      - uses: ./.github/actions/setup
+
+      # `!cancelled()` keeps the later checks running after an earlier one
+      # fails, so one push reports every problem it has instead of revealing
+      # them one force-push at a time. A stray missing semicolon in Prettier's
+      # eyes should not hide a type error.
+      - run: pnpm format
+      - run: pnpm lint
+        if: ${{ !cancelled() }}
+      - run: pnpm typecheck
+        if: ${{ !cancelled() }}
+
+  test:
+    name: Unit and story tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v7
+      - uses: ./.github/actions/setup
+
+      # The story project renders every story in a real browser and runs axe
+      # against the result, so Chromium is a test dependency, not an extra.
+      - run: pnpm exec playwright install --with-deps chromium
+
+      # No database and no environment variables: these two projects assert
+      # things that are true of the code alone, and needing a service to run
+      # them would mean one of them is in the wrong suite.
+      - run: pnpm test
+
+  e2e:
+    name: End-to-end
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    services:
+      postgres:
+        image: postgres:18
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: feedback_board_test
+        ports:
+          - 5432:5432
+        # Without a health check the first migration races the server's own
+        # startup, which fails perhaps one run in ten and looks like a flake.
+        options: >-
+          --health-cmd "pg_isready --quiet --username postgres --dbname feedback_board_test"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+
+    env:
+      DATABASE_URL: postgresql://postgres:postgres@127.0.0.1:5432/feedback_board_test
+      DATABASE_URL_UNPOOLED: postgresql://postgres:postgres@127.0.0.1:5432/feedback_board_test
+      # Deliberately a literal and deliberately not a repository secret. It
+      # signs sessions for a database that is created and destroyed inside this
+      # job, and a secret would be unavailable to pull requests from forks --
+      # which would mean CI cannot check the contributions that need it most.
+      BETTER_AUTH_SECRET: ci-only-value-not-a-secret-000000
+      BETTER_AUTH_URL: http://127.0.0.1:3100
+      FEEDBACK_BOARD_ENV: test
+
+    steps:
+      - uses: actions/checkout@v7
+      - uses: ./.github/actions/setup
+      - run: pnpm exec playwright install --with-deps chromium
+
+      # This builds the app and runs the suite against `next start`, not
+      # `next dev` -- see the comment in playwright.config.ts for why the
+      # difference is load-bearing. Migrations are applied by the suite's own
+      # global setup, so an out-of-date migration fails here too.
+      - run: pnpm test:e2e
+
+      # A failed end-to-end run is close to undebuggable from a log alone. The
+      # config already records a trace and a screenshot for failures; this is
+      # what makes them reachable from the run's summary page.
+      - uses: actions/upload-artifact@v7
+        if: ${{ failure() }}
+        with:
+          name: playwright-failure-artifacts
+          path: test-results/
+          retention-days: 7
+          if-no-files-found: ignore

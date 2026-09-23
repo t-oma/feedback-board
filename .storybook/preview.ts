@@ -8,8 +8,8 @@ const preview: Preview = {
       appDirectory: true,
     },
     // axe violations are defects, not suggestions. The addon panel reports them
-    // while developing; this setting is what a story runner would fail on, and
-    // the project has no such runner yet.
+    // while developing; this setting is what fails the story project in
+    // `pnpm test`, and with it the `Unit and story tests` job in CI.
     a11y: {
       test: "error",
     },
