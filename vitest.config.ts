@@ -4,7 +4,7 @@ import { fileURLToPath } from "node:url";
 import { storybookTest } from "@storybook/addon-vitest/vitest-plugin";
 import { playwright } from "@vitest/browser-playwright";
 import tsconfigPaths from "vite-tsconfig-paths";
-import { defineConfig } from "vitest/config";
+import { configDefaults, defineConfig } from "vitest/config";
 
 const dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -19,6 +19,11 @@ export default defineConfig({
         test: {
           name: "unit",
           environment: "node",
+          // A git worktree checked out inside the repository is a second copy
+          // of this suite, and the default pattern would run its tests as if
+          // they were ours. The story project needs no such guard: it collects
+          // what `.storybook/main.ts` names, which is `../src` and nothing else.
+          exclude: [...configDefaults.exclude, "**/.claude/worktrees/**"],
         },
       },
       // Every story, rendered in a real browser. The stories are the component
