@@ -1,7 +1,7 @@
 import { Tabs } from "@base-ui/react/tabs";
 import type { ComponentProps } from "react";
 
-import type { WithoutClassName } from "@/types";
+import type { WithoutClassName } from "../types";
 
 // Narrowed for the same reason as `TabsTab`: Base UI types a panel value as
 // `any`, and a panel whose value no longer matches its tab renders nothing.

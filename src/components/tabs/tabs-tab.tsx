@@ -1,7 +1,7 @@
 import { Tabs } from "@base-ui/react/tabs";
 import type { ComponentProps } from "react";
 
-import type { WithoutClassName } from "@/types";
+import type { WithoutClassName } from "../types";
 
 // Base UI declares a tab value as `any`, so a typo in one would pass every
 // check in the project. These wrappers narrow it to the strings the
