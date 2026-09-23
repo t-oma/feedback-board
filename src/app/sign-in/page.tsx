@@ -7,13 +7,8 @@ import {
   parseAuthNavigation,
 } from "@/features/auth";
 import { env } from "@/server/env";
-import type { SearchParams } from "@/types";
 
-type SignInPageProps = {
-  searchParams: Promise<SearchParams>;
-};
-
-export default function SignIn({ searchParams }: SignInPageProps) {
+export default function SignIn({ searchParams }: PageProps<"/sign-in">) {
   return (
     <>
       <AuthHeader goBackText="Feedback Board" />
@@ -27,7 +22,9 @@ export default function SignIn({ searchParams }: SignInPageProps) {
   );
 }
 
-async function AuthContent({ searchParams }: SignInPageProps) {
+async function AuthContent({
+  searchParams,
+}: Pick<PageProps<"/sign-in">, "searchParams">) {
   const query = await searchParams;
 
   const navigation = parseAuthNavigation({
