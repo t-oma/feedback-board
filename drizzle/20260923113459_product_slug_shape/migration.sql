@@ -1,0 +1,1 @@
+ALTER TABLE "products" ADD CONSTRAINT "products_slug_shape_check" CHECK ("slug" ~ '^[a-z0-9]+(-[a-z0-9]+)*$' AND length("slug") >= 3);
