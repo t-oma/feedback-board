@@ -1,7 +1,7 @@
 import { Field } from "@base-ui/react/field";
 import type { ComponentProps } from "react";
 
-import type { WithoutClassName } from "@/types";
+import type { WithoutClassName } from "../types";
 
 export function FieldLabel({
   children,

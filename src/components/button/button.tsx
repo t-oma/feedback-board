@@ -1,7 +1,7 @@
 import { LoaderCircle } from "lucide-react";
 import type { ComponentProps } from "react";
 
-import type { WithoutClassName } from "@/types";
+import type { WithoutClassName } from "../types";
 
 type ButtonProps = WithoutClassName<ComponentProps<"button">> & {
   showSpinner?: boolean;
