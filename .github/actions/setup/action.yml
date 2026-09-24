@@ -6,12 +6,12 @@ runs:
   steps:
     # No version here on purpose: the action reads `packageManager` from
     # package.json, so the pnpm the CI uses is the pnpm the repository pins.
-    - uses: pnpm/action-setup@v6
+    - uses: pnpm/action-setup@0977fd99725f1db4007ccb2928dbb4e90d06cc86 # v6.0.10
 
     # Same idea for Node: `.nvmrc` is what a contributor's `nvm use` reads, so
     # CI and a laptop cannot drift apart. pnpm must already be on PATH for the
     # cache to be able to resolve the store.
-    - uses: actions/setup-node@v7
+    - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
       with:
         node-version-file: .nvmrc
         cache: pnpm
