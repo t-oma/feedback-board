@@ -8,7 +8,11 @@ export default defineConfig({
   fullyParallel: true,
   forbidOnly: Boolean(process.env.CI),
   retries: process.env.CI ? 2 : 0,
-  reporter: "list",
+  // With retries on, a test that fails once and then passes leaves the run
+  // green, and the log it is mentioned in is one nobody opens. The GitHub
+  // reporter puts failures on the pull request and counts flaky tests in the
+  // run's summary, where a green run still shows them.
+  reporter: process.env.CI ? [["github"], ["list"]] : "list",
   globalSetup: "./e2e/global-setup.ts",
   use: {
     baseURL: e2eEnvironment.BETTER_AUTH_URL,
