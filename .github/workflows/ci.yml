@@ -72,7 +72,10 @@ jobs:
 
       # The story project renders every story in a real browser and runs axe
       # against the result, so Chromium is a test dependency, not an extra.
-      - run: pnpm exec playwright install --with-deps chromium
+      # Only its headless shell, though: headless with no `channel` is what
+      # Playwright launches that binary for, and both suites run exactly so.
+      # The full browser would be a download nothing here ever starts.
+      - run: pnpm exec playwright install --with-deps --only-shell chromium
 
       # No database and no environment variables: these two projects assert
       # things that are true of the code alone, and needing a service to run
@@ -115,7 +118,7 @@ jobs:
     steps:
       - uses: actions/checkout@v7
       - uses: ./.github/actions/setup
-      - run: pnpm exec playwright install --with-deps chromium
+      - run: pnpm exec playwright install --with-deps --only-shell chromium
 
       # This builds the app and runs the suite against `next start`, not
       # `next dev` -- see the comment in playwright.config.ts for why the
