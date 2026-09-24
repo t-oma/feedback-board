@@ -35,10 +35,18 @@ import { buildSignInHref } from "@/features/auth/navigation";
 export function proxy(request: NextRequest) {
   if (getSessionCookie(request)) return NextResponse.next();
 
-  const signInUrl = new URL(
-    buildSignInHref({ returnTo: request.nextUrl.pathname }),
-    request.url,
-  );
+  // The query belongs in `returnTo` as much as the path does -- a guest sent
+  // here from a filtered or sorted view should come back to that view, not to
+  // its bare route. `parseAuthNavigation` already reassembles
+  // `pathname + search + hash` on the way back, so the only thing that has to
+  // happen here is not dropping it. The fragment is unrecoverable: a browser
+  // never sends it.
+  //
+  // Next strips its own prefetch parameter before this runs, verified against
+  // a request for `/dashboard?tab=planned&_rsc=…`, which arrives here as
+  // `?tab=planned`. So this cannot put a stale `_rsc` into a sign-in link.
+  const returnTo = `${request.nextUrl.pathname}${request.nextUrl.search}`;
+  const signInUrl = new URL(buildSignInHref({ returnTo }), request.url);
 
   return NextResponse.redirect(signInUrl);
 }
