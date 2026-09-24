@@ -30,12 +30,15 @@ The visual design is owned by a separate UI workstream and now exists as the hi-
 
 ## Deferred after MVP
 
-Rate limiting is deliberately deferred rather than dropped. It is not part of the MVP Definition of Done: the current implementation does not add a Better Auth `rateLimit` table, a `RATE_LIMITED` action result, a feedback-creation time window, or tests for either limiter.
+Rate limiting is deliberately deferred rather than dropped. It is not part of the MVP Definition of Done: the current implementation does not add a Better Auth `rateLimit` table, a `RATE_LIMITED` action result, a feedback-creation time window, or tests for any limiter.
 
-The first post-MVP hardening pass must revisit two independent controls:
+Better Auth applies its limiter in its own HTTP router, before a request reaches an endpoint. A server-side `auth.api` call never passes through that router, so the limiter never sees it. This matters most for authentication itself. The sign-in and account-creation forms submit to Server Actions that call `auth.api.signInEmail` and `auth.api.signUpEmail`, and a Server Action is an ordinary public POST endpoint. In production Better Auth already enables an in-memory limiter by default, three sign-in or sign-up requests per ten seconds for each address on each server instance, but only on `/api/auth/[...all]`. The path the interface actually uses has no limit.
 
-- Better Auth rate limiting with database storage for requests that reach the public `/api/auth/[...all]` handler.
-- A per-user feedback-creation cap enforced by the Server Action, because Better Auth's route limiter does not cover feedback creation or server-side `auth.api` calls.
+The first post-MVP hardening pass must revisit three independent controls:
+
+- A limit enforced inside the sign-in and account-creation Server Actions, keyed on both the client address and the submitted email. These actions are the only credential entry points the interface uses, so they are where guessing has to be stopped.
+- Better Auth rate limiting with database storage for requests that reach the public `/api/auth/[...all]` handler. The same pass disables `/sign-in/email` and `/sign-up/email` on that handler through `disabledPaths`, because no form calls them. The option is checked by the same router, so it leaves `auth.api` untouched and leaves the Server Actions as the only credential door to guard.
+- A per-user feedback-creation cap enforced by the Server Action, for the same reason: feedback creation never reaches Better Auth's router.
 
 Platform-specific firewall rules remain optional and out of scope unless the deployment-portability requirements change.
 
