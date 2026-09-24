@@ -9,6 +9,18 @@ async function expectDashboardReturnTo(page: Page) {
   expect(new URL(page.url()).searchParams.get("returnTo")).toBe("/dashboard");
 }
 
+async function createAccount(page: Page, email: string, password: string) {
+  await page.goto("/sign-in?mode=create-account");
+
+  const panel = page.getByRole("tabpanel", { name: "Create account" });
+  await panel.getByLabel("Name").fill("Auth E2E User");
+  await panel.getByLabel("Email").fill(email);
+  await panel.getByLabel("Password", { exact: true }).fill(password);
+  await panel.getByRole("button", { name: "Create account" }).click();
+
+  await expectPath(page, "/dashboard");
+}
+
 test("redirects a dashboard guest to sign in", async ({ page }) => {
   await page.goto("/dashboard");
 
@@ -22,21 +34,7 @@ test("completes the credential session lifecycle", async ({ page }) => {
   const email = `auth-${crypto.randomUUID()}@example.com`;
   const password = "test password 123";
 
-  await page.goto("/sign-in?mode=create-account");
-
-  const createAccountPanel = page.getByRole("tabpanel", {
-    name: "Create account",
-  });
-  await createAccountPanel.getByLabel("Name").fill("Auth E2E User");
-  await createAccountPanel.getByLabel("Email").fill(email);
-  await createAccountPanel
-    .getByLabel("Password", { exact: true })
-    .fill(password);
-  await createAccountPanel
-    .getByRole("button", { name: "Create account" })
-    .click();
-
-  await expectPath(page, "/dashboard");
+  await createAccount(page, email, password);
   await expect(
     page.getByRole("heading", { level: 1, name: "Dashboard" }),
   ).toBeVisible();
@@ -98,4 +96,34 @@ test("completes the credential session lifecycle", async ({ page }) => {
   await expect(
     page.getByRole("heading", { level: 1, name: "Dashboard" }),
   ).toBeVisible();
+});
+
+test("returns a guest to the exact view they asked for", async ({ page }) => {
+  const email = `return-to-${crypto.randomUUID()}@example.com`;
+  const password = "test password 123";
+  // A guest arriving at a filtered view should be handed that view back, not
+  // the bare route. `/dashboard` reads no search params yet, so what this
+  // pins down is the round trip itself: the proxy puts the query into
+  // `returnTo`, and the sign-in action redirects to it unchanged.
+  const target = "/dashboard?tab=planned&sort=top";
+
+  await createAccount(page, email, password);
+  await page.getByRole("button", { name: "Sign out" }).click();
+  await expectPath(page, "/");
+
+  await page.goto(target);
+  await expectPath(page, "/sign-in");
+  expect(new URL(page.url()).searchParams.get("returnTo")).toBe(target);
+
+  const signInPanel = page.getByRole("tabpanel", { name: "Sign in" });
+  await signInPanel.getByLabel("Email").fill(email);
+  await signInPanel.getByLabel("Password", { exact: true }).fill(password);
+  await signInPanel.getByRole("button", { name: "Sign in" }).click();
+
+  await expect
+    .poll(() => {
+      const url = new URL(page.url());
+      return `${url.pathname}${url.search}`;
+    })
+    .toBe(target);
 });
