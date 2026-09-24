@@ -1,0 +1,25 @@
+# Dependabot opens a pull request when an action this repository pins has a
+# newer release, rewriting both the SHA and the version comment beside it. CI
+# runs on that pull request like on any other, so an update lands only once it
+# is green -- which is what makes pinning to a commit affordable at all.
+version: 2
+updates:
+  - package-ecosystem: github-actions
+    # `/` covers `.github/workflows`. A composite action anywhere else has to
+    # be named, or the pins inside it are never updated.
+    directories:
+      - /
+      - /.github/actions/setup
+    schedule:
+      interval: weekly
+    # A release that turns out to be malicious is usually pulled within days,
+    # so waiting a week before proposing one means Dependabot rarely offers it.
+    cooldown:
+      default-days: 7
+    # One pull request a week for every action together, not one per action.
+    groups:
+      actions:
+        patterns:
+          - "*"
+    commit-message:
+      prefix: ci
