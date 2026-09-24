@@ -24,7 +24,7 @@ type Story = StoryObj<typeof meta>;
 
 function AuthTabs({ defaultValue }: { defaultValue: AuthMode }) {
   return (
-    <Tabs.Root defaultValue={defaultValue} className="w-full">
+    <Tabs.Root defaultValue={defaultValue}>
       <Tabs.List>
         <Tabs.Tab value="sign-in">Sign in</Tabs.Tab>
         <Tabs.Tab value="create-account">Create account</Tabs.Tab>
@@ -76,7 +76,7 @@ export const CreateAccountActive: Story = {
 
 export const Links: Story = {
   render: () => (
-    <Tabs.Root defaultValue="sign-in" className="w-full">
+    <Tabs.Root defaultValue="sign-in">
       <Tabs.List>
         <Tabs.Tab
           value="sign-in"

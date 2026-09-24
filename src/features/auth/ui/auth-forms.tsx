@@ -25,7 +25,7 @@ export function AuthForms({
   const [email, setEmail] = useState("");
 
   return (
-    <Tabs.Root value={mode} className="w-full">
+    <Tabs.Root value={mode}>
       <Tabs.List>
         <Tabs.Tab
           value="sign-in"
