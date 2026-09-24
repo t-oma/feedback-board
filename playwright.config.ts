@@ -41,8 +41,9 @@ export default defineConfig({
     url: e2eEnvironment.BETTER_AUTH_URL,
     reuseExistingServer: false,
     timeout: 180_000,
-    // A server-side failure is the only record of why a server action did not
-    // do what the test expected, and the default swallows it.
+    // Server output is often the only record of why a server action did not
+    // do what the test expected. Playwright pipes stderr by default but drops
+    // stdout, which is where `console.log` and the build's progress go.
     stdout: "pipe",
     stderr: "pipe",
   },

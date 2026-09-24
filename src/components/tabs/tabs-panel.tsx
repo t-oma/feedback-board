@@ -3,8 +3,7 @@ import type { ComponentProps } from "react";
 
 import type { WithoutClassName } from "../types";
 
-// Narrowed for the same reason as `TabsTab`: Base UI types a panel value as
-// `any`, and a panel whose value no longer matches its tab renders nothing.
+// Narrowed to `string` for the same reason as `TabsTab`.
 type TabsPanelProps = Omit<
   WithoutClassName<ComponentProps<typeof Tabs.Panel>>,
   "value"

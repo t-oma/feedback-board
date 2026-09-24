@@ -58,8 +58,8 @@ const eslintConfig = defineConfig([
       // also supplies values keeps one import with an inline `type`, while a
       // type-only module gets its own `import type` line.
       "@typescript-eslint/consistent-type-imports": "error",
-      // Flipped from the stylistic default, which asks for `interface`. Roughly
-      // half of the types here cannot be one -- unions, `z.infer` results and
+      // Flipped from the stylistic default, which asks for `interface`. Many
+      // of the types here cannot be one -- unions, `z.infer` results and
       // `Omit<...>` aliases -- so a rule with exceptions would cost more than it
       // settles. `interface` is still the only option for module augmentation,
       // and there it reads as the deliberate exception it is.
@@ -68,18 +68,16 @@ const eslintConfig = defineConfig([
   },
 
   prettierConfig,
-  // Override default ignores of eslint-config-next.
+  // eslint-config-next already ignores `.next`, `out`, `build` and
+  // `next-env.d.ts`, and global ignores add up rather than replace each other.
+  // Unlike Prettier, flat config does not read `.gitignore`, so anything else
+  // that is generated has to be named here.
   globalIgnores([
-    // Default ignores of eslint-config-next:
-    ".next/**",
+    // The e2e build, which `next.config.ts` moves out of `.next`.
     ".next-e2e/**",
-    "out/**",
-    "build/**",
     "storybook-static/**",
-    "next-env.d.ts",
-    // A git worktree checked out inside the repository. Unlike Prettier, flat
-    // config does not read `.gitignore`, so it has to be named again here --
-    // otherwise linting this checkout also lints every other one.
+    // A git worktree checked out inside the repository. Without this, linting
+    // this checkout also lints every other one.
     ".claude/worktrees/**",
   ]),
 ]);

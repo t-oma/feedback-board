@@ -12,8 +12,8 @@ export default defineConfig({
   plugins: [tsconfigPaths()],
   test: {
     projects: [
-      // Domain and schema tests. No DOM is involved and none is wanted: a test
-      // that needs one belongs to a story instead.
+      // Everything that runs in plain Node. No DOM is involved and none is
+      // wanted: a test that needs one belongs to a story instead.
       {
         extends: true,
         test: {
