@@ -37,6 +37,27 @@ jobs:
       - run: pnpm typecheck
         if: ${{ !cancelled() && steps.setup.outcome == 'success' }}
 
+      # Applying migrations proves the committed ones run, not that they are
+      # complete: a schema change nobody generated a migration for applies
+      # cleanly and fails nothing unless a test happens to query it, and an
+      # index never does. Generating again and finding nothing new is what
+      # proves the folder describes the schema. `generate` never connects to
+      # the database; the URL is here only because drizzle.config.ts insists.
+      # The short timeout is for drizzle-kit asking whether a column was
+      # renamed, which would otherwise wait the whole job out.
+      - name: Migrations match the schema
+        if: ${{ !cancelled() && steps.setup.outcome == 'success' }}
+        timeout-minutes: 2
+        env:
+          DATABASE_URL_UNPOOLED: postgresql://unused@127.0.0.1:5432/unused
+        run: |
+          pnpm db:generate
+          if [ -n "$(git status --porcelain -- drizzle)" ]; then
+            git status --porcelain -- drizzle
+            echo "::error::The schema changed without a migration. Run pnpm db:generate and commit the result."
+            exit 1
+          fi
+
   test:
     name: Unit and story tests
     runs-on: ubuntu-latest
@@ -95,7 +116,8 @@ jobs:
       # This builds the app and runs the suite against `next start`, not
       # `next dev` -- see the comment in playwright.config.ts for why the
       # difference is load-bearing. Migrations are applied by the suite's own
-      # global setup, so an out-of-date migration fails here too.
+      # global setup, so one that no longer applies fails here too; one that
+      # was never generated is the static job's to catch.
       - run: pnpm test:e2e
 
       # A failed end-to-end run is close to undebuggable from a log alone. The
