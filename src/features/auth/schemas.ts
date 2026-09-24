@@ -12,7 +12,7 @@ const emailSchema = z
   .trim()
   .pipe(
     z.email({ error: "Enter a complete email address" }).max(MAX_EMAIL_LENGTH, {
-      error: `Use at most ${String(MAX_EMAIL_LENGTH)} characters`,
+      error: `Use at most ${MAX_EMAIL_LENGTH} characters`,
     }),
   );
 
@@ -21,10 +21,10 @@ const nameSchema = z
   .trim()
   .min(1, { error: "Enter your name" })
   .max(MAX_USER_NAME_LENGTH, {
-    error: `Use at most ${String(MAX_USER_NAME_LENGTH)} characters`,
+    error: `Use at most ${MAX_USER_NAME_LENGTH} characters`,
   });
 
-const passwordMaxMessage = `Use at most ${String(MAX_PASSWORD_LENGTH)} characters`;
+const passwordMaxMessage = `Use at most ${MAX_PASSWORD_LENGTH} characters`;
 
 // Sign-up enforces the policy. Sign-in only asks for a password: one set
 // under an older, weaker policy must still get its owner in. Both keep the
@@ -32,7 +32,7 @@ const passwordMaxMessage = `Use at most ${String(MAX_PASSWORD_LENGTH)} character
 const newPasswordSchema = z
   .string({ error: "Enter your password" })
   .min(MIN_PASSWORD_LENGTH, {
-    error: `Use at least ${String(MIN_PASSWORD_LENGTH)} characters`,
+    error: `Use at least ${MIN_PASSWORD_LENGTH} characters`,
   })
   .max(MAX_PASSWORD_LENGTH, { error: passwordMaxMessage });
 
