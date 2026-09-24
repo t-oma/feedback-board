@@ -10,8 +10,9 @@ const meta = {
     layout: "fullscreen",
   },
   decorators: [
-    // The same wrapper `/sign-in` renders it into, so what the story shows is
-    // the width, padding and background the skeleton actually appears against.
+    // The padding, gap and background of the `<main>` that `/sign-in` renders
+    // it into. `min-h-svh` stands in for that page's `flex-1`, which needs the
+    // root layout's flex column around it.
     (Story) => (
       <main className="flex min-h-svh flex-col gap-y-5 bg-surface px-5 py-6">
         <Story />

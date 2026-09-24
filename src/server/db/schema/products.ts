@@ -43,12 +43,12 @@ export const products = pgTable(
       .notNull(),
   },
   (table) => [
-    // The application normalises a slug before writing it: lowercase, words
-    // joined by single hyphens, none at either end. The pattern makes that
-    // shape true of every row rather than only of rows the application wrote,
-    // and it is what gives the unique index its meaning -- a varchar unique
-    // index is case-sensitive, so without this "Orbit" and "orbit" would both
-    // be accepted and resolve to different boards.
+    // A slug is lowercase words joined by single hyphens, none at either end,
+    // and at least `MIN_PRODUCT_SLUG_LENGTH` long. Checking that here makes it
+    // true of every row, whoever wrote it, and gives the unique index its
+    // meaning: a varchar unique index is case-sensitive, so without this
+    // "Orbit" and "orbit" would both be accepted and resolve to different
+    // boards.
     check(
       "products_slug_shape_check",
       sql`${table.slug} ~ '^[a-z0-9]+(-[a-z0-9]+)*$' AND length(${table.slug}) >= ${sql.raw(String(MIN_PRODUCT_SLUG_LENGTH))}`,
