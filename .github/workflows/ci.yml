@@ -22,16 +22,20 @@ jobs:
     steps:
       - uses: actions/checkout@v7
       - uses: ./.github/actions/setup
+        id: setup
 
       # `!cancelled()` keeps the later checks running after an earlier one
       # fails, so one push reports every problem it has instead of revealing
       # them one force-push at a time. A stray missing semicolon in Prettier's
-      # eyes should not hide a type error.
+      # eyes should not hide a type error. It would also run them after the
+      # setup itself failed, though, where every one of them fails for want of
+      # `node_modules` and buries the one line that says why -- hence the
+      # second half of the condition.
       - run: pnpm format
       - run: pnpm lint
-        if: ${{ !cancelled() }}
+        if: ${{ !cancelled() && steps.setup.outcome == 'success' }}
       - run: pnpm typecheck
-        if: ${{ !cancelled() }}
+        if: ${{ !cancelled() && steps.setup.outcome == 'success' }}
 
   test:
     name: Unit and story tests
