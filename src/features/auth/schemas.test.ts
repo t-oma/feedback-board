@@ -45,10 +45,12 @@ describe("signInSchema", () => {
     ).toBe(false);
   });
 
+  // The sign-up minimum is policy for new passwords. An existing one was set
+  // under whatever policy held at the time, so sign-in must not re-judge it.
   it.each([
-    ["accepts", 8, true],
+    ["accepts", 1, true],
+    ["accepts", 7, true],
     ["accepts", 128, true],
-    ["rejects", 7, false],
     ["rejects", 129, false],
   ])("%s a password with %i characters", (_, length, expected) => {
     expect(
@@ -57,6 +59,20 @@ describe("signInSchema", () => {
         password: "a".repeat(length),
       }).success,
     ).toBe(expected);
+  });
+
+  it("asks for a password when none was entered", () => {
+    const result = signInSchema.safeParse({
+      email: "ada@example.com",
+      password: "",
+    });
+
+    expect(result.success).toBe(false);
+    if (result.success) return;
+
+    expect(z.flattenError(result.error).fieldErrors).toEqual({
+      password: ["Enter your password"],
+    });
   });
 });
 

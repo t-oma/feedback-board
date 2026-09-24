@@ -56,7 +56,7 @@ describe("signInAction", () => {
   it("returns field errors without calling Better Auth when input is invalid", async () => {
     const formData = new FormData();
     formData.set("email", "ada@invalid");
-    formData.set("password", "short");
+    formData.set("password", "");
 
     await expect(signInAction(null, formData)).resolves.toEqual({
       ok: false,
@@ -64,7 +64,7 @@ describe("signInAction", () => {
       message: "Check the highlighted fields",
       fieldErrors: {
         email: ["Enter a complete email address"],
-        password: ["Use at least 8 characters"],
+        password: ["Enter your password"],
       },
     });
     expect(mocks.signInEmail).not.toHaveBeenCalled();
