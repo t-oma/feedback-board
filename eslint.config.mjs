@@ -19,6 +19,26 @@ const eslintConfig = defineConfig([
         tsconfigRootDir: import.meta.dirname,
       },
     },
+    rules: {
+      // Relaxed for numbers only: `${n}` and `${String(n)}` produce the same
+      // text, so the wrapper adds noise without catching anything. The rule's
+      // own defaults also allow `any`, booleans, nullish values and RegExps,
+      // and a partial options object falls back to them, so every option is
+      // spelled out to keep `strictTypeChecked`'s settings for the rest. It
+      // reads types, so it sits above the block that switches type-aware
+      // rules off for the untyped config files.
+      "@typescript-eslint/restrict-template-expressions": [
+        "error",
+        {
+          allowAny: false,
+          allowBoolean: false,
+          allowNever: false,
+          allowNullish: false,
+          allowNumber: true,
+          allowRegExp: false,
+        },
+      ],
+    },
   },
 
   // The config files below are not part of the TypeScript program, so there are
