@@ -18,13 +18,23 @@ concurrency:
 permissions:
   contents: read
 
+# Every action is pinned to a commit rather than a tag. A tag can be moved to
+# other code after the fact, which is how tj-actions/changed-files came to
+# print secrets into the logs of thousands of repositories in 2025; a commit
+# cannot. Dependabot keeps the pins current, and the trailing comment is the
+# version it reads and rewrites.
+
 jobs:
   static:
     name: Format, lint, types
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
-      - uses: actions/checkout@v7
+      # Checkout otherwise leaves the job's token in `.git/config` for every
+      # later step to read. Nothing in this workflow pushes, so nothing needs it.
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
       - uses: ./.github/actions/setup
         id: setup
 
@@ -67,7 +77,9 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:
-      - uses: actions/checkout@v7
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
       - uses: ./.github/actions/setup
 
       # The story project renders every story in a real browser and runs axe
@@ -116,7 +128,9 @@ jobs:
       FEEDBACK_BOARD_ENV: test
 
     steps:
-      - uses: actions/checkout@v7
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
       - uses: ./.github/actions/setup
       - run: pnpm exec playwright install --with-deps --only-shell chromium
 
@@ -130,7 +144,7 @@ jobs:
       # A failed end-to-end run is close to undebuggable from a log alone. The
       # config already records a trace and a screenshot for failures; this is
       # what makes them reachable from the run's summary page.
-      - uses: actions/upload-artifact@v7
+      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         if: ${{ failure() }}
         with:
           name: playwright-failure-artifacts
