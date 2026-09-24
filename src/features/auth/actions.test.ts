@@ -37,10 +37,16 @@ vi.mock("@/server/env", () => ({
 import { createAccountAction, signInAction, signOutAction } from "./actions";
 
 const redirectSignal = new Error("NEXT_REDIRECT");
+const requestHeaders = new Headers({
+  cookie: "session=test",
+  "user-agent": "Vitest",
+  "x-forwarded-for": "203.0.113.7",
+});
 
 describe("signInAction", () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    mocks.headers.mockResolvedValue(requestHeaders);
     mocks.signInEmail.mockResolvedValue(undefined);
     mocks.redirect.mockImplementation(() => {
       throw redirectSignal;
@@ -78,6 +84,7 @@ describe("signInAction", () => {
         email: "Ada@example.com",
         password,
       },
+      headers: requestHeaders,
     });
     expect(mocks.redirect).toHaveBeenCalledExactlyOnceWith(
       "/p/orbit-cli?sort=top#vote",
@@ -126,6 +133,7 @@ describe("signInAction", () => {
 describe("createAccountAction", () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    mocks.headers.mockResolvedValue(requestHeaders);
     mocks.signUpEmail.mockResolvedValue(undefined);
     mocks.redirect.mockImplementation(() => {
       throw redirectSignal;
@@ -169,6 +177,7 @@ describe("createAccountAction", () => {
         email: "ada@example.com",
         password,
       },
+      headers: requestHeaders,
     });
     expect(mocks.redirect).toHaveBeenCalledExactlyOnceWith(
       "/p/orbit-cli#comments",
@@ -228,8 +237,6 @@ describe("createAccountAction", () => {
 });
 
 describe("signOutAction", () => {
-  const requestHeaders = new Headers({ cookie: "session=test" });
-
   beforeEach(() => {
     vi.clearAllMocks();
     mocks.headers.mockResolvedValue(requestHeaders);

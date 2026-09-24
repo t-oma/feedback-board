@@ -34,7 +34,10 @@ export async function signInAction(
   });
 
   try {
-    await auth.api.signInEmail({ body: parsedInput.data });
+    await auth.api.signInEmail({
+      body: parsedInput.data,
+      headers: await headers(),
+    });
   } catch (error) {
     if (classifyAuthError(error) === "invalidCredentials") {
       return {
@@ -71,7 +74,10 @@ export async function createAccountAction(
   });
 
   try {
-    await auth.api.signUpEmail({ body: parsedInput.data });
+    await auth.api.signUpEmail({
+      body: parsedInput.data,
+      headers: await headers(),
+    });
   } catch (error) {
     if (classifyAuthError(error) === "emailAlreadyRegistered") {
       const message = "An account already uses this email.";
