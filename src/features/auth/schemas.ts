@@ -24,18 +24,26 @@ const nameSchema = z
     error: `Use at most ${String(MAX_USER_NAME_LENGTH)} characters`,
   });
 
-const passwordSchema = z
+const passwordMaxMessage = `Use at most ${String(MAX_PASSWORD_LENGTH)} characters`;
+
+// Sign-up enforces the policy. Sign-in only asks for a password: one set
+// under an older, weaker policy must still get its owner in. Both keep the
+// upper bound, which stops oversized input before it reaches the hash.
+const newPasswordSchema = z
   .string({ error: "Enter your password" })
   .min(MIN_PASSWORD_LENGTH, {
     error: `Use at least ${String(MIN_PASSWORD_LENGTH)} characters`,
   })
-  .max(MAX_PASSWORD_LENGTH, {
-    error: `Use at most ${String(MAX_PASSWORD_LENGTH)} characters`,
-  });
+  .max(MAX_PASSWORD_LENGTH, { error: passwordMaxMessage });
+
+const currentPasswordSchema = z
+  .string({ error: "Enter your password" })
+  .min(1, { error: "Enter your password" })
+  .max(MAX_PASSWORD_LENGTH, { error: passwordMaxMessage });
 
 export const signInSchema = z.object({
   email: emailSchema,
-  password: passwordSchema,
+  password: currentPasswordSchema,
 });
 
 export type SignInInput = z.infer<typeof signInSchema>;
@@ -43,7 +51,7 @@ export type SignInInput = z.infer<typeof signInSchema>;
 export const createAccountSchema = z.object({
   name: nameSchema,
   email: emailSchema,
-  password: passwordSchema,
+  password: newPasswordSchema,
 });
 
 export type CreateAccountInput = z.infer<typeof createAccountSchema>;
