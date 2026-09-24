@@ -7,8 +7,12 @@ on:
 
 # A branch is only ever merged at its newest commit, so a run for a commit that
 # has already been replaced is answering a question nobody is asking any more.
+# `main` is the exception: every commit there has shipped, and merges in quick
+# succession must not leave one of them without a verdict. Merely not cancelling
+# is not enough, because a group holds one pending run and a newer one replaces
+# it, so each commit on `main` gets a group of its own.
 concurrency:
-  group: ${{ github.workflow }}-${{ github.ref }}
+  group: ${{ github.workflow }}-${{ github.event_name == 'pull_request' && github.ref || github.sha }}
   cancel-in-progress: true
 
 permissions:
