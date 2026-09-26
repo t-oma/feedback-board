@@ -85,11 +85,11 @@ Renders a `<main>` with `EmptyState`:
 
 - `headingLevel={1}`;
 - eyebrow `404`;
-- title "This page doesn't exist";
+- title "This page doesn’t exist", with the design's typographic apostrophe;
 - description "The link may be wrong, or the board may have moved to a new address.";
 - one action, `<Link variant="secondary" href="/">Go to the landing page</Link>`.
 
-The document title is "Page not found · Feedback Board". Next.js documents a `metadata` export only for the experimental `global-not-found.js`, so the implementation plan decides between `metadata` and a React `<title>` by checking the built page. The end-to-end test asserts the result, whatever the mechanism.
+The document title is "Page not found · Feedback Board", set by a `metadata` export with the layout's template. Next.js documents `metadata` only for the experimental `global-not-found.js`, so this was checked on the production build: the page renders exactly one `<title>`, with that text. The end-to-end test asserts it.
 
 ### `src/app/error.tsx`
 
@@ -135,7 +135,7 @@ Stories, run by the story project with axe enforced:
 
 End-to-end tests against the production build:
 
-- a new test opens an unknown URL and expects status 404, the `h1` "This page doesn't exist", a link to `/` named "Go to the landing page", and the document title "Page not found · Feedback Board";
+- a new test opens an unknown URL and expects status 404, the `h1` "This page doesn’t exist", a link to `/` named "Go to the landing page", and the document title "Page not found · Feedback Board";
 - the existing tests assert "Sign in · Feedback Board" and "Dashboard · Feedback Board" with `toHaveTitle`.
 
 `error.tsx` and `global-error.tsx` have no automated test. Reaching them needs a page that fails in a production build, and a failing route must not ship. They are checked by hand with a temporary throw, and the result goes into the pull request description.
