@@ -1,20 +1,14 @@
 import "./globals.css";
 
 import type { Metadata } from "next";
-import { JetBrains_Mono, Source_Serif_4 } from "next/font/google";
 
-const sourceSerif = Source_Serif_4({
-  variable: "--font-source-serif",
-  subsets: ["latin"],
-});
-
-const jetbrainsMono = JetBrains_Mono({
-  variable: "--font-jetbrains-mono",
-  subsets: ["latin"],
-});
+import { jetbrainsMono, sourceSerif } from "./fonts";
 
 export const metadata: Metadata = {
-  title: "Feedback Board",
+  title: {
+    default: "Feedback Board",
+    template: "%s · Feedback Board",
+  },
   description:
     "One public board where your users post and vote on what to build next.",
 };

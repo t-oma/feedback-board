@@ -76,7 +76,7 @@ export function CreateAccountForm({
         <Field.Error />
       </Field.Root>
 
-      <Button type="submit" disabled={pending} showSpinner={pending}>
+      <Button type="submit" pending={pending}>
         {pending ? "Creating account…" : "Create account"}
       </Button>
     </Form>

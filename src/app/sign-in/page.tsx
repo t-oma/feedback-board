@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import { Suspense } from "react";
 
 import {
@@ -8,6 +9,12 @@ import {
   parseAuthNavigation,
 } from "@/features/auth";
 import { env } from "@/server/env";
+
+// One title for both modes. A title per mode would need `generateMetadata`
+// reading `searchParams`, which makes the head depend on the request.
+export const metadata: Metadata = {
+  title: "Sign in",
+};
 
 export default function SignIn({ searchParams }: PageProps<"/sign-in">) {
   return (

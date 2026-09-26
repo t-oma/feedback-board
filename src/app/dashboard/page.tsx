@@ -1,7 +1,13 @@
+import type { Metadata } from "next";
+
 import { signOutAction, SignOutButton } from "@/features/auth";
 import { requireSession } from "@/features/auth/session.server";
 
 export const instant = false;
+
+export const metadata: Metadata = {
+  title: "Dashboard",
+};
 
 export default async function Dashboard() {
   await requireSession({ returnTo: "/dashboard" });
@@ -10,7 +16,7 @@ export default async function Dashboard() {
     <main className="flex flex-1 flex-col gap-y-6 px-5 py-6">
       <h1 className="font-serif text-2xl font-semibold">Dashboard</h1>
 
-      <form action={signOutAction} className="w-full max-w-48">
+      <form action={signOutAction}>
         <SignOutButton />
       </form>
     </main>
