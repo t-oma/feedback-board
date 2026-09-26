@@ -8,12 +8,7 @@ export function SignOutButton() {
   const { pending } = useFormStatus();
 
   return (
-    <Button
-      type="submit"
-      disabled={pending}
-      showSpinner={pending}
-      aria-busy={pending}
-    >
+    <Button type="submit" pending={pending}>
       Sign out
     </Button>
   );

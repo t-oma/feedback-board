@@ -73,7 +73,7 @@ export function SignInForm({
         <Field.Error />
       </Field.Root>
 
-      <Button type="submit" disabled={pending} showSpinner={pending}>
+      <Button type="submit" pending={pending}>
         {pending ? "Signing in…" : "Sign in"}
       </Button>
     </Form>
