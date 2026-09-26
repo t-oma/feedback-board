@@ -1,31 +1,43 @@
+import { Button as BaseButton } from "@base-ui/react/button";
 import { LoaderCircle } from "lucide-react";
 import type { ComponentProps } from "react";
 
 import type { WithoutClassName } from "../types";
+import { buttonClassName, type ButtonVariant } from "./variants";
 
-type ButtonProps = WithoutClassName<ComponentProps<"button">> & {
-  showSpinner?: boolean;
+type ButtonProps = Omit<
+  WithoutClassName<ComponentProps<typeof BaseButton>>,
+  "render" | "nativeButton" | "focusableWhenDisabled"
+> & {
+  variant?: ButtonVariant;
+  pending?: boolean;
 };
 
 export function Button({
-  type,
+  variant = "primary",
+  pending = false,
+  disabled = false,
   children,
-  showSpinner = false,
   ...props
 }: ButtonProps) {
   return (
-    <button
+    <BaseButton
       {...props}
-      type={type ?? "button"}
-      className="inline-flex h-12 w-full items-center justify-center gap-2 rounded-lg bg-accent px-4 py-3 text-sm font-medium text-surface outline-none focus-visible:ring-3 focus-visible:ring-accent/20 enabled:hover:bg-accent/90 enabled:active:scale-98 disabled:cursor-not-allowed disabled:bg-accent-muted motion-safe:transition-[background-color,scale]"
+      // Pending keeps the button focusable, so a keyboard user does not lose
+      // their place while the request runs. Base UI still cancels clicks and
+      // keys, which is what stops a second submission.
+      disabled={pending || disabled}
+      focusableWhenDisabled={pending}
+      aria-busy={pending || undefined}
+      className={buttonClassName(variant)}
     >
-      {showSpinner && (
+      {pending && (
         <LoaderCircle
           aria-hidden="true"
           className="size-4 motion-safe:animate-spin"
         />
       )}
       {children}
-    </button>
+    </BaseButton>
   );
 }
