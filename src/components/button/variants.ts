@@ -2,7 +2,8 @@ export type ButtonVariant = "primary" | "secondary";
 
 // State styles key on `data-disabled`, which Base UI sets both for a natively
 // disabled button and for a pending one. A pending button is only
-// `aria-disabled`, so `:disabled` would miss it.
+// `aria-disabled`, so `:disabled` would miss it. `Link` uses these classes
+// too, and an anchor never matches `:enabled`.
 const baseClassName =
   "inline-flex h-12 items-center justify-center gap-2 rounded-lg px-4 py-3 text-sm font-medium outline-none focus-visible:ring-3 focus-visible:ring-accent/20 not-data-disabled:active:scale-98 data-disabled:cursor-not-allowed motion-safe:transition-[background-color,scale]";
 
