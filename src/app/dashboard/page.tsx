@@ -1,7 +1,13 @@
+import type { Metadata } from "next";
+
 import { signOutAction, SignOutButton } from "@/features/auth";
 import { requireSession } from "@/features/auth/session.server";
 
 export const instant = false;
+
+export const metadata: Metadata = {
+  title: "Dashboard",
+};
 
 export default async function Dashboard() {
   await requireSession({ returnTo: "/dashboard" });

@@ -14,7 +14,10 @@ const jetbrainsMono = JetBrains_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Feedback Board",
+  title: {
+    default: "Feedback Board",
+    template: "%s · Feedback Board",
+  },
   description:
     "One public board where your users post and vote on what to build next.",
 };

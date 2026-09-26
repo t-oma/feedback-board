@@ -28,6 +28,7 @@ test("redirects a dashboard guest to sign in", async ({ page }) => {
   await expect(
     page.getByRole("heading", { level: 1, name: "Sign in" }),
   ).toBeVisible();
+  await expect(page).toHaveTitle("Sign in · Feedback Board");
 });
 
 test("completes the credential session lifecycle", async ({ page }) => {
@@ -38,6 +39,7 @@ test("completes the credential session lifecycle", async ({ page }) => {
   await expect(
     page.getByRole("heading", { level: 1, name: "Dashboard" }),
   ).toBeVisible();
+  await expect(page).toHaveTitle("Dashboard · Feedback Board");
 
   const signOutPaused: PromiseWithResolvers<void> = Promise.withResolvers();
   const signOutRelease: PromiseWithResolvers<void> = Promise.withResolvers();
