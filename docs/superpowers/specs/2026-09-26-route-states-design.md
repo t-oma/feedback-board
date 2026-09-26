@@ -96,7 +96,7 @@ The document title is "Page not found · Feedback Board", set by a `metadata` ex
 A Client Component receiving `error` and `retry`. It renders a `<main>` with `ErrorState`:
 
 - `headingLevel={1}`;
-- title "We couldn't load this page. Please try again.";
+- title "We couldn’t load this page. Please try again.";
 - actions: `<Button onClick={retry}>Retry</Button>` and `<Link variant="secondary" href="/">Go to the landing page</Link>`.
 
 The design's second sentence, "If it keeps happening, the board may be temporarily unavailable.", and its "Go to the board" action assume a board. The root boundary has none, so both are left out here. They belong to the board's own error boundary.
@@ -105,7 +105,7 @@ It adds no client logging. Next.js already logs server errors on the server, whi
 
 ### `src/app/global-error.tsx`
 
-Replaces the root layout when the layout itself fails. It renders its own `<html lang="en">` and `<body>`, imports `globals.css`, sets `<title>Feedback Board</title>`, and shows the same `ErrorState` with Retry. It loads no web fonts; the serif stack's fallback is enough for a last-resort page.
+Replaces the root layout when the layout itself fails. It renders its own `<html lang="en">` and `<body>`, imports `globals.css`, sets `<title>Feedback Board</title>`, and shows the same `ErrorState` with Retry. It also applies the serif font's variable from `src/app/fonts.ts`, which the layout shares. Leaving the font out does not fall back to the serif stack: `font-serif` expands to `var(--font-source-serif), Georgia, serif`, an undefined `var()` makes the whole declaration invalid at computed-value time, and the heading inherits the body's sans. A production probe showed exactly that.
 
 ## Document titles
 

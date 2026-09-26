@@ -20,7 +20,7 @@ type Story = StoryObj<typeof meta>;
 
 export const WithActions: Story = {
   args: {
-    title: "We couldn't load this page. Please try again.",
+    title: "We couldn’t load this page. Please try again.",
     description:
       "If it keeps happening, the board may be temporarily unavailable.",
     headingLevel: 1,
@@ -39,7 +39,7 @@ export const WithActions: Story = {
     await expect(alert).toContainElement(
       canvas.getByRole("heading", {
         level: 1,
-        name: "We couldn't load this page. Please try again.",
+        name: "We couldn’t load this page. Please try again.",
       }),
     );
 
