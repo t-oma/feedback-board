@@ -39,4 +39,12 @@
     color: var(--color-foreground);
     font-family: var(--font-sans);
   }
+
+  /* Tailwind 4 leaves buttons on the browser's default arrow, while a link
+     gets a pointer from the browser. A button and a link that look the same
+     would otherwise disagree. */
+  button:not(:disabled),
+  [role="button"]:not(:disabled) {
+    cursor: pointer;
+  }
 }

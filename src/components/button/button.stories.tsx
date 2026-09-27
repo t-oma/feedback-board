@@ -19,7 +19,13 @@ const meta = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-export const Primary: Story = {};
+export const Primary: Story = {
+  play: async ({ canvas }) => {
+    await expect(canvas.getByRole("button", { name: "Continue" })).toHaveStyle({
+      cursor: "pointer",
+    });
+  },
+};
 
 export const Secondary: Story = {
   args: {
@@ -45,6 +51,7 @@ export const Disabled: Story = {
     const button = canvas.getByRole("button", { name: "Unavailable" });
 
     await expect(button).toHaveAttribute("disabled");
+    await expect(button).toHaveStyle({ cursor: "not-allowed" });
 
     await userEvent.tab();
     await expect(button).not.toHaveFocus();
@@ -73,6 +80,9 @@ export const Pending: Story = {
     await expect(button).toHaveAttribute("aria-disabled", "true");
     await expect(button).toHaveAttribute("aria-busy", "true");
     await expect(button).not.toHaveAttribute("disabled");
+    // Pending is not `:disabled`, so the base rule's pointer applies unless
+    // the component's own cursor overrides it.
+    await expect(button).toHaveStyle({ cursor: "not-allowed" });
     await expect(button.querySelector("svg")).toBeInTheDocument();
 
     await userEvent.tab();

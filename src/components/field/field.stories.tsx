@@ -57,6 +57,9 @@ export const Password: Story = {
   ),
   play: async ({ canvas }) => {
     const control = canvas.getByLabelText("Password");
+    await expect(
+      canvas.getByRole("button", { name: "Show password" }),
+    ).toHaveStyle({ cursor: "pointer" });
     await expect(control).toHaveAttribute("type", "password");
 
     await userEvent.click(

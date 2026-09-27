@@ -20,6 +20,7 @@ const meta = {
     const link = canvas.getByRole("link", { name: "Go to the landing page" });
 
     await expect(link).toHaveAttribute("href", "/");
+    await expect(link).toHaveStyle({ cursor: "pointer" });
     await expect(canvas.queryByRole("button")).not.toBeInTheDocument();
   },
 } satisfies Meta<typeof Link>;
