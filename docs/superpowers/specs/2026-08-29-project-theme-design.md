@@ -28,8 +28,7 @@ The first theme exposes the stable roles already repeated across the desktop and
 | `foreground-secondary` | `#3d3a35` | Labels and strong supporting text      |
 | `foreground-muted`     | `#57544e` | Body supporting copy                   |
 | `foreground-subtle`    | `#6f6b62` | Helpers, links, and secondary controls |
-| `foreground-faint`     | `#8c877c` | Metadata and low-emphasis utility text |
-| `foreground-disabled`  | `#c9c3b6` | Disabled and placeholder-like content  |
+| `foreground-disabled`  | `#c9c3b6` | Disabled text                          |
 | `border`               | `#ddd7cb` | Default control and surface borders    |
 | `border-subtle`        | `#e2ddd3` | Dividers and low-emphasis borders      |
 | `accent`               | `#7a5f33` | Primary actions and focus treatment    |
@@ -52,6 +51,8 @@ Only the body face is applied globally. Heading families, sizes, weights, and li
 
 ## Scope and Verification
 
-The theme implementation changes `src/app/globals.css` only. It does not modify the user's existing `src/app/sign-in/page.tsx`, add UI, introduce dependencies, or change the lockfile.
+The theme implementation does not modify the user's existing `src/app/sign-in/page.tsx`, add UI, introduce dependencies, or change the lockfile.
 
-Verification consists of Prettier, ESLint, TypeScript checking, and a production build so Tailwind processes every declared namespace and generated utility. Unit tests are not added for CSS token declarations. Visual verification starts with the auth page that consumes the tokens; testing the variable list itself would couple tests to implementation without exercising user-visible behavior.
+The contrast contract reads the color declarations from `src/app/globals.css` and checks every normal text token against every surface at the WCAG AA minimum of 4.5:1. The `Field` browser story verifies the computed placeholder color so the test covers the result of Tailwind and the base stylesheet in Chromium.
+
+The remaining verification consists of Prettier, ESLint, TypeScript checking, and a production build so Tailwind processes every declared namespace and generated utility.
