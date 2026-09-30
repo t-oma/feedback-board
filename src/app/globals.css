@@ -9,7 +9,6 @@
   --color-foreground-secondary: #3d3a35;
   --color-foreground-muted: #57544e;
   --color-foreground-subtle: #6f6b62;
-  --color-foreground-faint: #8c877c;
   --color-foreground-disabled: #c9c3b6;
 
   --color-border: #ddd7cb;
@@ -38,6 +37,10 @@
     background: var(--color-background);
     color: var(--color-foreground);
     font-family: var(--font-sans);
+  }
+
+  ::placeholder {
+    color: var(--color-foreground-subtle);
   }
 
   /* Tailwind 4 leaves buttons on the browser's default arrow, while a link

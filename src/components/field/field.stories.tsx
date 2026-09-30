@@ -33,6 +33,12 @@ export const Email: Story = {
       />
     </Field.Root>
   ),
+  play: async ({ canvas }) => {
+    const control = canvas.getByLabelText("Email");
+    const placeholder = getComputedStyle(control, "::placeholder");
+
+    await expect(placeholder.color).toBe("rgb(111, 107, 98)");
+  },
 };
 
 export const Filled: Story = {
