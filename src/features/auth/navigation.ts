@@ -15,8 +15,8 @@ export type SignInQuery = {
 };
 
 type BuildSignInHrefInput = {
-  returnTo?: string | undefined;
-  intent?: AuthIntent | undefined;
+  returnTo?: string | null | undefined;
+  intent?: AuthIntent | null | undefined;
   mode?: AuthMode | undefined;
 };
 
@@ -34,7 +34,7 @@ export function buildSignInHref({
   const searchParams = new URLSearchParams();
 
   if (returnTo) searchParams.set("returnTo", returnTo);
-  if (intent !== undefined) searchParams.set("intent", intent);
+  if (intent) searchParams.set("intent", intent);
   if (mode === "create-account") searchParams.set("mode", mode);
 
   const query = searchParams.toString();

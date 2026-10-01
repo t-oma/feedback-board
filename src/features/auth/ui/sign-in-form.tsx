@@ -1,6 +1,7 @@
 "use client";
 
 import { Form } from "@base-ui/react/form";
+import type { Route } from "next";
 import { useActionState, useEffect, useRef } from "react";
 
 import { Button } from "@/components/button";
@@ -12,7 +13,7 @@ import { AuthFormMessage } from "./auth-form-message";
 type SignInFormProps = {
   email: string;
   onEmailChange: (value: string) => void;
-  returnTo?: string | undefined;
+  returnTo: Route | null;
 };
 
 export function SignInForm({
@@ -40,7 +41,7 @@ export function SignInForm({
       aria-busy={pending}
       className="flex w-full flex-col gap-y-4"
     >
-      {returnTo !== undefined && (
+      {returnTo !== null && (
         <input type="hidden" name="returnTo" value={returnTo} />
       )}
 

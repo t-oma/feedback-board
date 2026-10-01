@@ -8,22 +8,17 @@ const intentSupportingText: Record<AuthIntent, string> = {
   board: "Sign in to create your board.",
 };
 
-export function AuthContent(query: SignInQuery) {
-  const { mode } = query;
-
+export function AuthContent({ returnTo, intent, mode }: SignInQuery) {
   const heading = mode === "sign-in" ? "Sign in" : "Create an account";
 
-  const signInSupportingText = query.intent
-    ? intentSupportingText[query.intent]
+  const signInSupportingText = intent
+    ? intentSupportingText[intent]
     : "Sign in to vote, add feedback, or manage your board.";
 
   const supportingText =
     mode === "sign-in"
       ? signInSupportingText
       : "Your name is shown next to anything you post. Nothing else is public.";
-
-  const returnTo = query.returnTo ?? undefined;
-  const intent = query.intent ?? undefined;
 
   const signInHref = buildSignInHref({
     returnTo,
