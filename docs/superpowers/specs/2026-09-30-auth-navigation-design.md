@@ -12,7 +12,7 @@ Nothing changes for the user. The end-to-end tests pass without edits, and that 
 - The supporting-text copy is split across two files. The intent sentences live in `navigation.ts`, a module about parsing and redirect safety. The neutral default and the create-account sentence live in the page.
 - `AuthContent` is defined in `src/app/sign-in/page.tsx`. Its skeleton lives in the feature and copies its geometry, and the skeleton's story copies the page's `<main>` classes. Nothing ties the three together. `AuthContent` is async and reads `searchParams`, so it has no stories, and only the end-to-end suite renders a mode and intent combination.
 - Every path is a `string`. Next.js checks `Link` hrefs and `redirect` targets against the app's routes only with `typedRoutes`, which is off.
-- `src/features/auth/index.ts` is meant to be the feature's public API, yet three of the five imports from outside the feature bypass it: `src/proxy.ts`, the dashboard's `requireSession` import and `src/server/auth.ts`. The proxy has no reason to import a module that re-exports Server Actions and Client Components, so the barrel cannot be the only entry point.
+- `src/features/auth/index.ts` ships the sign-in forms to `/dashboard`, which renders only the sign-out button. It is also meant to be the feature's public API, yet three of the five imports from outside the feature bypass it: `src/proxy.ts`, the dashboard's `requireSession` import and `src/server/auth.ts`.
 
 ## Navigation module
 
@@ -59,6 +59,17 @@ The fix is a mock file, `src/features/auth/__mocks__/actions.ts`, registered in 
 ## Barrel
 
 `src/features/auth/index.ts` is deleted. Every import names the file it needs, such as `@/features/auth/actions` or `@/features/auth/ui/auth-content`.
+
+A Server Component that imports the barrel reaches every Client Component it re-exports, and Next.js adds each of them to the route's client references, used or not. Production builds measured the route-specific JavaScript of `/dashboard`, read from its client reference manifest, uncompressed:
+
+| Imports                                                                 | `/dashboard` JavaScript | Includes `AuthForms` |
+| ----------------------------------------------------------------------- | ----------------------- | -------------------- |
+| Feature barrel, today                                                   | 84 KB                   | yes                  |
+| Direct imports                                                          | 27 KB                   | no                   |
+| A barrel in `ui/`                                                       | 84 KB                   | yes                  |
+| A barrel in `ui/`, plus `"sideEffects": ["**/*.css"]` in `package.json` | 27 KB                   | no                   |
+
+A barrel in `ui/` therefore works only with `sideEffects`, which promises that no module in the project except CSS does anything when imported. That is true today: the only bare imports in `src` are CSS files and the `server-only` package. Nothing checks it, though. A later bare import could be dropped from the bundle without a warning, and removing the field would grow `/dashboard` again without failing a test. Direct imports carry neither risk, and their only cost is a few more import lines in the sign-in page.
 
 The auth-session specification kept `session.server.ts` out of the barrel so that a Client Component could not reach it by accident. Removing the barrel keeps that protection. `session.server.ts` imports `server-only`, which fails the build when a Client Component imports it. The MVP specification requires that import in every `*.server.ts`.
 
