@@ -1,7 +1,8 @@
 import type { Metadata } from "next";
 
-import { signOutAction, SignOutButton } from "@/features/auth";
+import { signOutAction } from "@/features/auth/actions";
 import { requireSession } from "@/features/auth/session.server";
+import { SignOutButton } from "@/features/auth/ui/sign-out-button";
 
 export const instant = false;
 
