@@ -1,5 +1,6 @@
 "use client";
 
+import type { Route } from "next";
 import Link from "next/link";
 import { useState } from "react";
 
@@ -12,8 +13,8 @@ import { SignInForm } from "./sign-in-form";
 type AuthFormsProps = {
   mode: AuthMode;
   returnTo?: string | undefined;
-  signInHref: string;
-  createAccountHref: string;
+  signInHref: Route;
+  createAccountHref: Route;
 };
 
 export function AuthForms({
