@@ -37,10 +37,7 @@ export function proxy(request: NextRequest) {
 
   // The query belongs in `returnTo` as much as the path does -- a guest sent
   // here from a filtered or sorted view should come back to that view, not to
-  // its bare route. `parseAuthNavigation` already reassembles
-  // `pathname + search + hash` on the way back, so the only thing that has to
-  // happen here is not dropping it. The fragment is unrecoverable: a browser
-  // never sends it.
+  // its bare route. The fragment is unrecoverable: a browser never sends it.
   //
   // Next strips its own prefetch parameter before this runs, verified against
   // a request for `/dashboard?tab=planned&_rsc=…`, which arrives here as

@@ -6,8 +6,9 @@ import {
   AuthForms,
   AuthHeader,
   buildSignInHref,
-  parseAuthNavigation,
+  parseSignInQuery,
 } from "@/features/auth";
+import type { AuthIntent } from "@/features/auth/schemas";
 import { env } from "@/server/env";
 
 // One title for both modes. A title per mode would need `generateMetadata`
@@ -30,35 +31,31 @@ export default function SignIn({ searchParams }: PageProps<"/sign-in">) {
   );
 }
 
+const intentSupportingText: Record<AuthIntent, string> = {
+  vote: "Sign in to vote.",
+  feedback: "Sign in to add feedback.",
+  board: "Sign in to create your board.",
+};
+
 async function AuthContent({
   searchParams,
 }: Pick<PageProps<"/sign-in">, "searchParams">) {
-  const query = await searchParams;
+  const query = parseSignInQuery(await searchParams, env.BETTER_AUTH_URL);
+  const { mode } = query;
 
-  const navigation = parseAuthNavigation({
-    returnTo: query.returnTo,
-    intent: query.intent,
-    mode: query.mode,
-    origin: env.BETTER_AUTH_URL,
-    fallback: "/",
-  });
+  const heading = mode === "sign-in" ? "Sign in" : "Create an account";
 
-  const heading =
-    navigation.mode === "sign-in" ? "Sign in" : "Create an account";
-
-  const signInSupportingText =
-    navigation.supportingText ??
-    "Sign in to vote, add feedback, or manage your board.";
+  const signInSupportingText = query.intent
+    ? intentSupportingText[query.intent]
+    : "Sign in to vote, add feedback, or manage your board.";
 
   const supportingText =
-    navigation.mode === "sign-in"
+    mode === "sign-in"
       ? signInSupportingText
       : "Your name is shown next to anything you post. Nothing else is public.";
 
-  const returnTo = navigation.hasExplicitReturnTo
-    ? navigation.returnTo
-    : undefined;
-  const intent = navigation.intent ?? undefined;
+  const returnTo = query.returnTo ?? undefined;
+  const intent = query.intent ?? undefined;
 
   const signInHref = buildSignInHref({
     returnTo,
@@ -81,7 +78,7 @@ async function AuthContent({
       </div>
 
       <AuthForms
-        mode={navigation.mode}
+        mode={mode}
         returnTo={returnTo}
         signInHref={signInHref}
         createAccountHref={createAccountHref}

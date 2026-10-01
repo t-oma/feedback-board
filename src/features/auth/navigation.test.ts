@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { buildSignInHref, parseAuthNavigation } from "./navigation";
+import { buildSignInHref, parseReturnTo, parseSignInQuery } from "./navigation";
 
 const origin = "https://feedback.example";
 
@@ -61,19 +61,14 @@ describe("buildSignInHref", () => {
   });
 });
 
-describe("parseAuthNavigation", () => {
+describe("parseReturnTo", () => {
   it.each([
     ["/", "/"],
     ["/dashboard", "/dashboard"],
     ["/p/orbit-cli?sort=top#vote", "/p/orbit-cli?sort=top#vote"],
     ["/%2F%2Fevil.com", "/%2F%2Fevil.com"],
   ])("accepts the internal target %s", (returnTo, expected) => {
-    expect(
-      parseAuthNavigation({ returnTo, origin, fallback: "/fallback" }),
-    ).toMatchObject({
-      returnTo: expected,
-      hasExplicitReturnTo: true,
-    });
+    expect(parseReturnTo(returnTo, origin)).toBe(expected);
   });
 
   it.each([
@@ -89,46 +84,38 @@ describe("parseAuthNavigation", () => {
     "javascript:alert(1)",
     "/api",
     "/api/auth/get-session",
-  ])("replaces unsafe target %j with the caller fallback", (returnTo) => {
-    expect(
-      parseAuthNavigation({ returnTo, origin, fallback: "/fallback" }),
-    ).toMatchObject({
-      returnTo: "/fallback",
-      hasExplicitReturnTo: false,
-    });
+  ])("rejects the unsafe target %j", (returnTo) => {
+    expect(parseReturnTo(returnTo, origin)).toBeNull();
   });
+});
 
-  it.each([
-    ["vote", "Sign in to vote."],
-    ["feedback", "Sign in to add feedback."],
-    ["board", "Sign in to create your board."],
-  ])("maps intent %s to presentation copy", (intent, supportingText) => {
-    expect(
-      parseAuthNavigation({ intent, origin, fallback: "/" }),
-    ).toMatchObject({ intent, supportingText });
+describe("parseSignInQuery", () => {
+  it.each(["vote", "feedback", "board"])("keeps the intent %s", (intent) => {
+    expect(parseSignInQuery({ intent }, origin)).toMatchObject({ intent });
   });
 
   it.each([undefined, "", "admin", ["vote"]])(
     "ignores unknown intent %j",
     (intent) => {
-      expect(
-        parseAuthNavigation({ intent, origin, fallback: "/" }),
-      ).toMatchObject({ intent: null, supportingText: null });
+      expect(parseSignInQuery({ intent }, origin)).toMatchObject({
+        intent: null,
+      });
     },
   );
 
   it("never lets intent change the redirect target", () => {
     const targets = ["vote", "feedback", "board"].map(
       (intent) =>
-        parseAuthNavigation({
-          returnTo: "/p/orbit-cli",
-          intent,
-          origin,
-          fallback: "/",
-        }).returnTo,
+        parseSignInQuery({ returnTo: "/p/orbit-cli", intent }, origin).returnTo,
     );
 
     expect(targets).toEqual(["/p/orbit-cli", "/p/orbit-cli", "/p/orbit-cli"]);
+  });
+
+  it("drops an unsafe returnTo instead of replacing it", () => {
+    expect(parseSignInQuery({ returnTo: "//evil.com" }, origin)).toMatchObject({
+      returnTo: null,
+    });
   });
 
   it.each([
@@ -139,32 +126,19 @@ describe("parseAuthNavigation", () => {
     ["admin", "sign-in"],
     [["create-account"], "sign-in"],
   ])("parses auth mode %j as %s", (mode, expected) => {
-    expect(
-      parseAuthNavigation({
-        mode,
-        origin,
-        fallback: "/",
-      }),
-    ).toMatchObject({ mode: expected });
+    expect(parseSignInQuery({ mode }, origin)).toMatchObject({
+      mode: expected,
+    });
   });
 
-  it("parses all navigation parameters together", () => {
+  it("parses all query parameters together", () => {
     const returnTo = "/p/orbit-cli?sort=top#vote";
 
     expect(
-      parseAuthNavigation({
-        returnTo,
-        intent: "feedback",
-        mode: "create-account",
+      parseSignInQuery(
+        { returnTo, intent: "feedback", mode: "create-account" },
         origin,
-        fallback: "/",
-      }),
-    ).toEqual({
-      returnTo,
-      hasExplicitReturnTo: true,
-      intent: "feedback",
-      mode: "create-account",
-      supportingText: "Sign in to add feedback.",
-    });
+      ),
+    ).toEqual({ returnTo, intent: "feedback", mode: "create-account" });
   });
 });

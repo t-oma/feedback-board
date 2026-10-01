@@ -11,7 +11,7 @@ import {
 } from "@/shared/action-result";
 
 import { classifyAuthError } from "./errors";
-import { parseAuthNavigation } from "./navigation";
+import { parseReturnTo } from "./navigation";
 import { createAccountSchema, signInSchema } from "./schemas";
 
 export async function signInAction(
@@ -27,11 +27,8 @@ export async function signInAction(
     return toValidationActionError(parsedInput.error);
   }
 
-  const navigation = parseAuthNavigation({
-    returnTo: formData.get("returnTo"),
-    origin: env.BETTER_AUTH_URL,
-    fallback: "/",
-  });
+  const returnTo =
+    parseReturnTo(formData.get("returnTo"), env.BETTER_AUTH_URL) ?? "/";
 
   try {
     await auth.api.signInEmail({
@@ -50,7 +47,7 @@ export async function signInAction(
     throw error;
   }
 
-  redirect(navigation.returnTo);
+  redirect(returnTo);
 }
 
 export async function createAccountAction(
@@ -67,11 +64,9 @@ export async function createAccountAction(
     return toValidationActionError(parsedInput.error);
   }
 
-  const navigation = parseAuthNavigation({
-    returnTo: formData.get("returnTo"),
-    origin: env.BETTER_AUTH_URL,
-    fallback: "/dashboard",
-  });
+  const returnTo =
+    parseReturnTo(formData.get("returnTo"), env.BETTER_AUTH_URL) ??
+    "/dashboard";
 
   try {
     await auth.api.signUpEmail({
@@ -93,7 +88,7 @@ export async function createAccountAction(
     throw error;
   }
 
-  redirect(navigation.returnTo);
+  redirect(returnTo);
 }
 
 export async function signOutAction() {
