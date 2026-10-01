@@ -19,7 +19,7 @@ Nothing changes for the user. The end-to-end tests pass without edits, and that 
 `src/features/auth/navigation.ts` exports three functions.
 
 - `buildSignInHref({ returnTo, intent, mode }): Route`. Its behaviour does not change. `returnTo` stays a `string`, because the builder only encodes it and `parseReturnTo` validates it again when it comes back, as the auth-entry-href specification requires. The return type needs no assertion, because TypeScript infers `` `/sign-in?${string}` ``, which `Route` accepts.
-- `parseReturnTo(value: unknown, origin: string): Route | null`. This is today's private function, now exported, with the same rules. It accepts a string within the schema's bounds that starts with one `/` not followed by `/` or `\`, resolves to the same origin, and is neither `/api` nor below it. It returns `pathname + search + hash`.
+- `parseReturnTo(value: unknown, origin: string): Route | null`. This is today's private function, now exported, with the same rules. It accepts a string that starts with one `/` not followed by `/` or `\`, resolves to the same origin, and is neither `/api` nor below it. It returns `pathname + search + hash`.
 - `parseSignInQuery(query, origin): SignInQuery`. `query` holds `returnTo`, `intent` and `mode` as `unknown`, and `SignInQuery` is `{ returnTo: Route | null; intent: AuthIntent | null; mode: AuthMode }`. An unknown mode becomes `"sign-in"`, and an unknown intent becomes `null`.
 
 `parseAuthNavigation` and `AuthNavigation` are removed, and with them `fallback`, `hasExplicitReturnTo`, `supportingText` and the intent copy.
