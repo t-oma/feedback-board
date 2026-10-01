@@ -1,12 +1,10 @@
 import type { Metadata } from "next";
 import { Suspense } from "react";
 
-import {
-  AuthContentSkeleton,
-  AuthHeader,
-  parseSignInQuery,
-} from "@/features/auth";
+import { parseSignInQuery } from "@/features/auth/navigation";
 import { AuthContent } from "@/features/auth/ui/auth-content";
+import { AuthContentSkeleton } from "@/features/auth/ui/auth-content-skeleton";
+import { AuthHeader } from "@/features/auth/ui/auth-header";
 import { AuthMain } from "@/features/auth/ui/auth-main";
 import { env } from "@/server/env";
 
