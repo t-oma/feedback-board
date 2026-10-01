@@ -1,5 +1,6 @@
 import "server-only";
 
+import type { Route } from "next";
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { cache } from "react";
@@ -9,7 +10,7 @@ import { auth } from "@/server/auth";
 import { buildSignInHref } from "./navigation";
 
 type RequireSessionInput = {
-  returnTo: string;
+  returnTo: Route;
 };
 
 const readCurrentSession = cache(async () => {
