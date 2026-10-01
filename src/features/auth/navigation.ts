@@ -1,3 +1,5 @@
+import type { Route } from "next";
+
 import {
   type AuthIntent,
   authIntentSchema,
@@ -6,12 +8,10 @@ import {
   authReturnToSchema,
 } from "./schemas";
 
-export type AuthNavigation = {
-  returnTo: string;
-  hasExplicitReturnTo: boolean;
+export type SignInQuery = {
+  returnTo: Route | null;
   intent: AuthIntent | null;
   mode: AuthMode;
-  supportingText: string | null;
 };
 
 type BuildSignInHrefInput = {
@@ -20,25 +20,17 @@ type BuildSignInHrefInput = {
   mode?: AuthMode | undefined;
 };
 
-type ParseAuthNavigationInput = {
+type SignInQueryInput = {
   returnTo?: unknown;
   intent?: unknown;
   mode?: unknown;
-  origin: string;
-  fallback: string;
-};
-
-const intentMessages: Record<AuthIntent, string> = {
-  vote: "Sign in to vote.",
-  feedback: "Sign in to add feedback.",
-  board: "Sign in to create your board.",
 };
 
 export function buildSignInHref({
   returnTo,
   intent,
   mode,
-}: BuildSignInHrefInput = {}) {
+}: BuildSignInHrefInput = {}): Route {
   const searchParams = new URLSearchParams();
 
   if (returnTo) searchParams.set("returnTo", returnTo);
@@ -55,7 +47,7 @@ function hasSafePrefix(returnTo: string) {
   );
 }
 
-function parseReturnTo(value: unknown, origin: string) {
+export function parseReturnTo(value: unknown, origin: string): Route | null {
   const parsedValue = authReturnToSchema.safeParse(value);
   if (!parsedValue.success) return null;
 
@@ -74,7 +66,11 @@ function parseReturnTo(value: unknown, origin: string) {
       return null;
     }
 
-    return `${targetUrl.pathname}${targetUrl.search}${targetUrl.hash}`;
+    // A path from the browser becomes a `Route` only by assertion, and this
+    // is where it is checked. The checks prove the path is internal, not that
+    // a page exists there; an unknown one renders the not-found page, which is
+    // the right end for a redirect.
+    return `${targetUrl.pathname}${targetUrl.search}${targetUrl.hash}` as Route;
   } catch {
     return null;
   }
@@ -94,21 +90,13 @@ function parseModeOrDefault(value: unknown): AuthMode {
   return parsedValue.data;
 }
 
-export function parseAuthNavigation({
-  returnTo,
-  intent,
-  mode,
-  origin,
-  fallback,
-}: ParseAuthNavigationInput): AuthNavigation {
-  const parsedReturnTo = parseReturnTo(returnTo, origin);
-  const parsedIntent = parseIntent(intent);
-
+export function parseSignInQuery(
+  { returnTo, intent, mode }: SignInQueryInput,
+  origin: string,
+): SignInQuery {
   return {
-    returnTo: parsedReturnTo ?? fallback,
-    hasExplicitReturnTo: parsedReturnTo !== null,
-    intent: parsedIntent,
+    returnTo: parseReturnTo(returnTo, origin),
+    intent: parseIntent(intent),
     mode: parseModeOrDefault(mode),
-    supportingText: parsedIntent ? intentMessages[parsedIntent] : null,
   };
 }
