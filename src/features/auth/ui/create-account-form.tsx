@@ -1,6 +1,7 @@
 "use client";
 
 import { Form } from "@base-ui/react/form";
+import type { Route } from "next";
 import { useActionState } from "react";
 
 import { Button } from "@/components/button";
@@ -12,7 +13,7 @@ import { AuthFormMessage } from "./auth-form-message";
 type CreateAccountFormProps = {
   email: string;
   onEmailChange: (value: string) => void;
-  returnTo?: string | undefined;
+  returnTo: Route | null;
 };
 
 export function CreateAccountForm({
@@ -32,7 +33,7 @@ export function CreateAccountForm({
       aria-busy={pending}
       className="flex w-full flex-col gap-y-4"
     >
-      {returnTo !== undefined && (
+      {returnTo !== null && (
         <input type="hidden" name="returnTo" value={returnTo} />
       )}
 
