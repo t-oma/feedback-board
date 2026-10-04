@@ -145,6 +145,21 @@ test("leaves authentication after switching modes and remains a guest", async ({
   await expectDashboardReturnTo(page);
 });
 
+test("goes back to the page before sign-in after switching modes", async ({
+  page,
+}) => {
+  await page.goto("/");
+  await page.goto("/sign-in?returnTo=%2Fdashboard");
+
+  await page.getByRole("tab", { name: "Create account" }).click();
+  await expect(page).toHaveURL(/mode=create-account/);
+  await page.getByRole("tab", { name: "Sign in" }).click();
+  await expect(page).not.toHaveURL(/mode=create-account/);
+
+  await page.goBack();
+  await expectPath(page, "/");
+});
+
 test("preserves the public exit destination through auth mode switches", async ({
   page,
 }) => {
