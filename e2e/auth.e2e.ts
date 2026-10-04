@@ -129,3 +129,49 @@ test("returns a guest to the exact view they asked for", async ({ page }) => {
     })
     .toBe(target);
 });
+
+test("leaves authentication after switching modes and remains a guest", async ({
+  page,
+}) => {
+  await page.goto("/sign-in?returnTo=%2Fdashboard");
+
+  await page.getByRole("tab", { name: "Create account" }).click();
+  await expect(page).toHaveURL(/mode=create-account/);
+  await page.getByRole("link", { name: "Back to Feedback Board" }).click();
+
+  await expectPath(page, "/");
+
+  await page.goto("/dashboard");
+  await expectDashboardReturnTo(page);
+});
+
+test("preserves the public exit destination through auth mode switches", async ({
+  page,
+}) => {
+  const returnTo = "/p/orbit-cli?sort=top#vote";
+  const query = new URLSearchParams({ returnTo, intent: "feedback" });
+  await page.goto(`/sign-in?${query}`);
+
+  const exitLink = page.getByRole("link", { name: "Back to orbit-cli" });
+  await expect(exitLink).toHaveAttribute("href", returnTo);
+
+  const email = "visitor@example.com";
+  await page
+    .getByRole("tabpanel", { name: "Sign in" })
+    .getByLabel("Email")
+    .fill(email);
+
+  await page.getByRole("tab", { name: "Create account" }).click();
+  await expect(page).toHaveURL(/mode=create-account/);
+  await expect(exitLink).toHaveAttribute("href", returnTo);
+  await expect(
+    page.getByRole("tabpanel", { name: "Create account" }).getByLabel("Email"),
+  ).toHaveValue(email);
+
+  await page.getByRole("tab", { name: "Sign in" }).click();
+  await expect(page).not.toHaveURL(/mode=create-account/);
+  await expect(exitLink).toHaveAttribute("href", returnTo);
+  await expect(
+    page.getByRole("tabpanel", { name: "Sign in" }).getByLabel("Email"),
+  ).toHaveValue(email);
+});

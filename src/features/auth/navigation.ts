@@ -41,6 +41,36 @@ export function buildSignInHref({
   return query ? `/sign-in?${query}` : "/sign-in";
 }
 
+export type AuthBackTarget =
+  | { kind: "home"; href: Route }
+  | { kind: "board"; href: Route; slug: string }
+  | { kind: "feedback"; href: Route }
+  | { kind: "changelog"; href: Route };
+
+export function getAuthBackTarget(returnTo: Route | null): AuthBackTarget {
+  const pathname = returnTo?.split(/[?#]/, 1)[0] ?? "";
+  const match =
+    /^\/p\/([a-z0-9]+(?:-[a-z0-9]+)*)(?:\/(changelog|feedback\/[^/]+))?\/?$/.exec(
+      pathname,
+    );
+
+  const [, slug, section] = match ?? [];
+
+  if (returnTo === null || !slug) {
+    return { kind: "home", href: "/" };
+  }
+
+  if (section === "changelog") {
+    return { kind: "changelog", href: returnTo };
+  }
+
+  if (section) {
+    return { kind: "feedback", href: returnTo };
+  }
+
+  return { kind: "board", href: returnTo, slug };
+}
+
 function hasSafePrefix(returnTo: string) {
   return (
     returnTo.startsWith("/") && returnTo[1] !== "/" && returnTo[1] !== "\\"
