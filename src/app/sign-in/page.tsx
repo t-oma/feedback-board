@@ -1,10 +1,13 @@
 import type { Metadata } from "next";
 import { Suspense } from "react";
 
-import { parseSignInQuery } from "@/features/auth/navigation";
+import {
+  getAuthBackTarget,
+  parseSignInQuery,
+} from "@/features/auth/navigation";
 import { AuthContent } from "@/features/auth/ui/auth-content";
 import { AuthContentSkeleton } from "@/features/auth/ui/auth-content-skeleton";
-import { AuthHeader } from "@/features/auth/ui/auth-header";
+import { AuthHeader, AuthHeaderSkeleton } from "@/features/auth/ui/auth-header";
 import { AuthMain } from "@/features/auth/ui/auth-main";
 import { env } from "@/server/env";
 
@@ -16,22 +19,32 @@ export const metadata: Metadata = {
 
 export default function SignIn({ searchParams }: PageProps<"/sign-in">) {
   return (
-    <>
-      <AuthHeader goBackText="Feedback Board" />
-
-      <AuthMain>
-        <Suspense fallback={<AuthContentSkeleton />}>
-          <AuthContentFromQuery searchParams={searchParams} />
-        </Suspense>
-      </AuthMain>
-    </>
+    <Suspense
+      fallback={
+        <>
+          <AuthHeaderSkeleton />
+          <AuthMain>
+            <AuthContentSkeleton />
+          </AuthMain>
+        </>
+      }
+    >
+      <AuthPageFromQuery searchParams={searchParams} />
+    </Suspense>
   );
 }
 
-async function AuthContentFromQuery({
+async function AuthPageFromQuery({
   searchParams,
 }: Pick<PageProps<"/sign-in">, "searchParams">) {
   const query = parseSignInQuery(await searchParams, env.BETTER_AUTH_URL);
 
-  return <AuthContent {...query} />;
+  return (
+    <>
+      <AuthHeader backTarget={getAuthBackTarget(query.returnTo)} />
+      <AuthMain>
+        <AuthContent {...query} />
+      </AuthMain>
+    </>
+  );
 }
