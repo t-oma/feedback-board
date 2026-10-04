@@ -1,12 +1,14 @@
 import type { Metadata } from "next";
 
 import {
+  buildSignInHref,
   getAuthBackTarget,
   parseSignInQuery,
 } from "@/features/auth/navigation";
-import { AuthContent } from "@/features/auth/ui/auth-content";
 import { AuthHeader } from "@/features/auth/ui/auth-header";
+import { AuthIntro } from "@/features/auth/ui/auth-intro";
 import { AuthMain } from "@/features/auth/ui/auth-main";
+import { AuthTabs } from "@/features/auth/ui/auth-tabs";
 import { env } from "@/server/env";
 
 // One title for both modes. A title per mode would need `generateMetadata`
@@ -16,13 +18,28 @@ export const metadata: Metadata = {
 };
 
 export default async function SignIn({ searchParams }: PageProps<"/sign-in">) {
-  const query = parseSignInQuery(await searchParams, env.BETTER_AUTH_URL);
+  const { returnTo, intent, mode } = parseSignInQuery(
+    await searchParams,
+    env.BETTER_AUTH_URL,
+  );
+  const signInHref = buildSignInHref({ returnTo, intent, mode: "sign-in" });
+  const createAccountHref = buildSignInHref({
+    returnTo,
+    intent,
+    mode: "create-account",
+  });
 
   return (
     <>
-      <AuthHeader backTarget={getAuthBackTarget(query.returnTo)} />
+      <AuthHeader backTarget={getAuthBackTarget(returnTo)} />
       <AuthMain>
-        <AuthContent {...query} />
+        <AuthIntro mode={mode} intent={intent} />
+        <AuthTabs
+          mode={mode}
+          returnTo={returnTo}
+          signInHref={signInHref}
+          createAccountHref={createAccountHref}
+        />
       </AuthMain>
     </>
   );
