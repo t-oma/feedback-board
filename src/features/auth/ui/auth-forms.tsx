@@ -31,14 +31,14 @@ export function AuthForms({
         <Tabs.Tab
           value="sign-in"
           nativeButton={false}
-          render={<Link href={signInHref} />}
+          render={<Link href={signInHref} replace />}
         >
           Sign in
         </Tabs.Tab>
         <Tabs.Tab
           value="create-account"
           nativeButton={false}
-          render={<Link href={createAccountHref} />}
+          render={<Link href={createAccountHref} replace />}
         >
           Create account
         </Tabs.Tab>
