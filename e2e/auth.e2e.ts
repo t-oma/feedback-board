@@ -178,6 +178,15 @@ test("preserves the public exit destination through auth mode switches", async (
 
   await page.getByRole("tab", { name: "Create account" }).click();
   await expect(page).toHaveURL(/mode=create-account/);
+  await expect(
+    page.getByRole("heading", { level: 1, name: "Create an account" }),
+  ).toBeVisible();
+  await expect(
+    page.getByText(
+      "Your name is shown next to anything you post. Nothing else is public.",
+    ),
+  ).toBeVisible();
+  expect(new URL(page.url()).searchParams.get("intent")).toBe("feedback");
   await expect(exitLink).toHaveAttribute("href", returnTo);
   await expect(
     page.getByRole("tabpanel", { name: "Create account" }).getByLabel("Email"),
@@ -185,6 +194,11 @@ test("preserves the public exit destination through auth mode switches", async (
 
   await page.getByRole("tab", { name: "Sign in" }).click();
   await expect(page).not.toHaveURL(/mode=create-account/);
+  await expect(
+    page.getByRole("heading", { level: 1, name: "Sign in" }),
+  ).toBeVisible();
+  await expect(page.getByText("Sign in to add feedback.")).toBeVisible();
+  expect(new URL(page.url()).searchParams.get("intent")).toBe("feedback");
   await expect(exitLink).toHaveAttribute("href", returnTo);
   await expect(
     page.getByRole("tabpanel", { name: "Sign in" }).getByLabel("Email"),

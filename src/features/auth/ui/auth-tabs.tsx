@@ -10,19 +10,19 @@ import type { AuthMode } from "../schemas";
 import { CreateAccountForm } from "./create-account-form";
 import { SignInForm } from "./sign-in-form";
 
-type AuthFormsProps = {
+type AuthTabsProps = {
   mode: AuthMode;
   returnTo: Route | null;
   signInHref: Route;
   createAccountHref: Route;
 };
 
-export function AuthForms({
+export function AuthTabs({
   mode,
   returnTo,
   signInHref,
   createAccountHref,
-}: AuthFormsProps) {
+}: AuthTabsProps) {
   const [email, setEmail] = useState("");
 
   return (
