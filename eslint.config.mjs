@@ -4,6 +4,9 @@ import prettierConfig from "eslint-config-prettier/flat";
 import simpleImportSort from "eslint-plugin-simple-import-sort";
 import tseslint from "typescript-eslint";
 
+const OUTLINE_NONE_MESSAGE =
+  "`outline-none` leaves no focus indicator in forced-colors mode. Use `outline-hidden`, or a visible `focus-visible:outline-*`.";
+
 const eslintConfig = defineConfig([
   ...nextVitals,
 
@@ -64,6 +67,27 @@ const eslintConfig = defineConfig([
       // settles. `interface` is still the only option for module augmentation,
       // and there it reads as the deliberate exception it is.
       "@typescript-eslint/consistent-type-definitions": ["error", "type"],
+    },
+  },
+
+  // Tailwind 4's `outline-none` sets only `outline-style: none`, and
+  // forced-colors mode drops `box-shadow`, so an element that shows focus as a
+  // ring has no indicator left there. `outline-hidden` keeps a transparent
+  // outline in that mode, which the browser repaints in a system colour.
+  {
+    files: ["src/**/*.{ts,tsx}"],
+    rules: {
+      "no-restricted-syntax": [
+        "error",
+        {
+          selector: String.raw`Literal[value=/\boutline-none\b/]`,
+          message: OUTLINE_NONE_MESSAGE,
+        },
+        {
+          selector: String.raw`TemplateElement[value.raw=/\boutline-none\b/]`,
+          message: OUTLINE_NONE_MESSAGE,
+        },
+      ],
     },
   },
 
