@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
-import { expect } from "storybook/test";
+import { expect, userEvent } from "storybook/test";
 
 import { buildSignInHref } from "../navigation";
 import { AuthMain } from "./auth-main";
@@ -31,7 +31,16 @@ const meta = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-export const SignIn: Story = {};
+export const SignIn: Story = {
+  play: async ({ canvas }) => {
+    await userEvent.tab();
+    await expect(canvas.getByRole("tab", { name: "Sign in" })).toHaveFocus();
+
+    // The panel opens with a field, so it is not a Tab stop of its own.
+    await userEvent.tab();
+    await expect(canvas.getByRole("textbox", { name: "Email" })).toHaveFocus();
+  },
+};
 
 export const CreateAccount: Story = {
   args: { mode: "create-account" },

@@ -45,15 +45,17 @@ export function AuthTabs({
         <Tabs.Indicator renderBeforeHydration />
       </Tabs.List>
 
+      {/* Base UI makes a panel a Tab stop of its own. These open with a form,
+          so Tab goes from the active tab straight to the first field. */}
       <Tabs.Content>
-        <Tabs.Panel keepMounted value="sign-in">
+        <Tabs.Panel keepMounted tabIndex={-1} value="sign-in">
           <SignInForm
             email={email}
             onEmailChange={setEmail}
             returnTo={returnTo}
           />
         </Tabs.Panel>
-        <Tabs.Panel keepMounted value="create-account">
+        <Tabs.Panel keepMounted tabIndex={-1} value="create-account">
           <CreateAccountForm
             email={email}
             onEmailChange={setEmail}
