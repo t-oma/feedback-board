@@ -3,6 +3,7 @@ import { ArrowRight } from "lucide-react";
 import { expect, fn, userEvent } from "storybook/test";
 
 import { Button } from "@/components/button";
+import { expectFocusRing, tabTo } from "@/components/focus-ring.testing";
 
 const meta = {
   title: "Components/Button",
@@ -21,9 +22,12 @@ type Story = StoryObj<typeof meta>;
 
 export const Primary: Story = {
   play: async ({ canvas }) => {
-    await expect(canvas.getByRole("button", { name: "Continue" })).toHaveStyle({
-      cursor: "pointer",
-    });
+    const button = canvas.getByRole("button", { name: "Continue" });
+
+    await expect(button).toHaveStyle({ cursor: "pointer" });
+
+    await tabTo(button);
+    await expectFocusRing(button, "outside");
   },
 };
 

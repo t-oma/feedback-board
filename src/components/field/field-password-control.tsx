@@ -34,6 +34,9 @@ export function FieldPasswordControl({
         autoCapitalize={autoCapitalize}
       />
 
+      {/* Not `transition-colors`: that also animates `outline-color`, so the
+          focus ring would fade in from the icon colour instead of appearing in
+          `accent`. */}
       <button
         type="button"
         aria-controls={controlId}
@@ -41,7 +44,7 @@ export function FieldPasswordControl({
         onClick={() => {
           setIsPasswordVisible((isVisible) => !isVisible);
         }}
-        className="absolute inset-y-px right-px inline-flex w-12 items-center justify-center rounded-r-[7px] text-foreground-subtle outline-none hover:bg-surface-muted hover:text-accent focus-visible:ring-3 focus-visible:ring-accent/20 focus-visible:ring-inset motion-safe:transition-colors"
+        className="absolute inset-y-px right-px inline-flex w-12 items-center justify-center rounded-r-[7px] text-foreground-subtle hover:bg-surface-muted hover:text-accent focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-accent motion-safe:transition-[color,background-color]"
       >
         <VisibilityIcon aria-hidden="true" size={20} />
       </button>

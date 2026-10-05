@@ -1,6 +1,8 @@
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 import { expect, within } from "storybook/test";
 
+import { expectFocusRing, tabTo } from "@/components/focus-ring.testing";
+
 import { getAuthBackTarget, parseReturnTo } from "../navigation";
 import { AuthHeader, AuthHeaderSkeleton } from "./auth-header";
 
@@ -28,6 +30,9 @@ function checkBackLink(label: string): NonNullable<Story["play"]> {
 
     await expect(link).toHaveAttribute("href", args.backTarget.href);
     await expect(link).toBeVisible();
+
+    await tabTo(link);
+    await expectFocusRing(link, "inside");
   };
 }
 
@@ -77,6 +82,21 @@ export const LongBoardSlug: Story = {
   play: checkBackLink(
     "Back to a-product-with-a-particularly-long-but-valid-slug",
   ),
+};
+
+export const Desktop: Story = {
+  globals: {
+    viewport: { value: "desktop" },
+  },
+  play: async ({ canvas }) => {
+    const header = within(canvas.getByRole("banner"));
+    const homeLink = header.getByRole("link", { name: "Feedback Board" });
+
+    await expect(homeLink).toHaveAttribute("href", "/");
+
+    await tabTo(homeLink);
+    await expectFocusRing(homeLink, "outside");
+  },
 };
 
 export const Loading: Story = {

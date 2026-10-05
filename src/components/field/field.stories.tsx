@@ -3,6 +3,7 @@ import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 import { expect, userEvent } from "storybook/test";
 
 import { Field } from "@/components/field";
+import { expectFocusRing, tabTo } from "@/components/focus-ring.testing";
 
 const meta = {
   title: "Components/Field",
@@ -63,9 +64,12 @@ export const Password: Story = {
   ),
   play: async ({ canvas }) => {
     const control = canvas.getByLabelText("Password");
-    await expect(
-      canvas.getByRole("button", { name: "Show password" }),
-    ).toHaveStyle({ cursor: "pointer" });
+    const toggle = canvas.getByRole("button", { name: "Show password" });
+
+    await tabTo(toggle);
+    await expectFocusRing(toggle, "inside");
+
+    await expect(toggle).toHaveStyle({ cursor: "pointer" });
     await expect(control).toHaveAttribute("type", "password");
 
     await userEvent.click(
