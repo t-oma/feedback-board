@@ -1,6 +1,7 @@
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 import { expect } from "storybook/test";
 
+import { expectFocusRing, tabTo } from "@/components/focus-ring.testing";
 import { Link } from "@/components/link";
 
 const meta = {
@@ -22,6 +23,9 @@ const meta = {
     await expect(link).toHaveAttribute("href", "/");
     await expect(link).toHaveStyle({ cursor: "pointer" });
     await expect(canvas.queryByRole("button")).not.toBeInTheDocument();
+
+    await tabTo(link);
+    await expectFocusRing(link, "outside");
   },
 } satisfies Meta<typeof Link>;
 

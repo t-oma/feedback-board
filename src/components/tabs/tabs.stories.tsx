@@ -1,6 +1,7 @@
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 import { expect, userEvent } from "storybook/test";
 
+import { expectFocusRing, tabTo } from "@/components/focus-ring.testing";
 import { Tabs } from "@/components/tabs";
 
 type AuthMode = "sign-in" | "create-account";
@@ -72,6 +73,14 @@ export const SignInActive: Story = {
 
 export const CreateAccountActive: Story = {
   render: () => <AuthTabs defaultValue="create-account" />,
+  // These panels open with text, so each one stays a Tab stop and needs the
+  // ring itself.
+  play: async ({ canvas }) => {
+    const panel = canvas.getByRole("tabpanel", { name: "Create account" });
+
+    await tabTo(panel);
+    await expectFocusRing(panel, "outside");
+  },
 };
 
 export const Links: Story = {
