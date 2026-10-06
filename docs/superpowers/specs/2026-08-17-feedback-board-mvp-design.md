@@ -235,30 +235,41 @@ Each Server Action performs the following sequence:
 The serializable expected-result shape is:
 
 ```ts
-type ActionError = {
+type FieldErrors<Input> = { [Field in keyof Input]?: string[] };
+
+type ActionError<Input = Record<string, unknown>> = {
   ok: false;
   code:
-    "VALIDATION" | "UNAUTHENTICATED" | "FORBIDDEN" | "NOT_FOUND" | "CONFLICT";
-  message: string;
-  fieldErrors?: Record<string, string[]>;
+    | "VALIDATION"
+    | "UNAUTHENTICATED"
+    | "FORBIDDEN"
+    | "NOT_FOUND"
+    | "CONFLICT"
+    | "UNEXPECTED";
+  message?: string;
+  fieldErrors?: FieldErrors<Input>;
 };
 
-type ActionResult<T = undefined> = { ok: true; data: T } | ActionError;
+type ActionResult<T = undefined, Input = Record<string, unknown>> =
+  { ok: true; data: T } | ActionError<Input>;
 ```
+
+`Input` is the type the action's schema infers, so a field error for a field the input does not have fails to compile. `message` is form-level text, which a form shows in its banner; it is absent when the fields say everything. `fieldErrors` holds messages for named fields and is absent, never empty, when no field has one. Every error carries a `message`, `fieldErrors`, or both.
 
 Codes carry the following meaning:
 
-- `VALIDATION`: parsing or normalization rejected the input. `fieldErrors` carries the per-field messages.
+- `VALIDATION`: parsing or normalization rejected the input. `fieldErrors` carries the per-field messages, and issues that belong to no field, such as an object-level refinement without a path, become the `message`.
 - `UNAUTHENTICATED`: a protected action has no valid session, or a sign-in attempt supplied credentials that Better Auth rejected. The latter uses one form-level message and never identifies which credential was wrong.
 - `NOT_FOUND`: the target row does not exist, or the caller could not have reached it through a public read.
 - `FORBIDDEN`: the target exists and is publicly readable, but the caller does not own it.
 - `CONFLICT`: the target's current state does not permit the write. A uniqueness constraint rejecting a taken slug or a second product for one owner is one case; a vote against feedback that has reached `completed` is the other.
+- `UNEXPECTED`: the write failed for a reason the action did not anticipate, such as a database outage. The action logs the error and returns one neutral message that makes no claim about whether the write happened.
 
 `NOT_FOUND` and `FORBIDDEN` are separated by what the caller can already observe, so an action never reveals more than the matching public read. Feedback that is hidden, or that belongs to a different product than the one addressed, is reported to a non-owner as `NOT_FOUND` rather than `FORBIDDEN`; the owner of that board instead receives the real outcome, because hidden items are part of owner management. Feedback that is visible to everyone but owned by another board returns `FORBIDDEN`, since its existence is already public.
 
 `data` is required rather than optional, so a caller that narrows on `ok` reaches the payload without also handling `undefined`. The cost lands on the producing side: an action with no payload returns `{ ok: true, data: undefined }` rather than `{ ok: true }`. That trade is deliberate, because the omission is written once per action and the check would otherwise be written at every call site.
 
-Redirecting actions redirect instead of returning their success variant, so they are declared as `Promise<ActionError>`. Typing them as `ActionResult` would leave every caller with a success branch that can never run. `ActionError` is a named type for exactly this reason; it also keeps the error shape from being restated wherever only failures are possible. Passwords, raw database errors, and internal stack details are never returned.
+Redirecting actions redirect instead of returning their success variant, so they are declared as `Promise<ActionError<Input>>`. Typing them as `ActionResult` would leave every caller with a success branch that can never run. `ActionError` is a named type for exactly this reason; it also keeps the error shape from being restated wherever only failures are possible. Passwords, raw database errors, and internal stack details are never returned.
 
 Required mutations are:
 
@@ -340,7 +351,11 @@ Web fonts are self-hosted through the framework's font pipeline rather than fetc
 
 Expected operational failures are values, not thrown exceptions. Zod issues appear next to fields. A conflicting slug maps to the slug field. Invalid credentials use one generic message. Missing authentication prompts sign-in. Failed ownership checks return a generic unavailable-operation message. A `NOT_FOUND` result renders next to the control that produced it; only Server Component reads call `notFound()`, so route-level not-found UI is never swapped in underneath an interaction that merely addressed a stale row.
 
-Unexpected failures such as database outages or programming errors are logged on the server and bubble to the nearest route `error.tsx`. The UI shows a neutral message and retry control without exposing database or stack details. Vercel runtime logs are sufficient for the MVP; external monitoring is not required.
+Unexpected failures such as database outages or programming errors are logged on the server, and where they surface depends on what failed. A write that a form submitted returns `UNEXPECTED`, so the form stays on screen with what was typed and shows the neutral message in its banner. A read, and a write with nothing typed to keep, such as sign-out, bubbles to the nearest route `error.tsx`, which shows a neutral message and a retry control. Neither exposes database or stack details. Vercel runtime logs are sufficient for the MVP; external monitoring is not required.
+
+React resets a form after every form action, whatever the action returned, and the reset empties every uncontrolled field. A field whose value must survive a failed submit is therefore controlled. Password fields stay uncontrolled on purpose, so a failed submit clears them.
+
+After a failed submit, focus goes where the person acts next. Field errors move it to the first invalid field, which Base UI's `Form` already does. An error with only a form-level message moves it to the banner in a form that keeps every value, since submitting again is the next step. The auth forms clear the password, so they move it to the password instead.
 
 Route behavior includes:
 
