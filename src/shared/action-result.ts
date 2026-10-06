@@ -1,30 +1,25 @@
 import * as z from "zod";
 
-export type ActionError = {
+export type FieldErrors<Input> = { [Field in keyof Input]?: string[] };
+
+export type ActionError<Input = Record<string, unknown>> = {
   ok: false;
   code:
     "VALIDATION" | "UNAUTHENTICATED" | "FORBIDDEN" | "NOT_FOUND" | "CONFLICT";
   message: string;
-  fieldErrors?: Record<string, string[]>;
+  fieldErrors?: FieldErrors<Input>;
 };
 
-export type ActionResult<T = undefined> = { ok: true; data: T } | ActionError;
+export type ActionResult<T = undefined, Input = Record<string, unknown>> =
+  { ok: true; data: T } | ActionError<Input>;
 
-export function toValidationActionError<T extends Record<string, unknown>>(
-  error: z.ZodError<T>,
-): ActionError {
-  const fieldErrors: Record<string, string[]> = {};
-
-  for (const [field, messages] of Object.entries(
-    z.flattenError(error).fieldErrors,
-  )) {
-    if (messages !== undefined) fieldErrors[field] = messages;
-  }
-
+export function toValidationActionError<Input>(
+  error: z.ZodError<Input>,
+): ActionError<Input> {
   return {
     ok: false,
     code: "VALIDATION",
     message: "Check the highlighted fields",
-    fieldErrors,
+    fieldErrors: z.flattenError(error).fieldErrors,
   };
 }

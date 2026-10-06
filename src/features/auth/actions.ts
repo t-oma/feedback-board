@@ -12,12 +12,17 @@ import {
 
 import { classifyAuthError } from "./errors";
 import { parseReturnTo } from "./navigation";
-import { createAccountSchema, signInSchema } from "./schemas";
+import {
+  type CreateAccountInput,
+  createAccountSchema,
+  type SignInInput,
+  signInSchema,
+} from "./schemas";
 
 export async function signInAction(
-  _previousState: ActionError | null,
+  _previousState: ActionError<SignInInput> | null,
   formData: FormData,
-): Promise<ActionError> {
+): Promise<ActionError<SignInInput>> {
   const parsedInput = signInSchema.safeParse({
     email: formData.get("email"),
     password: formData.get("password"),
@@ -51,9 +56,9 @@ export async function signInAction(
 }
 
 export async function createAccountAction(
-  _previousState: ActionError | null,
+  _previousState: ActionError<CreateAccountInput> | null,
   formData: FormData,
-): Promise<ActionError> {
+): Promise<ActionError<CreateAccountInput>> {
   const parsedInput = createAccountSchema.safeParse({
     name: formData.get("name"),
     email: formData.get("email"),
