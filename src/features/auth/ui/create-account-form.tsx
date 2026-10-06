@@ -2,7 +2,7 @@
 
 import { Form } from "@base-ui/react/form";
 import type { Route } from "next";
-import { useActionState } from "react";
+import { useActionState, useState } from "react";
 
 import { Button } from "@/components/button";
 import { Field } from "@/components/field";
@@ -21,6 +21,9 @@ export function CreateAccountForm({
   onEmailChange,
   returnTo,
 }: CreateAccountFormProps) {
+  // React resets the form after every action, failed ones included. Name is
+  // held here so that it survives; the password is left to the reset.
+  const [name, setName] = useState("");
   const [error, formAction, pending] = useActionState(
     createAccountAction,
     null,
@@ -46,6 +49,8 @@ export function CreateAccountForm({
           aria-required="true"
           placeholder="John Doe"
           autoComplete="name"
+          value={name}
+          onValueChange={setName}
           readOnly={pending}
         />
         <Field.Error />
