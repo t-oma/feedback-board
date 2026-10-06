@@ -24,14 +24,13 @@ export function SignInForm({
   const [error, formAction, pending] = useActionState(signInAction, null);
   const passwordRef = useRef<HTMLInputElement>(null);
 
+  // React resets the form after every action, which empties the uncontrolled
+  // password and leaves the controlled email alone. The password is therefore
+  // the field to fill again.
   useEffect(() => {
     if (error?.code !== "UNAUTHENTICATED") return;
 
-    const passwordControl = passwordRef.current;
-    if (passwordControl === null) return;
-
-    passwordControl.value = "";
-    passwordControl.focus();
+    passwordRef.current?.focus();
   }, [error]);
 
   return (
