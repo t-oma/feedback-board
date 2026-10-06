@@ -14,7 +14,6 @@ expectTypeOf(toValidationActionError(signUpError)).toEqualTypeOf<
 export const misspeltField: ActionError<SignUp> = {
   ok: false,
   code: "CONFLICT",
-  message: "An account already uses this email.",
   // @ts-expect-error `emial` is not a field of the input.
   fieldErrors: { emial: ["An account already uses this email."] },
 };

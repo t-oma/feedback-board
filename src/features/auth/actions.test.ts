@@ -58,10 +58,9 @@ describe("signInAction", () => {
     formData.set("email", "ada@invalid");
     formData.set("password", "");
 
-    await expect(signInAction(null, formData)).resolves.toEqual({
+    await expect(signInAction(null, formData)).resolves.toStrictEqual({
       ok: false,
       code: "VALIDATION",
-      message: "Check the highlighted fields",
       fieldErrors: {
         email: ["Enter a complete email address"],
         password: ["Enter your password"],
@@ -110,7 +109,7 @@ describe("signInAction", () => {
     formData.set("email", "ada@example.com");
     formData.set("password", "pass word");
 
-    await expect(signInAction(null, formData)).resolves.toEqual({
+    await expect(signInAction(null, formData)).resolves.toStrictEqual({
       ok: false,
       code: "UNAUTHENTICATED",
       message: "That email and password do not match an account.",
@@ -146,10 +145,9 @@ describe("createAccountAction", () => {
     formData.set("email", "ada@invalid");
     formData.set("password", "short");
 
-    await expect(createAccountAction(null, formData)).resolves.toEqual({
+    await expect(createAccountAction(null, formData)).resolves.toStrictEqual({
       ok: false,
       code: "VALIDATION",
-      message: "Check the highlighted fields",
       fieldErrors: {
         name: ["Enter your name"],
         email: ["Enter a complete email address"],
@@ -210,10 +208,9 @@ describe("createAccountAction", () => {
     formData.set("email", "ada@example.com");
     formData.set("password", "pass word");
 
-    await expect(createAccountAction(null, formData)).resolves.toEqual({
+    await expect(createAccountAction(null, formData)).resolves.toStrictEqual({
       ok: false,
       code: "CONFLICT",
-      message: "An account already uses this email.",
       fieldErrors: {
         email: ["An account already uses this email."],
       },

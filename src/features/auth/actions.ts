@@ -80,13 +80,10 @@ export async function createAccountAction(
     });
   } catch (error) {
     if (classifyAuthError(error) === "emailAlreadyRegistered") {
-      const message = "An account already uses this email.";
-
       return {
         ok: false,
         code: "CONFLICT",
-        message,
-        fieldErrors: { email: [message] },
+        fieldErrors: { email: ["An account already uses this email."] },
       };
     }
 

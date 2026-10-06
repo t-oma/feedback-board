@@ -7,7 +7,7 @@ type AuthFormMessageProps = {
 };
 
 export function AuthFormMessage({ error }: AuthFormMessageProps) {
-  if (error === null || error.fieldErrors !== undefined) return null;
+  if (error?.message === undefined) return null;
 
   return (
     <div
