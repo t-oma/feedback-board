@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
-import { expect, mocked, userEvent, waitFor, within } from "storybook/test";
+import { expect, fn, mocked, userEvent, waitFor, within } from "storybook/test";
 
 import { createAccountAction, signInAction } from "../actions";
 import { buildSignInHref } from "../navigation";
@@ -100,6 +100,98 @@ export const SignInWrongCredentials: Story = {
     const password = form.getByLabelText("Password");
     await expect(password).toHaveValue("");
     await waitFor(() => expect(password).toHaveFocus());
+  },
+};
+
+const unexpectedMessage =
+  "We couldn’t complete your request. Please try again.";
+
+export const SignInUnexpectedFailure: Story = {
+  beforeEach: () => {
+    mocked(signInAction).mockResolvedValue({
+      ok: false,
+      code: "UNEXPECTED",
+      message: unexpectedMessage,
+    });
+  },
+  play: async ({ canvas }) => {
+    const form = within(canvas.getByRole("tabpanel"));
+
+    await userEvent.type(form.getByLabelText("Email"), "marta@orbit.dev");
+    await userEvent.type(form.getByLabelText("Password"), "correct horse");
+    await userEvent.click(form.getByRole("button", { name: "Sign in" }));
+
+    await expect(await form.findByRole("alert")).toHaveTextContent(
+      unexpectedMessage,
+    );
+    await expect(form.getByLabelText("Email")).toHaveValue("marta@orbit.dev");
+    await waitFor(() => expect(form.getByLabelText("Password")).toHaveFocus());
+  },
+};
+
+export const CreateAccountUnexpectedFailure: Story = {
+  args: { mode: "create-account" },
+  beforeEach: () => {
+    mocked(createAccountAction).mockResolvedValue({
+      ok: false,
+      code: "UNEXPECTED",
+      message: unexpectedMessage,
+    });
+  },
+  play: async ({ canvas }) => {
+    const form = within(canvas.getByRole("tabpanel"));
+
+    await userEvent.type(form.getByLabelText("Name"), "Marta Kowal");
+    await userEvent.type(form.getByLabelText("Email"), "marta@orbit.dev");
+    await userEvent.type(form.getByLabelText("Password"), "correct horse");
+    await userEvent.click(form.getByRole("button", { name: "Create account" }));
+
+    await expect(await form.findByRole("alert")).toHaveTextContent(
+      unexpectedMessage,
+    );
+    await expect(form.getByLabelText("Name")).toHaveValue("Marta Kowal");
+    await expect(form.getByLabelText("Email")).toHaveValue("marta@orbit.dev");
+
+    const password = form.getByLabelText("Password");
+    await expect(password).toHaveValue("");
+    await waitFor(() => expect(password).toHaveFocus());
+  },
+};
+
+// A form-level message and a field error at once: both are shown, and focus
+// goes to the field, because Base UI's `Form` moves it to the first invalid
+// one. Base UI moves it last, so the email ends up focused even if the
+// password took focus first; the listener catches that detour.
+export const CreateAccountFormAndFieldErrors: Story = {
+  args: { mode: "create-account" },
+  beforeEach: () => {
+    mocked(createAccountAction).mockResolvedValue({
+      ok: false,
+      code: "VALIDATION",
+      message: "Use a name that differs from your email",
+      fieldErrors: { email: ["Enter a complete email address"] },
+    });
+  },
+  play: async ({ canvas }) => {
+    const form = within(canvas.getByRole("tabpanel"));
+
+    await userEvent.type(form.getByLabelText("Name"), "marta@orbit");
+    await userEvent.type(form.getByLabelText("Email"), "marta@orbit");
+    const password = form.getByLabelText("Password");
+    await userEvent.type(password, "correct horse");
+
+    const passwordFocused = fn();
+    password.addEventListener("focus", passwordFocused);
+    await userEvent.click(form.getByRole("button", { name: "Create account" }));
+
+    await expect(await form.findByRole("alert")).toHaveTextContent(
+      "Use a name that differs from your email",
+    );
+    await expect(
+      form.getByText("Enter a complete email address"),
+    ).toBeVisible();
+    await waitFor(() => expect(form.getByLabelText("Email")).toHaveFocus());
+    await expect(passwordFocused).not.toHaveBeenCalled();
   },
 };
 

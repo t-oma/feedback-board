@@ -1,5 +1,6 @@
 import { BASE_ERROR_CODES } from "better-auth";
 import { APIError } from "better-auth/api";
+import type * as Navigation from "next/navigation";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 const mocks = vi.hoisted(() => ({
@@ -14,9 +15,14 @@ vi.mock("next/headers", () => ({
   headers: mocks.headers,
 }));
 
-vi.mock("next/navigation", () => ({
+// `unstable_rethrow` stays real, so the tests exercise how the actions treat
+// an error Next.js throws on purpose.
+vi.mock("next/navigation", async (importOriginal) => ({
+  ...(await importOriginal<typeof Navigation>()),
   redirect: mocks.redirect,
 }));
+
+vi.mock("server-only", () => ({}));
 
 vi.mock("@/server/auth", () => ({
   auth: {
@@ -37,6 +43,32 @@ vi.mock("@/server/env", () => ({
 import { createAccountAction, signInAction, signOutAction } from "./actions";
 
 const redirectSignal = new Error("NEXT_REDIRECT");
+
+const navigation = await vi.importActual<typeof Navigation>("next/navigation");
+
+function thrownBy(run: () => unknown) {
+  try {
+    run();
+  } catch (error) {
+    return error;
+  }
+
+  throw new Error("Expected the call to throw");
+}
+
+// A real redirect error, which `unstable_rethrow` recognises by its digest.
+const nextRedirectError = thrownBy(() => navigation.redirect("/dashboard"));
+
+const unexpectedActionError = {
+  ok: false,
+  code: "UNEXPECTED",
+  message: "We couldn’t complete your request. Please try again.",
+};
+
+const consoleError = vi
+  .spyOn(console, "error")
+  .mockImplementation(() => undefined);
+
 const requestHeaders = new Headers({
   cookie: "session=test",
   "user-agent": "Vitest",
@@ -117,15 +149,31 @@ describe("signInAction", () => {
     expect(mocks.redirect).not.toHaveBeenCalled();
   });
 
-  it("rethrows unexpected sign-in errors", async () => {
+  it("logs an unexpected sign-in error and returns it as UNEXPECTED", async () => {
     const unexpectedError = new Error("Database unavailable");
     mocks.signInEmail.mockRejectedValueOnce(unexpectedError);
     const formData = new FormData();
     formData.set("email", "ada@example.com");
     formData.set("password", "pass word");
 
-    await expect(signInAction(null, formData)).rejects.toBe(unexpectedError);
+    await expect(signInAction(null, formData)).resolves.toStrictEqual(
+      unexpectedActionError,
+    );
+    expect(consoleError).toHaveBeenCalledWith(
+      expect.any(String),
+      unexpectedError,
+    );
     expect(mocks.redirect).not.toHaveBeenCalled();
+  });
+
+  it("rethrows a Next.js redirect raised inside the sign-in call", async () => {
+    mocks.signInEmail.mockRejectedValueOnce(nextRedirectError);
+    const formData = new FormData();
+    formData.set("email", "ada@example.com");
+    formData.set("password", "pass word");
+
+    await expect(signInAction(null, formData)).rejects.toBe(nextRedirectError);
+    expect(consoleError).not.toHaveBeenCalled();
   });
 });
 
@@ -218,7 +266,7 @@ describe("createAccountAction", () => {
     expect(mocks.redirect).not.toHaveBeenCalled();
   });
 
-  it("rethrows unexpected account-creation errors", async () => {
+  it("logs an unexpected account-creation error and returns it as UNEXPECTED", async () => {
     const unexpectedError = new Error("Database unavailable");
     mocks.signUpEmail.mockRejectedValueOnce(unexpectedError);
     const formData = new FormData();
@@ -226,10 +274,27 @@ describe("createAccountAction", () => {
     formData.set("email", "ada@example.com");
     formData.set("password", "pass word");
 
-    await expect(createAccountAction(null, formData)).rejects.toBe(
+    await expect(createAccountAction(null, formData)).resolves.toStrictEqual(
+      unexpectedActionError,
+    );
+    expect(consoleError).toHaveBeenCalledWith(
+      expect.any(String),
       unexpectedError,
     );
     expect(mocks.redirect).not.toHaveBeenCalled();
+  });
+
+  it("rethrows a Next.js redirect raised inside the sign-up call", async () => {
+    mocks.signUpEmail.mockRejectedValueOnce(nextRedirectError);
+    const formData = new FormData();
+    formData.set("name", "Ada Lovelace");
+    formData.set("email", "ada@example.com");
+    formData.set("password", "pass word");
+
+    await expect(createAccountAction(null, formData)).rejects.toBe(
+      nextRedirectError,
+    );
+    expect(consoleError).not.toHaveBeenCalled();
   });
 });
 

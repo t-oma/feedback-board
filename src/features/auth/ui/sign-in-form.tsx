@@ -2,13 +2,14 @@
 
 import { Form } from "@base-ui/react/form";
 import type { Route } from "next";
-import { useActionState, useEffect, useRef } from "react";
+import { useActionState } from "react";
 
 import { Button } from "@/components/button";
 import { Field } from "@/components/field";
 
 import { signInAction } from "../actions";
 import { AuthFormMessage } from "./auth-form-message";
+import { usePasswordFocusAfterFormError } from "./use-password-focus";
 
 type SignInFormProps = {
   email: string;
@@ -22,16 +23,7 @@ export function SignInForm({
   returnTo,
 }: SignInFormProps) {
   const [error, formAction, pending] = useActionState(signInAction, null);
-  const passwordRef = useRef<HTMLInputElement>(null);
-
-  // React resets the form after every action, which empties the uncontrolled
-  // password and leaves the controlled email alone. The password is therefore
-  // the field to fill again.
-  useEffect(() => {
-    if (error?.code !== "UNAUTHENTICATED") return;
-
-    passwordRef.current?.focus();
-  }, [error]);
+  const passwordRef = usePasswordFocusAfterFormError(error);
 
   return (
     <Form

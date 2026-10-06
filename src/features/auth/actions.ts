@@ -1,8 +1,9 @@
 "use server";
 
 import { headers } from "next/headers";
-import { redirect } from "next/navigation";
+import { redirect, unstable_rethrow } from "next/navigation";
 
+import { toUnexpectedActionError } from "@/server/action-errors";
 import { auth } from "@/server/auth";
 import { env } from "@/server/env";
 import {
@@ -41,6 +42,8 @@ export async function signInAction(
       headers: await headers(),
     });
   } catch (error) {
+    unstable_rethrow(error);
+
     if (classifyAuthError(error) === "invalidCredentials") {
       return {
         ok: false,
@@ -49,7 +52,7 @@ export async function signInAction(
       };
     }
 
-    throw error;
+    return toUnexpectedActionError("signInAction", error);
   }
 
   redirect(returnTo);
@@ -79,6 +82,8 @@ export async function createAccountAction(
       headers: await headers(),
     });
   } catch (error) {
+    unstable_rethrow(error);
+
     if (classifyAuthError(error) === "emailAlreadyRegistered") {
       return {
         ok: false,
@@ -87,7 +92,7 @@ export async function createAccountAction(
       };
     }
 
-    throw error;
+    return toUnexpectedActionError("createAccountAction", error);
   }
 
   redirect(returnTo);

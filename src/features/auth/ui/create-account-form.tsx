@@ -9,6 +9,7 @@ import { Field } from "@/components/field";
 
 import { createAccountAction } from "../actions";
 import { AuthFormMessage } from "./auth-form-message";
+import { usePasswordFocusAfterFormError } from "./use-password-focus";
 
 type CreateAccountFormProps = {
   email: string;
@@ -28,6 +29,7 @@ export function CreateAccountForm({
     createAccountAction,
     null,
   );
+  const passwordRef = usePasswordFocusAfterFormError(error);
 
   return (
     <Form
@@ -74,6 +76,7 @@ export function CreateAccountForm({
       <Field.Root name="password">
         <Field.Label>Password</Field.Label>
         <Field.PasswordControl
+          ref={passwordRef}
           aria-required="true"
           placeholder="••••••••"
           autoComplete="new-password"

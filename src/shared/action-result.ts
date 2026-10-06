@@ -5,7 +5,12 @@ export type FieldErrors<Input> = { [Field in keyof Input]?: string[] };
 export type ActionError<Input = Record<string, unknown>> = {
   ok: false;
   code:
-    "VALIDATION" | "UNAUTHENTICATED" | "FORBIDDEN" | "NOT_FOUND" | "CONFLICT";
+    | "VALIDATION"
+    | "UNAUTHENTICATED"
+    | "FORBIDDEN"
+    | "NOT_FOUND"
+    | "CONFLICT"
+    | "UNEXPECTED";
   // Form-level text, which the form shows in its banner. Absent when the
   // fields say everything there is to say.
   message?: string;
