@@ -84,6 +84,31 @@ export const Password: Story = {
   },
 };
 
+export const OnPhone: Story = {
+  globals: {
+    viewport: { value: "mobile1" },
+  },
+  render: () => (
+    <div className="flex flex-col gap-y-4">
+      <Field.Root name="email">
+        <Field.Label>Email</Field.Label>
+        <Field.Control type="email" autoComplete="email" />
+      </Field.Root>
+      <Field.Root name="password">
+        <Field.Label>Password</Field.Label>
+        <Field.PasswordControl autoComplete="current-password" />
+      </Field.Root>
+    </div>
+  ),
+  play: async ({ canvas }) => {
+    for (const label of ["Email", "Password"]) {
+      await expect(canvas.getByLabelText(label)).toHaveStyle({
+        fontSize: "16px",
+      });
+    }
+  },
+};
+
 export const Invalid: Story = {
   render: () => (
     <Form errors={{ email: ["Enter a complete email address"] }}>
