@@ -62,7 +62,7 @@ function AuthHeaderFrame({ children }: { children: ReactNode }) {
       </div>
       <nav
         aria-label="Exit authentication"
-        className="flex h-12 items-center border-b border-border bg-surface px-5 md:border-b-0"
+        className="flex h-12 items-center border-b border-border bg-surface px-5 md:border-b-0 md:bg-transparent"
       >
         {children}
       </nav>

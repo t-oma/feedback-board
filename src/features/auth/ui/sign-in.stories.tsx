@@ -67,6 +67,31 @@ export const CreateAccount: Story = {
   args: { mode: "create-account", returnTo: "/dashboard", intent: "board" },
 };
 
+export const OnPhone: Story = {
+  globals: {
+    viewport: { value: "mobile1" },
+  },
+  play: async ({ canvas }) => {
+    const { left, width } = canvas.getByRole("main").getBoundingClientRect();
+
+    await expect(left).toBe(0);
+    await expect(width).toBe(document.documentElement.clientWidth);
+  },
+};
+
+export const OnTablet: Story = {
+  globals: {
+    viewport: { value: "tablet" },
+  },
+  play: async ({ canvas }) => {
+    const { left, width } = canvas.getByRole("main").getBoundingClientRect();
+    const tabStrip = canvas.getByRole("tablist").getBoundingClientRect();
+
+    await expect(tabStrip.width).toBe(440);
+    await expect(left).toBe((document.documentElement.clientWidth - width) / 2);
+  },
+};
+
 export const Loading: Story = {
   render: () => (
     <>
