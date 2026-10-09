@@ -28,7 +28,7 @@ vi.mock("@/server/auth", () => ({
   },
 }));
 
-import { requireSession } from "./session.server";
+import { getSession, requireSession } from "./session.server";
 
 const redirectSignal = new Error("NEXT_REDIRECT");
 const requestHeaders = new Headers({ cookie: "session=test" });
@@ -77,6 +77,22 @@ describe("auth session boundary", () => {
     await expect(requireSession({ returnTo: "/dashboard" })).rejects.toBe(
       unexpectedError,
     );
+    expect(mocks.redirect).not.toHaveBeenCalled();
+  });
+
+  it("gives a protected action the session as it is", async () => {
+    mocks.getSession.mockResolvedValueOnce(validSession);
+
+    await expect(getSession()).resolves.toBe(validSession);
+    expect(mocks.getSession).toHaveBeenCalledExactlyOnceWith({
+      headers: requestHeaders,
+    });
+  });
+
+  it("gives a protected action null for a missing session, without redirecting", async () => {
+    mocks.getSession.mockResolvedValueOnce(null);
+
+    await expect(getSession()).resolves.toBeNull();
     expect(mocks.redirect).not.toHaveBeenCalled();
   });
 });
