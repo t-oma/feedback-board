@@ -76,12 +76,28 @@ export const OnPhone: Story = {
 
     await expect(left).toBe(0);
     await expect(width).toBe(document.documentElement.clientWidth);
+    await expect(
+      canvas.queryByRole("link", { name: "Feedback Board" }),
+    ).not.toBeInTheDocument();
   },
 };
 
+// The header and the card switch together at `sm`. An iPad mini in portrait
+// is narrower than `md`, so this width tells the two breakpoints apart.
 export const OnTablet: Story = {
+  parameters: {
+    viewport: {
+      options: {
+        ipadMini: {
+          name: "iPad mini",
+          styles: { width: "744px", height: "1133px" },
+          type: "tablet",
+        },
+      },
+    },
+  },
   globals: {
-    viewport: { value: "tablet" },
+    viewport: { value: "ipadMini" },
   },
   play: async ({ canvas }) => {
     const { left, width } = canvas.getByRole("main").getBoundingClientRect();
@@ -89,6 +105,9 @@ export const OnTablet: Story = {
 
     await expect(tabStrip.width).toBe(440);
     await expect(left).toBe((document.documentElement.clientWidth - width) / 2);
+    await expect(
+      canvas.getByRole("link", { name: "Feedback Board" }),
+    ).toBeVisible();
   },
 };
 
