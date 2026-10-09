@@ -7,7 +7,7 @@ type FocusRingPlacement = "outside" | "inside";
 const MAX_TAB_PRESSES = 10;
 
 // Presses Tab until `element` has focus. How many stops come first can depend
-// on the viewport: the `AuthHeader` home link only exists from `md` up.
+// on the viewport: the `AuthHeader` home link only exists from `sm` up.
 export async function tabTo(element: Element) {
   for (
     let presses = 0;

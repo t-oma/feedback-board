@@ -32,8 +32,14 @@ From `sm` (640px) up, `main` itself is the card:
   quarter of the screen.
 
 The card starts at `sm` rather than `md` because it fits from about 554px, and
-an iPad mini in portrait is 744px wide. The header keeps its `md` switch, so
-between 640px and 767px the mobile header bar sits above the card.
+an iPad mini in portrait is 744px wide. The header moves its switch from `md`
+to `sm` with it, so the page has two states: the mobile layout, and the card
+under the two-row header. A mobile header bar above the card would mix the two.
+
+A phone held sideways gets the card once it is 640px wide. Below `md` that is
+only small phones such as an iPhone SE at 667×375, where the 108px header, the
+76px offset and the card padding push the first field below the fold. Phones of 768px and wider already got the two-row header
+before this change. A height condition would fix both and is left for later.
 
 `main` keeps `overflow-x-clip`, so the sideways slide of the tab panels is
 clipped at the card's edge rather than the viewport's.
@@ -43,9 +49,9 @@ stories get the same frame with no change where they use it.
 
 ## Header
 
-From `md` up, the exit-link row has no fill, so the link sits on the page
+From `sm` up, the exit-link row has no fill, so the link sits on the page
 background above the card. The brand row and its bottom border are unchanged
-and still close the header. Below `md` the exit-link row is the mobile header
+and still close the header. Below `sm` the exit-link row is the mobile header
 bar and keeps its `surface` fill and border.
 
 ## Deviations from the design
@@ -70,10 +76,11 @@ variable, and `AuthMain` keeps the mobile behaviour.
 
 ## Verification
 
-- A `Features/Auth/SignIn` story at Storybook's `tablet` viewport (834px)
-  checks that the tab strip, which spans the card's content, is 440px wide and
-  that `main` is centred. A story at `mobile1` (320px) checks that `main` spans
-  the viewport. axe runs on both.
+- A `Features/Auth/SignIn` story at an iPad mini viewport (744px, between `sm`
+  and `md`) checks that the tab strip, which spans the card's content, is 440px
+  wide, that `main` is centred and that the header shows the brand link. A
+  story at `mobile1` (320px) checks that `main` spans the viewport and that the
+  brand link is absent. axe runs on both.
 - Playwright screenshots at 390, 744, 834 and 1280px in both modes, compared by
   eye, plus a check in the iPad simulator.
 - `pnpm verify`.
