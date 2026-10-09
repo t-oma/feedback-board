@@ -24,6 +24,16 @@ Description normalization converts every CRLF and lone CR to LF before it trims 
 
 Slug input follows the MVP normalization order before validation: trim, lowercase, replace spaces and underscores with hyphens, remove unsupported characters, collapse repeated hyphens, and trim hyphens at both ends. The generated suggestion uses the same function, then keeps the first 48 characters and drops a hyphen the cut leaves at the end. A name may be 80 characters long, so without the cut the form would suggest an address it then rejects, under a field the user never touched. If a name cannot produce a slug of at least three characters, the user must enter a valid Latin slug. The manual-slug validation example in the visual mockup yields to this normalization rule: an input that normalizes to a valid slug succeeds.
 
+Validation messages follow the design where it has them and keep its voice where it does not:
+
+- an empty name: "Enter a product name";
+- a name shorter than two characters: "Use at least 2 characters";
+- any field over its maximum: "Remove N characters", where N is how far the normalized value exceeds it;
+- an address that normalizes to nothing, such as one typed in Cyrillic: "Use Latin letters, numbers and hyphens";
+- an address shorter than three characters: "Use at least 3 characters".
+
+The auth forms keep "Use at most N characters" for now; bringing them in line with the design is a separate change.
+
 The shared field pattern supports an optional character counter. This form uses it for name, slug, and description. It counts what validation counts: the normalized value, with a line break as one character. The counter sits in the label row, as in the design, but outside the `<label>` element; inside it, the counter would become part of the field's accessible name and change with every keystroke. Authentication fields keep their existing presentation without counters. Their validation errors continue to explain length limits. The counter is presentation, not a substitute for validation.
 
 The description needs a multi-line control. `Field.Control` fixes its height at 48 pixels, so `src/components/field` gains a textarea control with the same border, focus, and invalid styles. It follows the MVP rule of 16-pixel text below `md`, which stops iOS Safari from zooming into the focused field.
@@ -40,7 +50,9 @@ The bounds move into `contracts.ts` from `src/server/db/schema/products.ts`, whi
 
 The dashboard page checks the full session before reading owner data. The action validates input, performs its own full session check, writes the product, and calls `refresh()`, so the page re-renders with the owner state. It never trusts an owner ID from the form. The action's session check must not redirect: a protected action with no session returns `UNAUTHENTICATED`, while `requireSession` redirects to sign-in. `session.server.ts` therefore also exposes a reader that returns the session or `null`, which the auth-session design deferred until a caller needed one.
 
-The existing uniqueness constraints on `products.owner_id` and `products.slug` enforce one product per user and globally unique public addresses under concurrent requests. The migration declares both inline, so PostgreSQL names them `products_owner_id_key` and `products_slug_key`, and the action tells them apart by that name rather than by message text. A taken slug returns a field-level `CONFLICT` with the design's wording, "This slug is already taken. Choose another one." A second product for the same owner returns a form-level `CONFLICT`. Missing authentication returns `UNAUTHENTICATED`.
+The existing uniqueness constraints on `products.owner_id` and `products.slug` enforce one product per user and globally unique public addresses, under concurrent requests too, so the action inserts without reading the owner's product first. The migration declares both inline, so PostgreSQL names them `products_owner_id_key` and `products_slug_key`. Drizzle wraps the driver's error in `DrizzleQueryError`, and the action reads the constraint name from its `cause` rather than matching message text. `products_owner_id_key` maps to a form-level `CONFLICT`, "You already have a board.", and the action calls `refresh()`, so the page shows the board that exists. `products_slug_key` maps to a field-level `CONFLICT` with the design's wording, "This slug is already taken. Choose another one." Missing authentication returns `UNAUTHENTICATED` with "Your session has ended. Sign in again to create your board."
+
+A second product whose slug is also taken violates both constraints, and PostgreSQL reports the owner's, because it checks unique indexes in the order they were created. PostgreSQL does not document that order, so a database test pins it. A read before the insert would make the message independent of the order, but it would cost a query on every creation and change nothing a test can observe today.
 
 An unexpected failure while creating returns `UNEXPECTED` through `toUnexpectedActionError`, after `unstable_rethrow`, so the form stays on screen with what was typed and shows the neutral message in its banner. Reads keep the route error boundary: a failed owner read on `/dashboard` or product read on the public board reaches `src/app/error.tsx`.
 
@@ -56,7 +68,11 @@ The public product read is independent of the viewer and remains uncached in thi
 
 Vitest covers name, description, and slug normalization, field boundaries, the slug suggestion's cut at 48 characters, conflict mapping, and authorization. The description boundary includes a 500-character value with CRLF line breaks.
 
-Database integration tests verify one product per owner and one owner per slug, including concurrent creation attempts. The repository has no database tests yet: Vitest has a `unit` project that runs without a database and a `storybook` project, and CI starts PostgreSQL only for the end-to-end job. The first pull request adds a Vitest project for these tests, guarded like `e2e/environment.ts` so that it runs only against `feedback_board_test`, and PostgreSQL for the CI job that runs it.
+Database integration tests verify one product per owner and one owner per slug, including concurrent creation attempts. They call the create-product action against the database, with only the session reader and `refresh()` mocked, so the constraint mapping and the owner taken from the session are tested as they run.
+
+The repository has no database tests yet. Vitest has a `unit` project and a `storybook` project, and the CI job that runs them states that they need no database and no environment variables, and that a test needing a service belongs to another suite. The first pull request therefore adds a third Vitest project, `db`, that collects `*.db.test.ts` files, which the other two exclude. `pnpm test` keeps running only `unit` and `storybook`; a new `pnpm test:db` runs `db`, and `pnpm verify` runs it before the end-to-end suite. In CI it runs in the end-to-end job, which already provides PostgreSQL and the test environment.
+
+The `db` project loads the test environment the way Playwright does and refuses any database other than `feedback_board_test`, then applies the committed migrations in its global setup. The guard and the migration step move out of `e2e/` into a module both suites import, so neither keeps its own copy. Like the end-to-end suite, these tests never reset the database. Each test inserts its own users directly into `users` and uses its own slugs, so the tests do not depend on order or on what earlier runs left behind.
 
 Playwright extends the existing isolated test setup with registration, mobile create-board interaction, return to the owner dashboard, and opening the empty public board. It also checks that a taken slug leaves the other form values intact. For an unknown slug it asserts the not-found heading and the `noindex` tag, not the 404 status that `e2e/not-found.e2e.ts` asserts for an unmatched URL.
 
@@ -64,16 +80,11 @@ Each pull request is complete when `pnpm verify` and `pnpm build-storybook` pass
 
 ## Delivery
 
-1. **Product domain.** `contracts.ts`, `schemas.ts` with the normalization and the slug suggestion, `queries.server.ts`, the create-product action, the nullable session reader, the database test project, and the database tests. Nothing renders yet.
-2. **Dashboard.** The onboarding form with the counter and the textarea control, the shared form banner, the empty owner state with the public URL, copy link, and link to the board, the success notice, and Playwright coverage for creating a board and for a taken slug. Until the third pull request lands, the link to the board leads to the not-found page.
+1. **Product domain.** `contracts.ts`, `schemas.ts` with the normalization and the slug suggestion, the create-product action, the nullable session reader, the database test project, and the database tests. Nothing renders yet.
+2. **Dashboard.** `queries.server.ts` with the owner's product, the onboarding form with the counter and the textarea control, the shared form banner, the empty owner state with the public URL, copy link, and link to the board, the success notice, and Playwright coverage for creating a board and for a taken slug. Until the third pull request lands, the link to the board leads to the not-found page.
 3. **Public board.** `/p/[productSlug]`, and the Playwright journey extended to opening the empty board and to an unknown slug.
 
 ## Open questions
-
-### Product domain
-
-- Whether the action reads the owner's product before inserting. With the insert alone, a second product whose slug is also taken can fail on the slug constraint first and report a taken address. Reading first returns the form-level `CONFLICT` in that case too, and the constraint still guards the race. A related question is whether that `CONFLICT` also calls `refresh()`, so the page shows the product that already exists.
-- The shape of the database test project: its name, file suffix, how it applies migrations, and which CI job runs it.
 
 ### Dashboard
 
