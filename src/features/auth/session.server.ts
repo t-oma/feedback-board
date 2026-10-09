@@ -13,12 +13,15 @@ type RequireSessionInput = {
   returnTo: Route;
 };
 
-const readCurrentSession = cache(async () => {
+// The session, or `null` when there is none. A protected Server Action reads
+// it this way because it answers a missing session with `UNAUTHENTICATED`; a
+// redirect would take the person away from everything the form held.
+export const getSession = cache(async () => {
   return auth.api.getSession({ headers: await headers() });
 });
 
 export async function requireSession({ returnTo }: RequireSessionInput) {
-  const session = await readCurrentSession();
+  const session = await getSession();
 
   if (!session) redirect(buildSignInHref({ returnTo }));
 
