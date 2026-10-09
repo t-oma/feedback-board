@@ -1,8 +1,8 @@
 import nextEnv from "@next/env";
 
-import { parseE2EEnvironment } from "./environment";
+import { parseTestEnvironment } from "./environment";
 
 Object.assign(process.env, { NODE_ENV: "test" });
 nextEnv.loadEnvConfig(process.cwd(), false);
 
-export const e2eEnvironment = parseE2EEnvironment(process.env);
+export const testEnvironment = parseTestEnvironment(process.env);

@@ -23,7 +23,12 @@ export default defineConfig({
           // of this suite, and the default pattern would run its tests as if
           // they were ours. The story project needs no such guard: it collects
           // what `.storybook/main.ts` names, which is `../src` and nothing else.
-          exclude: [...configDefaults.exclude, "**/.claude/worktrees/**"],
+          // Database tests have a project of their own, below.
+          exclude: [
+            ...configDefaults.exclude,
+            "**/.claude/worktrees/**",
+            "**/*.db.test.ts",
+          ],
         },
       },
       // Every story, rendered in a real browser. The stories are the component
@@ -42,6 +47,22 @@ export default defineConfig({
             provider: playwright({}),
             instances: [{ browser: "chromium" }],
           },
+        },
+      },
+      // Tests that need PostgreSQL. They pass the same environment check and
+      // apply the same migrations as the end-to-end suite, so they only ever
+      // reach `feedback_board_test`. `pnpm test` leaves them out: its two
+      // projects need no service, and `pnpm test:db` runs this one.
+      {
+        extends: true,
+        test: {
+          name: "db",
+          environment: "node",
+          include: ["src/**/*.db.test.ts"],
+          globalSetup: ["./test/global-setup.ts"],
+          // Every worker loads the environment before a test file imports
+          // `@/server/env`, which reads it once, on first import.
+          setupFiles: ["./test/load-environment.ts"],
         },
       },
     ],

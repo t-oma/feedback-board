@@ -1,6 +1,6 @@
 import { defineConfig, devices } from "@playwright/test";
 
-import { e2eEnvironment } from "./e2e/load-environment";
+import { testEnvironment } from "./test/load-environment";
 
 export default defineConfig({
   testDir: "./e2e",
@@ -13,9 +13,9 @@ export default defineConfig({
   // reporter puts failures on the pull request and counts flaky tests in the
   // run's summary, where a green run still shows them.
   reporter: process.env.CI ? [["github"], ["list"]] : "list",
-  globalSetup: "./e2e/global-setup.ts",
+  globalSetup: "./test/global-setup.ts",
   use: {
-    baseURL: e2eEnvironment.BETTER_AUTH_URL,
+    baseURL: testEnvironment.BETTER_AUTH_URL,
     screenshot: "only-on-failure",
     trace: "retain-on-failure",
   },
@@ -38,7 +38,7 @@ export default defineConfig({
     // build against `.env` and point the production bundle at the dev database.
     command:
       "pnpm exec next build && pnpm exec next start --hostname 127.0.0.1 --port 3100",
-    url: e2eEnvironment.BETTER_AUTH_URL,
+    url: testEnvironment.BETTER_AUTH_URL,
     reuseExistingServer: false,
     timeout: 180_000,
     // Server output is often the only record of why a server action did not
