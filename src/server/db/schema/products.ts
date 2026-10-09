@@ -1,13 +1,15 @@
 import { sql } from "drizzle-orm";
 import { check, pgTable, text, varchar } from "drizzle-orm/pg-core";
 
+import {
+  MAX_PRODUCT_DESCRIPTION_LENGTH,
+  MAX_PRODUCT_NAME_LENGTH,
+  MAX_PRODUCT_SLUG_LENGTH,
+  MIN_PRODUCT_SLUG_LENGTH,
+} from "@/features/products/contracts";
+
 import { users } from "./auth";
 import { timestamptz, uuidv7 } from "./columns";
-
-export const MAX_PRODUCT_NAME_LENGTH = 80;
-export const MIN_PRODUCT_SLUG_LENGTH = 3;
-export const MAX_PRODUCT_SLUG_LENGTH = 48;
-export const MAX_PRODUCT_DESCRIPTION_LENGTH = 500;
 
 export const products = pgTable(
   "products",

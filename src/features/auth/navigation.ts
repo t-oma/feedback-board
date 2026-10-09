@@ -1,5 +1,7 @@
 import type { Route } from "next";
 
+import { PRODUCT_SLUG_PATTERN } from "@/features/products/contracts";
+
 import {
   type AuthIntent,
   authIntentSchema,
@@ -47,12 +49,13 @@ export type AuthBackTarget =
   | { kind: "feedback"; href: Route }
   | { kind: "changelog"; href: Route };
 
+const boardPathPattern = new RegExp(
+  `^/p/(${PRODUCT_SLUG_PATTERN})(?:/(changelog|feedback/[^/]+))?/?$`,
+);
+
 export function getAuthBackTarget(returnTo: Route | null): AuthBackTarget {
   const pathname = returnTo?.split(/[?#]/, 1)[0] ?? "";
-  const match =
-    /^\/p\/([a-z0-9]+(?:-[a-z0-9]+)*)(?:\/(changelog|feedback\/[^/]+))?\/?$/.exec(
-      pathname,
-    );
+  const match = boardPathPattern.exec(pathname);
 
   const [, slug, section] = match ?? [];
 
