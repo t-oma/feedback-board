@@ -95,7 +95,7 @@ jobs:
       - run: pnpm test
 
   e2e:
-    name: End-to-end
+    name: Database and end-to-end
     runs-on: ubuntu-latest
     timeout-minutes: 20
 
@@ -132,7 +132,17 @@ jobs:
         with:
           persist-credentials: false
       - uses: ./.github/actions/setup
+        id: setup
+
+      # The Vitest project that needs PostgreSQL, which is why it runs here and
+      # not beside `pnpm test`. It applies the migrations itself, through the
+      # same global setup as the end-to-end suite.
+      - run: pnpm test:db
+
+      # The same `!cancelled()` guard as in the static job: a failing database
+      # test should not hide what the browser suite has to say.
       - run: pnpm exec playwright install --with-deps --only-shell chromium
+        if: ${{ !cancelled() && steps.setup.outcome == 'success' }}
 
       # This builds the app and runs the suite against `next start`, not
       # `next dev` -- see the comment in playwright.config.ts for why the
@@ -140,6 +150,7 @@ jobs:
       # global setup, so one that no longer applies fails here too; one that
       # was never generated is the static job's to catch.
       - run: pnpm test:e2e
+        if: ${{ !cancelled() && steps.setup.outcome == 'success' }}
 
       # A failed end-to-end run is close to undebuggable from a log alone. The
       # config already records a trace and a screenshot for failures; this is

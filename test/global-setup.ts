@@ -4,11 +4,13 @@ import { drizzle } from "drizzle-orm/node-postgres";
 import { migrate } from "drizzle-orm/node-postgres/migrator";
 import { Pool } from "pg";
 
-import { e2eEnvironment } from "./load-environment";
+import { testEnvironment } from "./load-environment";
 
+// Playwright and the `db` Vitest project both run this before their tests.
+// Each accepts a default-exported function, so one file serves both.
 export default async function globalSetup() {
   const pool = new Pool({
-    connectionString: e2eEnvironment.DATABASE_URL_UNPOOLED,
+    connectionString: testEnvironment.DATABASE_URL_UNPOOLED,
     max: 1,
   });
   const database = drizzle({ client: pool });

@@ -1,5 +1,8 @@
 import * as z from "zod";
 
+// One environment for every suite that touches the database: the end-to-end
+// tests and the `db` Vitest project load the same files and pass the same
+// check, so neither can reach a database the other would refuse.
 export const E2E_BASE_URL = "http://127.0.0.1:3100";
 
 function pointsToTestDatabase(value: string) {
@@ -18,7 +21,7 @@ const testDatabaseUrlSchema = z
     error: "Database URL must point to feedback_board_test",
   });
 
-const e2eEnvironmentSchema = z.object({
+const testEnvironmentSchema = z.object({
   DATABASE_URL: testDatabaseUrlSchema,
   DATABASE_URL_UNPOOLED: testDatabaseUrlSchema,
   BETTER_AUTH_SECRET: z.string().min(32),
@@ -26,17 +29,17 @@ const e2eEnvironmentSchema = z.object({
   FEEDBACK_BOARD_ENV: z.literal("test"),
 });
 
-export function parseE2EEnvironment(
+export function parseTestEnvironment(
   environment: Readonly<Record<string, string | undefined>>,
 ) {
-  const parsed = e2eEnvironmentSchema.safeParse(environment);
+  const parsed = testEnvironmentSchema.safeParse(environment);
 
   if (!parsed.success) {
     const issues = parsed.error.issues
       .map((issue) => `${issue.path.join(".")}: ${issue.message}`)
       .join("\n");
 
-    throw new Error(`Invalid E2E environment:\n${issues}`);
+    throw new Error(`Invalid test environment:\n${issues}`);
   }
 
   return parsed.data;

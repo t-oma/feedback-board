@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { E2E_BASE_URL, parseE2EEnvironment } from "./environment";
+import { E2E_BASE_URL, parseTestEnvironment } from "./environment";
 
 const validEnvironment = {
   DATABASE_URL:
@@ -12,16 +12,16 @@ const validEnvironment = {
   FEEDBACK_BOARD_ENV: "test",
 } satisfies Record<string, string>;
 
-describe("parseE2EEnvironment", () => {
+describe("parseTestEnvironment", () => {
   it("returns an explicitly configured test environment", () => {
-    expect(parseE2EEnvironment(validEnvironment)).toEqual(validEnvironment);
+    expect(parseTestEnvironment(validEnvironment)).toEqual(validEnvironment);
   });
 
   it.each(["DATABASE_URL", "DATABASE_URL_UNPOOLED"] as const)(
     "rejects a non-test %s",
     (key) => {
       expect(() =>
-        parseE2EEnvironment({
+        parseTestEnvironment({
           ...validEnvironment,
           [key]: "postgresql://feedback:password@127.0.0.1:5432/feedback_board",
         }),
@@ -31,7 +31,7 @@ describe("parseE2EEnvironment", () => {
 
   it("rejects a non-test application environment", () => {
     expect(() =>
-      parseE2EEnvironment({
+      parseTestEnvironment({
         ...validEnvironment,
         FEEDBACK_BOARD_ENV: "dev",
       }),
@@ -40,7 +40,7 @@ describe("parseE2EEnvironment", () => {
 
   it("rejects an auth URL that does not match the isolated web server", () => {
     expect(() =>
-      parseE2EEnvironment({
+      parseTestEnvironment({
         ...validEnvironment,
         BETTER_AUTH_URL: "http://localhost:3000",
       }),
