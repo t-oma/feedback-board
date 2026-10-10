@@ -1,6 +1,6 @@
 import { Form } from "@base-ui/react/form";
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
-import { expect, userEvent } from "storybook/test";
+import { expect, fn, userEvent } from "storybook/test";
 
 import { Field } from "@/components/field";
 import { expectFocusRing, tabTo } from "@/components/focus-ring.testing";
@@ -174,6 +174,54 @@ export const Password: Story = {
   },
 };
 
+const onDescriptionChange = fn();
+
+// A `<textarea>` rendered by `Field.Control`, which Base UI does not
+// document, so this checks what a form relies on: the label, the name it
+// submits under, the height, and `onValueChange` with the line break as typed.
+export const Textarea: Story = {
+  render: () => (
+    <Field.Root name="description">
+      <Field.Label>Description</Field.Label>
+      <Field.Textarea onValueChange={onDescriptionChange} />
+    </Field.Root>
+  ),
+  play: async ({ canvas }) => {
+    const textarea = canvas.getByLabelText("Description");
+
+    await expect(textarea.tagName).toBe("TEXTAREA");
+    await expect(textarea).toHaveAttribute("name", "description");
+    await expect(textarea.getBoundingClientRect().height).toBe(88);
+
+    await userEvent.type(textarea, "One{Enter}Two");
+    await expect(onDescriptionChange).toHaveBeenLastCalledWith(
+      "One\nTwo",
+      expect.anything(),
+    );
+  },
+};
+
+export const InvalidTextarea: Story = {
+  render: () => (
+    <Form errors={{ description: ["Remove 12 characters"] }}>
+      <Field.Root name="description">
+        <Field.Label>Description</Field.Label>
+        <Field.Textarea defaultValue="Orbit CLI is a deploy tool for small teams" />
+        <Field.Error />
+      </Field.Root>
+    </Form>
+  ),
+  play: async ({ canvas }) => {
+    const textarea = canvas.getByLabelText("Description");
+
+    await expect(textarea).toHaveAttribute("aria-invalid", "true");
+    await expect(textarea).toHaveAccessibleDescription("Remove 12 characters");
+    await expect(textarea).toHaveStyle({
+      borderColor: themeColor("--color-danger"),
+    });
+  },
+};
+
 export const OnPhone: Story = {
   globals: {
     viewport: { value: "mobile1" },
@@ -188,10 +236,14 @@ export const OnPhone: Story = {
         <Field.Label>Password</Field.Label>
         <Field.PasswordControl autoComplete="current-password" />
       </Field.Root>
+      <Field.Root name="description">
+        <Field.Label>Description</Field.Label>
+        <Field.Textarea />
+      </Field.Root>
     </div>
   ),
   play: async ({ canvas }) => {
-    for (const label of ["Email", "Password"]) {
+    for (const label of ["Email", "Password", "Description"]) {
       await expect(canvas.getByLabelText(label)).toHaveStyle({
         fontSize: "16px",
       });
