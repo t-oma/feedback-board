@@ -6,9 +6,9 @@ import { useActionState, useState } from "react";
 
 import { Button } from "@/components/button";
 import { Field } from "@/components/field";
+import { FormError } from "@/components/form-error";
 
 import { createAccountAction } from "../actions";
-import { AuthFormMessage } from "./auth-form-message";
 import { usePasswordFocusAfterFormError } from "./use-password-focus";
 
 type CreateAccountFormProps = {
@@ -42,7 +42,7 @@ export function CreateAccountForm({
         <input type="hidden" name="returnTo" value={returnTo} />
       )}
 
-      <AuthFormMessage error={error} />
+      <FormError message={error?.message} />
 
       <Field.Root name="name">
         <Field.Label>Name</Field.Label>

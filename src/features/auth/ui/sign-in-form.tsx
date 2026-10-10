@@ -6,9 +6,9 @@ import { useActionState } from "react";
 
 import { Button } from "@/components/button";
 import { Field } from "@/components/field";
+import { FormError } from "@/components/form-error";
 
 import { signInAction } from "../actions";
-import { AuthFormMessage } from "./auth-form-message";
 import { usePasswordFocusAfterFormError } from "./use-password-focus";
 
 type SignInFormProps = {
@@ -36,7 +36,7 @@ export function SignInForm({
         <input type="hidden" name="returnTo" value={returnTo} />
       )}
 
-      <AuthFormMessage error={error} />
+      <FormError message={error?.message} />
 
       <Field.Root name="email">
         <Field.Label>Email</Field.Label>
