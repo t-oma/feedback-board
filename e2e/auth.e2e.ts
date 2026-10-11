@@ -37,7 +37,7 @@ test("completes the credential session lifecycle", async ({ page }) => {
 
   await createAccount(page, email, password);
   await expect(
-    page.getByRole("heading", { level: 1, name: "Dashboard" }),
+    page.getByRole("heading", { level: 1, name: "Create your board" }),
   ).toBeVisible();
   await expect(page).toHaveTitle("Dashboard · Feedback Board");
 
@@ -96,7 +96,7 @@ test("completes the credential session lifecycle", async ({ page }) => {
 
   await expectPath(page, "/dashboard");
   await expect(
-    page.getByRole("heading", { level: 1, name: "Dashboard" }),
+    page.getByRole("heading", { level: 1, name: "Create your board" }),
   ).toBeVisible();
 });
 
