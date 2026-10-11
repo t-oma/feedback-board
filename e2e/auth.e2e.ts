@@ -1,24 +1,10 @@
 import { expect, type Page, test } from "@playwright/test";
 
-async function expectPath(page: Page, pathname: string) {
-  await expect.poll(() => new URL(page.url()).pathname).toBe(pathname);
-}
+import { createAccount, expectPath } from "./accounts";
 
 async function expectDashboardReturnTo(page: Page) {
   await expectPath(page, "/sign-in");
   expect(new URL(page.url()).searchParams.get("returnTo")).toBe("/dashboard");
-}
-
-async function createAccount(page: Page, email: string, password: string) {
-  await page.goto("/sign-in?mode=create-account");
-
-  const panel = page.getByRole("tabpanel", { name: "Create account" });
-  await panel.getByLabel("Name").fill("Auth E2E User");
-  await panel.getByLabel("Email").fill(email);
-  await panel.getByLabel("Password", { exact: true }).fill(password);
-  await panel.getByRole("button", { name: "Create account" }).click();
-
-  await expectPath(page, "/dashboard");
 }
 
 test("redirects a dashboard guest to sign in", async ({ page }) => {
