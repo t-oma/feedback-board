@@ -8,7 +8,7 @@ export function SignOutButton() {
   const { pending } = useFormStatus();
 
   return (
-    <Button type="submit" pending={pending}>
+    <Button type="submit" variant="secondary" pending={pending}>
       Sign out
     </Button>
   );
