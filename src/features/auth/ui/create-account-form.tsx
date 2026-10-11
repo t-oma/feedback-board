@@ -7,9 +7,9 @@ import { useActionState, useState } from "react";
 import { Button } from "@/components/button";
 import { Field } from "@/components/field";
 import { FormError } from "@/components/form-error";
+import { useFocusAfterFormError } from "@/shared/use-focus-after-form-error";
 
 import { createAccountAction } from "../actions";
-import { usePasswordFocusAfterFormError } from "./use-password-focus";
 
 type CreateAccountFormProps = {
   email: string;
@@ -29,7 +29,9 @@ export function CreateAccountForm({
     createAccountAction,
     null,
   );
-  const passwordRef = usePasswordFocusAfterFormError(error);
+  // The password is cleared after a failed submit, so typing it again is
+  // the next step.
+  const passwordRef = useFocusAfterFormError<HTMLInputElement>(error);
 
   return (
     <Form
