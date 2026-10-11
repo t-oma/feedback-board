@@ -1,9 +1,10 @@
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 import { expect, fn, mocked, userEvent, waitFor, within } from "storybook/test";
 
+import { NarrowMain } from "@/components/narrow-main";
+
 import { createAccountAction, signInAction } from "../actions";
 import { buildSignInHref } from "../navigation";
-import { AuthMain } from "./auth-main";
 import { AuthTabs } from "./auth-tabs";
 
 const meta = {
@@ -15,9 +16,9 @@ const meta = {
   decorators: [
     (Story) => (
       <div className="flex min-h-svh flex-col">
-        <AuthMain>
+        <NarrowMain>
           <Story />
-        </AuthMain>
+        </NarrowMain>
       </div>
     ),
   ],

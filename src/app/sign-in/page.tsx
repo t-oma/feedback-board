@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 
+import { NarrowMain } from "@/components/narrow-main";
 import {
   buildSignInHref,
   getAuthBackTarget,
@@ -7,7 +8,6 @@ import {
 } from "@/features/auth/navigation";
 import { AuthHeader } from "@/features/auth/ui/auth-header";
 import { AuthIntro } from "@/features/auth/ui/auth-intro";
-import { AuthMain } from "@/features/auth/ui/auth-main";
 import { AuthTabs } from "@/features/auth/ui/auth-tabs";
 import { env } from "@/server/env";
 
@@ -32,7 +32,7 @@ export default async function SignIn({ searchParams }: PageProps<"/sign-in">) {
   return (
     <>
       <AuthHeader backTarget={getAuthBackTarget(returnTo)} />
-      <AuthMain>
+      <NarrowMain>
         <AuthIntro mode={mode} intent={intent} />
         <AuthTabs
           mode={mode}
@@ -40,7 +40,7 @@ export default async function SignIn({ searchParams }: PageProps<"/sign-in">) {
           signInHref={signInHref}
           createAccountHref={createAccountHref}
         />
-      </AuthMain>
+      </NarrowMain>
     </>
   );
 }
