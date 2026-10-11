@@ -100,6 +100,25 @@ test("completes the credential session lifecycle", async ({ page }) => {
   ).toBeVisible();
 });
 
+// The tab still shows the dashboard after the session ended elsewhere. Its
+// sign-out is a POST to `/dashboard`, which the proxy must leave to the action
+// instead of sending it to sign in like a page request.
+test("signs out from a tab whose session has already ended", async ({
+  page,
+  context,
+}) => {
+  await createAccount(
+    page,
+    `ended-${crypto.randomUUID()}@example.com`,
+    "test password 123",
+  );
+  await context.clearCookies();
+
+  await page.getByRole("button", { name: "Sign out" }).click();
+
+  await expectPath(page, "/");
+});
+
 test("returns a guest to the exact view they asked for", async ({ page }) => {
   const email = `return-to-${crypto.randomUUID()}@example.com`;
   const password = "test password 123";
