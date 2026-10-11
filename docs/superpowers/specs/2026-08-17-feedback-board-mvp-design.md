@@ -123,7 +123,7 @@ Because `returnTo` reaches the server as untrusted form data on a Server Action 
 
 Auth forms may call Better Auth's server API through Server Actions with its Next.js cookie integration. The Better Auth Route Handler remains mounted as required by the library.
 
-The dashboard validates the full session in its server layout or page. Every protected Server Action independently validates the full session again. The MVP does not depend on `proxy.ts` for security.
+The dashboard validates the full session in its server layout or page. Every protected Server Action independently validates the full session again. The MVP does not depend on `proxy.ts` for security. The proxy only sends a guest to sign in on a page request; a Server Action is a POST to the same route, and it answers a missing session itself with `UNAUTHENTICATED` rather than being redirected.
 
 ## Access model
 
@@ -348,6 +348,8 @@ Status filters and the sort toggle are links, not scripted controls. They are UR
 Web fonts are self-hosted through the framework's font pipeline rather than fetched from a third-party host, which keeps the deployment free of an external runtime dependency and matches the portability rule the rest of this document applies. The design's body face falls back to Arial away from macOS; the implementation either accepts that or ships a body web font, and the choice is recorded in the design files rather than left to the reader.
 
 Controls that take typed text use 16px text below the `md` breakpoint, where the mobile design sets 13.5px; as with field bounds, this document governs. iOS Safari zooms the page in when a field with smaller text receives focus and keeps the zoom after the keyboard closes, which leaves the page cropped. From `md` up the design's smaller size stays, because an iPad Pro 11-inch at 834px does not zoom into 14px fields. The rule covers every control that takes typed text, including the feedback description. Turning zoom off in the viewport meta tag is not an alternative: a `maximum-scale` below 2 fails axe-core's `meta-viewport` rule (WCAG 1.4.4), since it also stops people from enlarging the page to read it.
+
+A field's error message is 14px, the size of its label, with an alert icon before it. The design sets it at 12.5px with a filled exclamation mark, but at 12px the message was hard to read, and it is the text a person reads next to the field. While a field shows an error, its hint is hidden, as in the design's error examples, so a hint and an error that say much the same thing never stand one under the other.
 
 ## Error handling and states
 
