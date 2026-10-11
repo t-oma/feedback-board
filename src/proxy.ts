@@ -33,6 +33,13 @@ import { buildSignInHref } from "@/features/auth/navigation";
 // Proxy runs on the Node runtime by default, so `auth.api.getSession` is
 // available here, at the cost of a query on every request to a guarded route.
 export function proxy(request: NextRequest) {
+  // Only a page request is sent to sign in. A Server Action is a POST to the
+  // route that uses it, and a redirect is no answer to one: the browser
+  // repeats the POST to the sign-in page, gets a page back instead of the
+  // action's result, and the route error boundary replaces the form. The
+  // action checks the session itself and answers `UNAUTHENTICATED`.
+  // `e2e/auth.e2e.ts` covers sign-out from a tab whose session has ended.
+  if (request.method !== "GET") return NextResponse.next();
   if (getSessionCookie(request)) return NextResponse.next();
 
   // The query belongs in `returnTo` as much as the path does -- a guest sent
