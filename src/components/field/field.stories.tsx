@@ -266,6 +266,40 @@ export const Invalid: Story = {
       </Field.Root>
     </Form>
   ),
+  play: async ({ canvas }) => {
+    const message = canvas.getByText("Enter a complete email address");
+
+    // As large as the label, and marked by an icon as well as by colour.
+    await expect(message).toHaveStyle({ fontSize: "14px" });
+    await expect(message.parentElement?.querySelector("svg")).toBeVisible();
+    await expect(canvas.getByRole("textbox")).toHaveAccessibleDescription(
+      "Enter a complete email address",
+    );
+  },
+};
+
+// The error takes the hint's place rather than repeating it from below.
+export const DescriptionGivesWayToTheError: Story = {
+  render: () => (
+    <Form errors={{ slug: ["Use Latin letters, numbers and hyphens"] }}>
+      <Field.Root name="slug">
+        <Field.Label>Public address</Field.Label>
+        <Field.Control defaultValue="орбіта" autoComplete="off" />
+        <Field.Description>
+          Lowercase letters, numbers and hyphens
+        </Field.Description>
+        <Field.Error />
+      </Field.Root>
+    </Form>
+  ),
+  play: async ({ canvas }) => {
+    await expect(
+      canvas.getByText("Use Latin letters, numbers and hyphens"),
+    ).toBeVisible();
+    await expect(
+      canvas.getByText("Lowercase letters, numbers and hyphens"),
+    ).not.toBeVisible();
+  },
 };
 
 export const ReadOnlyPassword: Story = {
