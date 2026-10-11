@@ -44,8 +44,8 @@ before this change. A height condition would fix both and is left for later.
 `main` keeps `overflow-x-clip`, so the sideways slide of the tab panels is
 clipped at the card's edge rather than the viewport's.
 
-`AuthMain` renders the card, so the page, its `loading.tsx` skeleton and the
-stories get the same frame with no change where they use it.
+`NarrowMain` in `src/components` renders the card, so the page, its
+`loading.tsx` skeleton and the stories get the same frame.
 
 ## Header
 
@@ -65,14 +65,16 @@ bar and keeps its `surface` fill and border.
 - Field text follows the MVP specification's rule: 16px below `md`, 14px from
   `md` up.
 
-## Not shared yet
+## Shared with onboarding
 
-The card stays in `AuthMain`. The design has one other card, on the onboarding
-screen, and it differs in width (620px), border colour (`border`), radius
-(11px), padding, gap and shadow. Apart from the width, these differences look
-like drift in the design rather than intent. When onboarding is built, the card
-look moves to `src/components` with the values above and the width as its only
-variable, and `AuthMain` keeps the mobile behaviour.
+The design has one other card, on the onboarding screen, and it differs in
+width (620px), border colour (`border`), radius (11px), padding, gap and
+shadow. Apart from the width, these differences look like drift in the design
+rather than intent. The width belongs to the design's desktop composition of
+onboarding, which is not built yet, so onboarding renders its mobile
+composition in this card too (see the onboarding design). The card was first
+`AuthMain`; it moved to `src/components` as `NarrowMain`, with the values above
+and no variable.
 
 ## Verification
 
@@ -87,4 +89,4 @@ variable, and `AuthMain` keeps the mobile behaviour.
 
 ## Out of scope
 
-The header's composition, a logo, and a shared card component.
+The header's composition and a logo.

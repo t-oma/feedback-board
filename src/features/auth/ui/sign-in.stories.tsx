@@ -1,6 +1,8 @@
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 import { expect } from "storybook/test";
 
+import { NarrowMain } from "@/components/narrow-main";
+
 import {
   buildSignInHref,
   getAuthBackTarget,
@@ -10,7 +12,6 @@ import {
 import { AuthContentSkeleton } from "./auth-content-skeleton";
 import { AuthHeader, AuthHeaderSkeleton } from "./auth-header";
 import { AuthIntro } from "./auth-intro";
-import { AuthMain } from "./auth-main";
 import { AuthTabs } from "./auth-tabs";
 
 const meta = {
@@ -33,7 +34,7 @@ const meta = {
   render: ({ returnTo, intent, mode }) => (
     <>
       <AuthHeader backTarget={getAuthBackTarget(returnTo)} />
-      <AuthMain>
+      <NarrowMain>
         <AuthIntro mode={mode} intent={intent} />
         <AuthTabs
           mode={mode}
@@ -45,7 +46,7 @@ const meta = {
             mode: "create-account",
           })}
         />
-      </AuthMain>
+      </NarrowMain>
     </>
   ),
 } satisfies Meta<SignInQuery>;
@@ -115,9 +116,9 @@ export const Loading: Story = {
   render: () => (
     <>
       <AuthHeaderSkeleton />
-      <AuthMain>
+      <NarrowMain>
         <AuthContentSkeleton />
-      </AuthMain>
+      </NarrowMain>
     </>
   ),
   play: async ({ canvas }) => {
