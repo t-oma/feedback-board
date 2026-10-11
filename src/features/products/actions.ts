@@ -15,7 +15,7 @@ import {
 import { classifyProductError } from "./errors";
 import { type CreateProductInput, createProductSchema } from "./schemas";
 
-type CreateProductResult = ActionResult<undefined, CreateProductInput>;
+export type CreateProductResult = ActionResult<undefined, CreateProductInput>;
 
 export async function createProductAction(
   _previousState: CreateProductResult | null,
