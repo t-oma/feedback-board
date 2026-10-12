@@ -2,6 +2,10 @@ import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 import { expect, userEvent } from "storybook/test";
 
 import { expectFocusRing, tabTo } from "@/components/focus-ring.testing";
+import {
+  expectSkeletonGeometry,
+  SkeletonGeometry,
+} from "@/components/skeleton/skeleton.testing";
 import { Tabs } from "@/components/tabs";
 
 type AuthMode = "sign-in" | "create-account";
@@ -118,4 +122,20 @@ export const Links: Story = {
       </Tabs.Content>
     </Tabs.Root>
   ),
+};
+
+export const Skeleton: Story = {
+  render: () => (
+    <SkeletonGeometry
+      content={<AuthTabs defaultValue="sign-in" />}
+      skeleton={
+        <Tabs.Skeleton labels={["Sign in", "Create account"]}>
+          <p className="text-sm">Sign in to continue to your board.</p>
+        </Tabs.Skeleton>
+      }
+    />
+  ),
+  play: async ({ canvasElement }) => {
+    await expectSkeletonGeometry(canvasElement);
+  },
 };

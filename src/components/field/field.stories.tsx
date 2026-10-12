@@ -4,6 +4,10 @@ import { expect, fn, userEvent } from "storybook/test";
 
 import { Field } from "@/components/field";
 import { expectFocusRing, tabTo } from "@/components/focus-ring.testing";
+import {
+  expectSkeletonGeometry,
+  SkeletonGeometry,
+} from "@/components/skeleton/skeleton.testing";
 
 const meta = {
   title: "Components/Field",
@@ -313,4 +317,49 @@ export const ReadOnlyPassword: Story = {
       />
     </Field.Root>
   ),
+};
+
+export const Skeleton: Story = {
+  render: () => (
+    <SkeletonGeometry
+      content={
+        <Field.Root name="slug">
+          <Field.Label counter={{ count: 0, max: 48 }}>
+            Public address
+          </Field.Label>
+          <Field.Control />
+          <Field.Description>
+            Lowercase letters, numbers and hyphens
+          </Field.Description>
+        </Field.Root>
+      }
+      skeleton={
+        <Field.Skeleton
+          label="Public address"
+          counter={48}
+          description="Lowercase letters, numbers and hyphens"
+        />
+      }
+    />
+  ),
+  play: async ({ canvasElement }) => {
+    await expectSkeletonGeometry(canvasElement);
+  },
+};
+
+export const TextareaSkeleton: Story = {
+  render: () => (
+    <SkeletonGeometry
+      content={
+        <Field.Root name="description">
+          <Field.Label>Description</Field.Label>
+          <Field.Textarea />
+        </Field.Root>
+      }
+      skeleton={<Field.Skeleton label="Description" control="textarea" />}
+    />
+  ),
+  play: async ({ canvasElement }) => {
+    await expectSkeletonGeometry(canvasElement);
+  },
 };
