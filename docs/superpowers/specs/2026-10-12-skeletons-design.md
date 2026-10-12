@@ -16,9 +16,9 @@ skeleton happens to match at that width.
 
 ## Decision
 
-A skeleton is built from parts that take their geometry from the code that
-renders the real content, and a story checks that the content and its skeleton
-line up.
+A skeleton is built from parts that sit beside the code that renders the real
+content and repeat its geometry, and a story checks that the content and its
+skeleton line up.
 
 ### Text the skeleton knows
 
@@ -51,17 +51,13 @@ In `src/components/skeleton`:
   `aria-hidden` body. The body stacks its children with the gap `NarrowMain`
   puts between the content it stands in for.
 - `SkeletonText`, as above.
-- `skeletonToneClassName`, the fill of a block that stands in for a control. It
-  is a class rather than a component because every component in
-  `src/components` refuses `className`, which `types.test-d.ts` enforces, and a
-  block's size belongs to the part it stands in for.
 
 Each shared part that appears in a loading state gets a skeleton beside it,
-sharing the classes that decide its geometry:
+which repeats the classes that place and size the part:
 
 - `Field.Skeleton`: the label row, with the counter's `0 / max` when given, an
   input or textarea block of the control's height, and the hint when given.
-- `FormSkeleton`: the form's column. `formClassName` stops being exported.
+- `FormSkeleton`: the form's column.
 - `ButtonSkeleton`: a block of the button's height and radius.
 - `Tabs.Skeleton`: the tab strip with its names, the first one active, over the
   panel area's offset.
@@ -71,9 +67,21 @@ address control, `AuthIntroSkeleton` beside `AuthIntro`, and the onboarding
 heading and intro move into `CreateProductIntro` with its skeleton. A feature
 skeleton then only composes parts.
 
+### Styles
+
+Classes stay inline, in a part and in its skeleton alike, so reading either
+shows its styles. A variable holds classes only where several components share
+a look that has to change together, as `Button` and `Link` share
+`buttonClassName`, and the text controls `textControlClassName`. What keeps a
+skeleton's geometry with its part is the check below, not a shared variable:
+the check compares what renders, which a shared class cannot guarantee, since a
+skeleton can use every class right and still lay its parts out differently. It
+does not see a colour or a font weight, which change a bar's look but move
+nothing.
+
 ## Checking the geometry
 
-`expectSkeletonGeometry` in `src/components/skeleton/skeleton.testing.ts`
+`expectSkeletonGeometry` in `src/components/skeleton/skeleton.testing.tsx`
 compares a rendered content tree with its skeleton: the same total height, and
 for every control, tab and submit button, the same top and height as the block
 standing in for it. A skeleton marks those blocks with `data-skeleton-control`.
