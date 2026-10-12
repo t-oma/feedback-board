@@ -1,3 +1,5 @@
+import { formClassName } from "@/components/form";
+
 // Stands in for `/dashboard` while it streams. It takes the shape of the
 // onboarding form, the first state a new account sees there: toned blocks in
 // the real layout, no spinner and no shimmer, announced as busy, as the
@@ -22,7 +24,7 @@ export function CreateProductFormSkeleton() {
     <div role="status" aria-busy="true" className="flex flex-col gap-y-5">
       <span className="sr-only">Loading your dashboard</span>
 
-      <div aria-hidden="true" className="flex flex-col gap-y-5">
+      <div aria-hidden="true" className={formClassName}>
         <div className="flex flex-col gap-y-2">
           <div className="flex h-7 items-center">
             <div className={`h-5.5 w-3/5 ${toneClassName}`} />

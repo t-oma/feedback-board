@@ -351,6 +351,8 @@ Controls that take typed text use 16px text below the `md` breakpoint, where the
 
 A field's error message is 14px, the size of its label, with an alert icon before it. The design sets it at 12.5px with a filled exclamation mark, but at 12px the message was hard to read, and it is the text a person reads next to the field. While a field shows an error, its hint is hidden, as in the design's error examples, so a hint and an error that say much the same thing never stand one under the other.
 
+Every form is one column: its banner, its fields and its submit button, 18 pixels apart as in both mobile designs, through `Form` in `src/components`. The submit button comes right after the last field at every width. Pinned to the bottom of the screen, it would sit behind a phone's keyboard, because iOS Safari, and Chrome on Android since version 108, shrink only the visual viewport for it; in the flow it stays above the keyboard whenever the form leaves room, and the return key submits from a single-line field. A loading skeleton that stands in for a form takes the same layout.
+
 ## Error handling and states
 
 Expected operational failures are values, not thrown exceptions. Zod issues appear next to fields. A conflicting slug maps to the slug field. Invalid credentials use one generic message. Missing authentication prompts sign-in. Failed ownership checks return a generic unavailable-operation message. A `NOT_FOUND` result renders next to the control that produced it; only Server Component reads call `notFound()`, so route-level not-found UI is never swapped in underneath an interaction that merely addressed a stale row.

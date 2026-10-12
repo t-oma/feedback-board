@@ -1,11 +1,11 @@
 "use client";
 
-import { Form } from "@base-ui/react/form";
 import type { Route } from "next";
 import { useActionState } from "react";
 
 import { Button } from "@/components/button";
 import { Field } from "@/components/field";
+import { Form } from "@/components/form";
 import { FormError } from "@/components/form-error";
 import { useFocusAfterFormError } from "@/shared/use-focus-after-form-error";
 
@@ -28,12 +28,7 @@ export function SignInForm({
   const passwordRef = useFocusAfterFormError<HTMLInputElement>(error);
 
   return (
-    <Form
-      action={formAction}
-      errors={error?.fieldErrors}
-      aria-busy={pending}
-      className="flex w-full flex-col gap-y-4"
-    >
+    <Form action={formAction} errors={error?.fieldErrors} aria-busy={pending}>
       {returnTo !== null && (
         <input type="hidden" name="returnTo" value={returnTo} />
       )}
