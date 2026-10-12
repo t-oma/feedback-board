@@ -353,6 +353,8 @@ A field's error message is 14px, the size of its label, with an alert icon befor
 
 Every form is one column: its banner, its fields and its submit button, 18 pixels apart as in both mobile designs, through `Form` in `src/components`. The submit button comes right after the last field at every width. Pinned to the bottom of the screen, it would sit behind a phone's keyboard, because iOS Safari, and Chrome on Android since version 108, shrink only the visual viewport for it; in the flow it stays above the keyboard whenever the form leaves room, and the return key submits from a single-line field. A loading skeleton that stands in for a form takes the same layout.
 
+Classes are written inline where they apply. A variable holds classes only for a look that several components share and must change together, such as the button variants that `Button` and `Link` both use. A skeleton repeats the classes of the part it stands in for, and its geometry stories, not a shared variable, check that the two line up; the skeletons design has the details.
+
 ## Error handling and states
 
 Expected operational failures are values, not thrown exceptions. Zod issues appear next to fields. A conflicting slug maps to the slug field. Invalid credentials use one generic message. Missing authentication prompts sign-in. Failed ownership checks return a generic unavailable-operation message. A `NOT_FOUND` result renders next to the control that produced it; only Server Component reads call `notFound()`, so route-level not-found UI is never swapped in underneath an interaction that merely addressed a stale row.
