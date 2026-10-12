@@ -1,3 +1,5 @@
+import { formClassName } from "@/components/form";
+
 // Stands in for the request-dependent part of `/sign-in` while it streams.
 //
 // The state sheet in the design fixes what this looks like: toned blocks in the
@@ -47,7 +49,7 @@ export function AuthContentSkeleton() {
             <div className="h-11 flex-1" />
           </div>
 
-          <div className="flex flex-col gap-y-4 pt-5">
+          <div className={`${formClassName} pt-5`}>
             <FieldSkeleton />
             <FieldSkeleton />
             <div className={`h-12 w-full ${toneClassName}`} />

@@ -1,10 +1,10 @@
 "use client";
 
-import { Form } from "@base-ui/react/form";
 import { useState } from "react";
 
 import { Button } from "@/components/button";
 import { Field } from "@/components/field";
+import { Form } from "@/components/form";
 import { FormError } from "@/components/form-error";
 import { Link } from "@/components/link";
 import { buildSignInHref } from "@/features/auth/navigation";
@@ -54,12 +54,7 @@ export function CreateProductForm({ publicHost }: CreateProductFormProps) {
   const bannerRef = useFocusAfterFormError<HTMLDivElement>(error);
 
   return (
-    <Form
-      action={formAction}
-      errors={error?.fieldErrors}
-      aria-busy={pending}
-      className="flex flex-col gap-y-5"
-    >
+    <Form action={formAction} errors={error?.fieldErrors} aria-busy={pending}>
       <div className="flex flex-col gap-y-2">
         <h1 className="font-serif text-2xl font-semibold">Create your board</h1>
         <p className="text-sm text-foreground-muted">
