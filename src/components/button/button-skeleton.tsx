@@ -1,11 +1,6 @@
-import { skeletonToneClassName } from "../skeleton";
-import { buttonShapeClassName } from "./variants";
-
+// As tall and as round as a button.
 export function ButtonSkeleton() {
   return (
-    <div
-      data-skeleton-control
-      className={`${buttonShapeClassName} ${skeletonToneClassName}`}
-    />
+    <div data-skeleton-control className="h-12 rounded-lg bg-surface-muted" />
   );
 }

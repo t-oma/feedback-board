@@ -1,15 +1,9 @@
 import type { ReactElement } from "react";
 
-import { SkeletonText, skeletonToneClassName } from "../skeleton";
-import {
-  counterClassName,
-  descriptionClassName,
-  inputHeightClassName,
-  labelClassName,
-  labelRowClassName,
-  rootClassName,
-  textareaHeightClassName,
-} from "./geometry";
+import { SkeletonText } from "../skeleton";
+
+// Each part repeats the classes that place and size the field part it stands
+// in for. The `Skeleton` stories check that the two line up.
 
 type FieldSkeletonProps = {
   label: string;
@@ -25,7 +19,7 @@ function FieldLabelSkeleton({
   counter,
 }: Pick<FieldSkeletonProps, "label" | "counter">) {
   const labelSkeleton = (
-    <span className={labelClassName}>
+    <span className="text-sm font-medium">
       <SkeletonText>{label}</SkeletonText>
     </span>
   );
@@ -33,10 +27,10 @@ function FieldLabelSkeleton({
   if (counter === undefined) return labelSkeleton;
 
   return (
-    <div className={labelRowClassName}>
+    <div className="flex items-baseline justify-between gap-3">
       {labelSkeleton}
 
-      <span className={counterClassName}>
+      <span className="shrink-0 font-mono text-xs">
         <SkeletonText>{`0 / ${counter}`}</SkeletonText>
       </span>
     </div>
@@ -52,7 +46,7 @@ function FieldControlSkeleton({
     return (
       <div
         data-skeleton-control
-        className={`${control === "input" ? inputHeightClassName : textareaHeightClassName} rounded-lg ${skeletonToneClassName}`}
+        className={`${control === "input" ? "h-12" : "min-h-22"} rounded-lg bg-surface-muted`}
       />
     );
   }
@@ -66,7 +60,7 @@ function FieldDescriptionSkeleton({
   if (description === undefined) return null;
 
   return (
-    <p className={descriptionClassName}>
+    <p className="font-mono text-xs/normal">
       <SkeletonText>{description}</SkeletonText>
     </p>
   );
@@ -79,7 +73,7 @@ export function FieldSkeleton({
   description,
 }: FieldSkeletonProps) {
   return (
-    <div className={rootClassName}>
+    <div className="flex flex-col gap-2">
       <FieldLabelSkeleton label={label} counter={counter} />
 
       <FieldControlSkeleton control={control} />
