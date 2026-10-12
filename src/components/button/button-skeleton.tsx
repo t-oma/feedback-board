@@ -1,6 +1,7 @@
-// As tall and as round as a button.
+import { buttonStyles } from "./styles";
+
 export function ButtonSkeleton() {
   return (
-    <div data-skeleton-control className="h-12 rounded-lg bg-surface-muted" />
+    <div data-skeleton-control className={buttonStyles({ skeleton: true })} />
   );
 }

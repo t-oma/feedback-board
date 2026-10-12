@@ -3,7 +3,7 @@ import { LoaderCircle } from "lucide-react";
 import type { ComponentProps } from "react";
 
 import type { WithoutClassName } from "../types";
-import { buttonClassName, type ButtonVariant } from "./variants";
+import { buttonStyles, type ButtonVariant } from "./styles";
 
 type ButtonProps = Omit<
   WithoutClassName<ComponentProps<typeof BaseButton>>,
@@ -29,7 +29,7 @@ export function Button({
       disabled={pending || disabled}
       focusableWhenDisabled={pending}
       aria-busy={pending || undefined}
-      className={buttonClassName(variant)}
+      className={buttonStyles({ variant })}
     >
       {pending && (
         <LoaderCircle

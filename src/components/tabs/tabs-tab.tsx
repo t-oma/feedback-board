@@ -2,6 +2,7 @@ import { Tabs } from "@base-ui/react/tabs";
 import type { ComponentProps } from "react";
 
 import type { WithoutClassName } from "../types";
+import { tabsStyles } from "./styles";
 
 // Base UI declares a tab value as `any`, which accepts a number, an object or
 // `undefined` without complaint. Narrowing it to `string` rejects those. It
@@ -15,11 +16,7 @@ type TabsTabProps = Omit<
 
 export function TabsTab({ children, value, ...props }: TabsTabProps) {
   return (
-    <Tabs.Tab
-      {...props}
-      value={value}
-      className="inline-flex flex-1 items-center justify-center rounded-lg bg-transparent px-4 py-3 text-sm transition-[colors,font] duration-150 ease-in-out focus-visible:outline-accent data-active:font-semibold"
-    >
+    <Tabs.Tab {...props} value={value} className={tabsStyles().tab()}>
       {children}
     </Tabs.Tab>
   );

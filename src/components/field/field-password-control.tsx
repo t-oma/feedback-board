@@ -5,6 +5,7 @@ import type { ComponentProps } from "react";
 import { useId, useState } from "react";
 
 import { FieldControl } from "./field-control";
+import { fieldStyles } from "./styles";
 
 type FieldPasswordControlProps = Omit<
   ComponentProps<typeof FieldControl>,
@@ -23,9 +24,10 @@ export function FieldPasswordControl({
 
   const toggleLabel = isPasswordVisible ? "Hide password" : "Show password";
   const VisibilityIcon = isPasswordVisible ? EyeOffIcon : EyeIcon;
+  const { passwordControl, passwordToggle } = fieldStyles();
 
   return (
-    <div className="relative w-full [&>input]:w-full [&>input]:pr-12">
+    <div className={passwordControl()}>
       <FieldControl
         {...props}
         id={controlId}
@@ -34,9 +36,6 @@ export function FieldPasswordControl({
         autoCapitalize={autoCapitalize}
       />
 
-      {/* Not `transition-colors`: that also animates `outline-color`, so the
-          focus ring would fade in from the icon colour instead of appearing in
-          `accent`. */}
       <button
         type="button"
         aria-controls={controlId}
@@ -44,7 +43,7 @@ export function FieldPasswordControl({
         onClick={() => {
           setIsPasswordVisible((isVisible) => !isVisible);
         }}
-        className="absolute inset-y-px right-px inline-flex w-12 items-center justify-center rounded-r-[7px] text-foreground-subtle hover:bg-surface-muted hover:text-accent focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-accent motion-safe:transition-[color,background-color]"
+        className={passwordToggle()}
       >
         <VisibilityIcon aria-hidden="true" size={20} />
       </button>

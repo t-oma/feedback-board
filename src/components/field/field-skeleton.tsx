@@ -1,9 +1,7 @@
 import type { ReactElement } from "react";
 
 import { SkeletonText } from "../skeleton";
-
-// Each part repeats the classes that place and size the field part it stands
-// in for. The `Skeleton` stories check that the two line up.
+import { fieldStyles, textControlStyles } from "./styles";
 
 type FieldSkeletonProps = {
   label: string;
@@ -14,12 +12,14 @@ type FieldSkeletonProps = {
   description?: string | undefined;
 };
 
+const styles = fieldStyles({ skeleton: true });
+
 function FieldLabelSkeleton({
   label,
   counter,
 }: Pick<FieldSkeletonProps, "label" | "counter">) {
   const labelSkeleton = (
-    <span className="text-sm font-medium">
+    <span className={styles.label()}>
       <SkeletonText>{label}</SkeletonText>
     </span>
   );
@@ -27,10 +27,10 @@ function FieldLabelSkeleton({
   if (counter === undefined) return labelSkeleton;
 
   return (
-    <div className="flex items-baseline justify-between gap-3">
+    <div className={styles.labelRow()}>
       {labelSkeleton}
 
-      <span className="shrink-0 font-mono text-xs">
+      <span className={styles.counter()}>
         <SkeletonText>{`0 / ${counter}`}</SkeletonText>
       </span>
     </div>
@@ -46,7 +46,7 @@ function FieldControlSkeleton({
     return (
       <div
         data-skeleton-control
-        className={`${control === "input" ? "h-12" : "min-h-22"} rounded-lg bg-surface-muted`}
+        className={textControlStyles({ kind: control, skeleton: true })}
       />
     );
   }
@@ -60,7 +60,7 @@ function FieldDescriptionSkeleton({
   if (description === undefined) return null;
 
   return (
-    <p className="font-mono text-xs/normal">
+    <p className={styles.description()}>
       <SkeletonText>{description}</SkeletonText>
     </p>
   );
@@ -73,7 +73,7 @@ export function FieldSkeleton({
   description,
 }: FieldSkeletonProps) {
   return (
-    <div className="flex flex-col gap-2">
+    <div className={styles.root()}>
       <FieldLabelSkeleton label={label} counter={counter} />
 
       <FieldControlSkeleton control={control} />

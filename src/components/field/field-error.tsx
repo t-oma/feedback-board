@@ -3,6 +3,7 @@ import { CircleAlert } from "lucide-react";
 import type { ComponentProps } from "react";
 
 import type { WithoutClassName } from "../types";
+import { fieldStyles } from "./styles";
 
 // The icon marks the message as an error by shape as well as by colour.
 // Base UI passes the message, or a list of messages, as `children` into the
@@ -10,13 +11,15 @@ import type { WithoutClassName } from "../types";
 export function FieldError(
   props: WithoutClassName<Omit<ComponentProps<typeof Field.Error>, "render">>,
 ) {
+  const { error, errorIcon } = fieldStyles();
+
   return (
     <Field.Error
       {...props}
-      className="flex items-start gap-1.5 text-sm font-medium text-danger"
+      className={error()}
       render={({ children, ...errorProps }) => (
         <div {...errorProps}>
-          <CircleAlert aria-hidden="true" className="mt-0.5 size-4 shrink-0" />
+          <CircleAlert aria-hidden="true" className={errorIcon()} />
           <div>{children}</div>
         </div>
       )}
