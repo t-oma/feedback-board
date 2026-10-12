@@ -1,13 +1,11 @@
 export type ButtonVariant = "primary" | "secondary";
 
-// Shared with `ButtonSkeleton`, which stands in for a button at its size.
-export const buttonShapeClassName = "h-12 rounded-lg";
-
 // State styles key on `data-disabled`, which Base UI sets both for a natively
 // disabled button and for a pending one. A pending button is only
 // `aria-disabled`, so `:disabled` would miss it. `Link` uses these classes
 // too, and an anchor never matches `:enabled`.
-const baseClassName = `inline-flex ${buttonShapeClassName} items-center justify-center gap-2 px-4 py-3 text-sm font-medium focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent not-data-disabled:active:scale-98 data-disabled:cursor-not-allowed motion-safe:transition-[background-color,scale]`;
+const baseClassName =
+  "inline-flex h-12 items-center justify-center gap-2 rounded-lg px-4 py-3 text-sm font-medium focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent not-data-disabled:active:scale-98 data-disabled:cursor-not-allowed motion-safe:transition-[background-color,scale]";
 
 const variantClassNames = {
   primary:

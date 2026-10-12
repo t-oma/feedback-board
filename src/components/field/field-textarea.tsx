@@ -2,7 +2,6 @@ import { Field } from "@base-ui/react/field";
 import type { ComponentProps } from "react";
 
 import type { WithoutClassName } from "../types";
-import { textareaHeightClassName } from "./geometry";
 import { textControlClassName } from "./text-control-class-name";
 
 type FieldTextareaProps = WithoutClassName<
@@ -18,7 +17,7 @@ export function FieldTextarea(props: FieldTextareaProps) {
     <Field.Control
       {...props}
       render={<textarea />}
-      className={`${textareaHeightClassName} resize-y py-2.5 ${textControlClassName}`}
+      className={`min-h-22 resize-y py-2.5 ${textControlClassName}`}
     />
   );
 }

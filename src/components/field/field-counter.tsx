@@ -1,7 +1,5 @@
 import { Field } from "@base-ui/react/field";
 
-import { counterClassName } from "./geometry";
-
 export type FieldCounterProps = {
   count: number;
   max: number;
@@ -11,7 +9,7 @@ export type FieldCounterProps = {
 // `aria-describedby`.
 export function FieldCounter({ count, max }: FieldCounterProps) {
   return (
-    <Field.Description className={`${counterClassName} text-foreground-subtle`}>
+    <Field.Description className="shrink-0 font-mono text-xs text-foreground-subtle">
       <span aria-hidden="true">
         {/* Past the maximum the count is underlined as well as red: the red
             is about as dark as the resting grey, 1.45:1, and small text barely

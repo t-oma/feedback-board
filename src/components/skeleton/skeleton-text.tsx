@@ -1,5 +1,3 @@
-import { skeletonToneClassName } from "./skeleton-tone-class-name";
-
 type SkeletonTextProps = {
   children: string;
 };
@@ -13,9 +11,7 @@ type SkeletonTextProps = {
 // the line height, so it goes inside an element of its own there.
 export function SkeletonText({ children }: SkeletonTextProps) {
   return (
-    <span
-      className={`rounded-md box-decoration-clone text-transparent select-none ${skeletonToneClassName}`}
-    >
+    <span className="rounded-md bg-surface-muted box-decoration-clone text-transparent select-none">
       {children}
     </span>
   );
