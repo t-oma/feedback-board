@@ -23,6 +23,7 @@ import {
   normalizeProductSlug,
   suggestProductSlug,
 } from "../schemas";
+import { CreateProductIntro } from "./create-product-intro";
 import { useCreateProduct } from "./create-product-provider";
 import { PublicAddressControl } from "./public-address-control";
 
@@ -55,12 +56,7 @@ export function CreateProductForm({ publicHost }: CreateProductFormProps) {
 
   return (
     <Form action={formAction} errors={error?.fieldErrors} aria-busy={pending}>
-      <div className="flex flex-col gap-y-2">
-        <h1 className="font-serif text-2xl font-semibold">Create your board</h1>
-        <p className="text-sm text-foreground-muted">
-          Everything here can be changed later in Settings.
-        </p>
-      </div>
+      <CreateProductIntro />
 
       <FormError message={error?.message} ref={bannerRef} />
       {error?.code === "UNAUTHENTICATED" && (
