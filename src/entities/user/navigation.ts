@@ -1,6 +1,6 @@
 import type { Route } from "next";
 
-import { PRODUCT_SLUG_PATTERN } from "@/features/products/contracts";
+import { PRODUCT_SLUG_PATTERN } from "@/entities/product/contracts";
 
 import {
   type AuthIntent,

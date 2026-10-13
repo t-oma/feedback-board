@@ -7,22 +7,22 @@ import { Field } from "@/components/field";
 import { Form } from "@/components/form";
 import { FormError } from "@/components/form-error";
 import { Link } from "@/components/link";
-import { buildSignInHref } from "@/entities/user/navigation";
-import { fieldValidator } from "@/shared/field-validator";
-import { useFocusAfterFormError } from "@/shared/use-focus-after-form-error";
-
 import {
   MAX_PRODUCT_DESCRIPTION_LENGTH,
   MAX_PRODUCT_NAME_LENGTH,
   MAX_PRODUCT_SLUG_LENGTH,
-} from "../contracts";
+} from "@/entities/product/contracts";
 import {
-  createProductSchema,
   normalizeProductDescription,
   normalizeProductName,
   normalizeProductSlug,
   suggestProductSlug,
-} from "../schemas";
+} from "@/entities/product/schemas";
+import { buildSignInHref } from "@/entities/user/navigation";
+import { fieldValidator } from "@/shared/field-validator";
+import { useFocusAfterFormError } from "@/shared/use-focus-after-form-error";
+
+import { createProductSchema } from "../schemas";
 import { CreateProductIntro } from "./create-product-intro";
 import { useCreateProduct } from "./create-product-provider";
 import { PublicAddressControl } from "./public-address-control";

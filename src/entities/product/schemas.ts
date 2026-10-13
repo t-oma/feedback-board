@@ -55,7 +55,7 @@ const latinSlugMessage = "Use Latin letters, numbers and hyphens";
 
 // `abort` keeps an empty value to the one message that says what to enter,
 // instead of adding the minimum length below it.
-const productNameSchema = z
+export const productNameSchema = z
   .string({ error: "Enter a product name" })
   .overwrite(normalizeProductName)
   .min(1, { error: "Enter a product name", abort: true })
@@ -68,7 +68,7 @@ const productNameSchema = z
 
 // An address that normalizes to nothing was typed in another script, or not
 // typed at all; either way, the message says which characters work.
-const productSlugSchema = z
+export const productSlugSchema = z
   .string({ error: latinSlugMessage })
   .overwrite(normalizeProductSlug)
   .min(1, { error: latinSlugMessage, abort: true })
@@ -79,17 +79,9 @@ const productSlugSchema = z
     error: removeExcess(MAX_PRODUCT_SLUG_LENGTH),
   });
 
-const productDescriptionSchema = z
+export const productDescriptionSchema = z
   .string()
   .overwrite(normalizeProductDescription)
   .max(MAX_PRODUCT_DESCRIPTION_LENGTH, {
     error: removeExcess(MAX_PRODUCT_DESCRIPTION_LENGTH),
   });
-
-export const createProductSchema = z.object({
-  name: productNameSchema,
-  slug: productSlugSchema,
-  description: productDescriptionSchema,
-});
-
-export type CreateProductInput = z.infer<typeof createProductSchema>;

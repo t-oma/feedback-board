@@ -1,7 +1,8 @@
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 import { expect, fn, spyOn, userEvent, waitFor } from "storybook/test";
 
-import { CreateProductProvider } from "./create-product-provider";
+import { CreateProductProvider } from "@/features/create-product/ui/create-product-provider";
+
 import { OwnerOverview } from "./owner-overview";
 
 const publicUrl = "https://feedbackboard.app/p/orbit-cli";

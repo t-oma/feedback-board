@@ -3,7 +3,7 @@
 import { CircleCheck, Info, X } from "lucide-react";
 import { type RefObject, useEffect, useRef, useState } from "react";
 
-import { useCreateProduct } from "./create-product-provider";
+import { useCreateProduct } from "@/features/create-product/ui/create-product-provider";
 
 type OwnerHeadingProps = {
   productName: string;

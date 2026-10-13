@@ -6,7 +6,7 @@ import {
   MAX_PRODUCT_NAME_LENGTH,
   MAX_PRODUCT_SLUG_LENGTH,
   MIN_PRODUCT_SLUG_LENGTH,
-} from "@/features/products/contracts";
+} from "@/entities/product/contracts";
 
 import { users } from "./auth";
 import { timestamptz, uuidv7 } from "./columns";

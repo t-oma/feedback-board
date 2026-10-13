@@ -2,12 +2,12 @@ import { ButtonSkeleton } from "@/components/button";
 import { Field } from "@/components/field";
 import { FormSkeleton } from "@/components/form";
 import { Skeleton } from "@/components/skeleton";
-
 import {
   MAX_PRODUCT_DESCRIPTION_LENGTH,
   MAX_PRODUCT_NAME_LENGTH,
   MAX_PRODUCT_SLUG_LENGTH,
-} from "../contracts";
+} from "@/entities/product/contracts";
+
 import { CreateProductIntroSkeleton } from "./create-product-intro";
 import { PublicAddressControlSkeleton } from "./public-address-control";
 

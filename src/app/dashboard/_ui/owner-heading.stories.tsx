@@ -3,10 +3,13 @@ import { useEffect, useState } from "react";
 import { expect, mocked, userEvent } from "storybook/test";
 
 import { NarrowMain } from "@/components/narrow-main";
+import {
+  createProductAction,
+  type CreateProductResult,
+} from "@/features/create-product/actions";
+import { CreateProductForm } from "@/features/create-product/ui/create-product-form";
+import { CreateProductProvider } from "@/features/create-product/ui/create-product-provider";
 
-import { createProductAction, type CreateProductResult } from "../actions";
-import { CreateProductForm } from "./create-product-form";
-import { CreateProductProvider } from "./create-product-provider";
 import { OwnerOverview } from "./owner-overview";
 
 // The mocked action calls this the way the real one's `refresh()` makes the
