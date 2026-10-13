@@ -10,7 +10,7 @@ import {
 } from "@/components/skeleton/skeleton.testing";
 
 const meta = {
-  title: "Components/Field",
+  title: "Field",
   parameters: {
     layout: "centered",
   },

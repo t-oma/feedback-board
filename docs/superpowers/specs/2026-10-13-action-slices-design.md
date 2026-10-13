@@ -166,8 +166,13 @@ schemas: the field and normalization tests go to the entity, and the tests of
 each action's schema go to that action.
 
 Each action keeps a mock beside it in `__mocks__/actions.ts`, and
-`.storybook/preview.ts` registers one `sb.mock` per action. Story titles stay
-as they are.
+`.storybook/preview.ts` registers one `sb.mock` per action.
+
+A story's title starts with its layer. `.storybook/main.ts` lists each layer's
+directory with a `titlePrefix`, `Components`, `Entities`, `Features` or
+`Pages`, and a story's own `title` names only its slice or route and its
+component, such as `Sign In/Header`. A story that moves to another layer moves
+in the sidebar with it.
 
 ## MVP specification
 
@@ -190,7 +195,6 @@ and their mutations as actions, and it points here for the import rules.
 ## Out of scope
 
 - Renaming the bottom layer.
-- Story titles.
 - The `Field` namespace on `/dashboard`: the onboarding skeleton imports it, so
   the route lists `field-password-control.tsx`, which it never renders.
 

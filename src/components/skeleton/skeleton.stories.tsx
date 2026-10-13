@@ -4,7 +4,7 @@ import { expect } from "storybook/test";
 import { Skeleton, SkeletonText } from "@/components/skeleton";
 
 const meta = {
-  title: "Components/Skeleton",
+  title: "Skeleton",
   component: Skeleton,
   parameters: {
     layout: "centered",

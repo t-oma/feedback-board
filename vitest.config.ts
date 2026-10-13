@@ -22,7 +22,7 @@ export default defineConfig({
           // A git worktree checked out inside the repository is a second copy
           // of this suite, and the default pattern would run its tests as if
           // they were ours. The story project needs no such guard: it collects
-          // what `.storybook/main.ts` names, which is `../src` and nothing else.
+          // only the directories `.storybook/main.ts` lists, all inside `src`.
           // Database tests have a project of their own, below.
           exclude: [
             ...configDefaults.exclude,

@@ -9,7 +9,7 @@ import { signInAction } from "@/features/sign-in/actions";
 import { AuthTabs } from "./auth-tabs";
 
 const meta = {
-  title: "Features/Auth/Tabs",
+  title: "Sign In/Tabs",
   component: AuthTabs,
   parameters: {
     layout: "fullscreen",

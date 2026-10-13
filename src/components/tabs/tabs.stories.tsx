@@ -11,7 +11,7 @@ import { Tabs } from "@/components/tabs";
 type AuthMode = "sign-in" | "create-account";
 
 const meta = {
-  title: "Components/Tabs",
+  title: "Tabs",
   parameters: {
     layout: "padded",
   },

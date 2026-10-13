@@ -7,7 +7,7 @@ import { getAuthBackTarget, parseReturnTo } from "@/entities/user/navigation";
 import { AuthHeader, AuthHeaderSkeleton } from "./auth-header";
 
 const meta = {
-  title: "Features/Auth/Header",
+  title: "Sign In/Header",
   component: AuthHeader,
   parameters: {
     layout: "fullscreen",

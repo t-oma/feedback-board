@@ -5,7 +5,7 @@ import { expectFocusRing, tabTo } from "@/components/focus-ring.testing";
 import { Link } from "@/components/link";
 
 const meta = {
-  title: "Components/Link",
+  title: "Link",
   component: Link,
   parameters: {
     layout: "centered",
