@@ -2,9 +2,10 @@ import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 import { expect, fn, mocked, userEvent, waitFor, within } from "storybook/test";
 
 import { NarrowMain } from "@/components/narrow-main";
+import { buildSignInHref } from "@/entities/user/navigation";
+import { createAccountAction } from "@/features/create-account/actions";
+import { signInAction } from "@/features/sign-in/actions";
 
-import { createAccountAction, signInAction } from "../actions";
-import { buildSignInHref } from "../navigation";
 import { AuthTabs } from "./auth-tabs";
 
 const meta = {

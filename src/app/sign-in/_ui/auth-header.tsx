@@ -2,7 +2,7 @@ import { ArrowLeftIcon } from "lucide-react";
 import Link from "next/link";
 import type { ReactNode } from "react";
 
-import type { AuthBackTarget } from "../navigation";
+import type { AuthBackTarget } from "@/entities/user/navigation";
 
 type AuthHeaderProps = {
   backTarget: AuthBackTarget;

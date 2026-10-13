@@ -7,7 +7,7 @@ import { Field } from "@/components/field";
 import { Form } from "@/components/form";
 import { FormError } from "@/components/form-error";
 import { Link } from "@/components/link";
-import { buildSignInHref } from "@/features/auth/navigation";
+import { buildSignInHref } from "@/entities/user/navigation";
 import { fieldValidator } from "@/shared/field-validator";
 import { useFocusAfterFormError } from "@/shared/use-focus-after-form-error";
 

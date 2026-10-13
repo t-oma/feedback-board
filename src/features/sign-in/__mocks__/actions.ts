@@ -5,5 +5,3 @@ import { fn } from "storybook/test";
 import type * as actions from "../actions";
 
 export const signInAction = fn<typeof actions.signInAction>();
-export const createAccountAction = fn<typeof actions.createAccountAction>();
-export const signOutAction = fn<typeof actions.signOutAction>();

@@ -1,7 +1,7 @@
 import { getSessionCookie } from "better-auth/cookies";
 import { type NextRequest, NextResponse } from "next/server";
 
-import { buildSignInHref } from "@/features/auth/navigation";
+import { buildSignInHref } from "@/entities/user/navigation";
 
 // Sends a guest to sign in before the protected route renders at all.
 //

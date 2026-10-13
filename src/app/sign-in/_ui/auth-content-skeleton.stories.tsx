@@ -5,8 +5,8 @@ import {
   expectSkeletonGeometry,
   SkeletonGeometry,
 } from "@/components/skeleton/skeleton.testing";
+import { buildSignInHref } from "@/entities/user/navigation";
 
-import { buildSignInHref } from "../navigation";
 import { AuthContentSkeleton } from "./auth-content-skeleton";
 import { AuthIntro } from "./auth-intro";
 import { AuthTabs } from "./auth-tabs";

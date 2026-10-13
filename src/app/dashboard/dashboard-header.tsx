@@ -1,7 +1,7 @@
 import Link from "next/link";
 
-import { signOutAction } from "@/features/auth/actions";
-import { SignOutButton } from "@/features/auth/ui/sign-out-button";
+import { signOutAction } from "@/features/sign-out/actions";
+import { SignOutButton } from "@/features/sign-out/ui/sign-out-button";
 
 export function DashboardHeader() {
   return (

@@ -5,11 +5,12 @@ import {
   buildSignInHref,
   getAuthBackTarget,
   parseSignInQuery,
-} from "@/features/auth/navigation";
-import { AuthHeader } from "@/features/auth/ui/auth-header";
-import { AuthIntro } from "@/features/auth/ui/auth-intro";
-import { AuthTabs } from "@/features/auth/ui/auth-tabs";
+} from "@/entities/user/navigation";
 import { env } from "@/server/env";
+
+import { AuthHeader } from "./_ui/auth-header";
+import { AuthIntro } from "./_ui/auth-intro";
+import { AuthTabs } from "./_ui/auth-tabs";
 
 // One title for both modes. A title per mode would need `generateMetadata`
 // reading `searchParams`, which makes the head depend on the request.

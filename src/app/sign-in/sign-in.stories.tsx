@@ -2,17 +2,17 @@ import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 import { expect } from "storybook/test";
 
 import { NarrowMain } from "@/components/narrow-main";
-
 import {
   buildSignInHref,
   getAuthBackTarget,
   parseReturnTo,
   type SignInQuery,
-} from "../navigation";
-import { AuthContentSkeleton } from "./auth-content-skeleton";
-import { AuthHeader, AuthHeaderSkeleton } from "./auth-header";
-import { AuthIntro } from "./auth-intro";
-import { AuthTabs } from "./auth-tabs";
+} from "@/entities/user/navigation";
+
+import { AuthContentSkeleton } from "./_ui/auth-content-skeleton";
+import { AuthHeader, AuthHeaderSkeleton } from "./_ui/auth-header";
+import { AuthIntro } from "./_ui/auth-intro";
+import { AuthTabs } from "./_ui/auth-tabs";
 
 const meta = {
   title: "Features/Auth/SignIn",

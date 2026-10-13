@@ -15,7 +15,7 @@ vi.mock("next/cache", () => ({
   refresh: mocks.refresh,
 }));
 
-vi.mock("@/features/auth/session.server", () => ({
+vi.mock("@/entities/user/session.server", () => ({
   getSession: mocks.getSession,
 }));
 
