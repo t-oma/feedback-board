@@ -9,7 +9,7 @@ const neutralSignInText =
   "Sign in to vote, add feedback, or manage your board.";
 
 const meta = {
-  title: "Features/Auth/Intro",
+  title: "Sign In/Intro",
   component: AuthIntro,
   parameters: {
     layout: "fullscreen",

@@ -42,7 +42,7 @@ function SignInPage({ returnTo, intent, mode }: SignInQuery) {
 }
 
 const meta = {
-  title: "Features/Auth/SignIn",
+  title: "Sign In/Page",
   parameters: {
     layout: "fullscreen",
   },

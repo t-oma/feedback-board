@@ -14,7 +14,7 @@ import { CreateProductProvider } from "./create-product-provider";
 const publicHost = "feedbackboard.app";
 
 const meta = {
-  title: "Features/Products/Create Product Form Skeleton",
+  title: "Create Product/Form Skeleton",
   parameters: {
     layout: "fullscreen",
   },

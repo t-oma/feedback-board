@@ -8,7 +8,7 @@ import { Link } from "@/components/link";
 const retry = fn();
 
 const meta = {
-  title: "Components/Error State",
+  title: "Error State",
   component: ErrorState,
   parameters: {
     layout: "padded",

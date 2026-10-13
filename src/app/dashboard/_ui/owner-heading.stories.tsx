@@ -48,7 +48,7 @@ function answerWith(result: CreateProductResult) {
 }
 
 const meta = {
-  title: "Features/Products/Owner Heading",
+  title: "Dashboard/Owner Heading",
   render: () => <DashboardWithServer />,
   parameters: {
     layout: "fullscreen",

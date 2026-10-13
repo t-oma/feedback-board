@@ -7,7 +7,7 @@ import { Form } from "@/components/form";
 import { FormError } from "@/components/form-error";
 
 const meta = {
-  title: "Components/Form",
+  title: "Form",
   component: Form,
   parameters: {
     layout: "centered",

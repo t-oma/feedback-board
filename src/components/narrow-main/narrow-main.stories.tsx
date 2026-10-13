@@ -4,7 +4,7 @@ import { expect } from "storybook/test";
 import { NarrowMain } from "@/components/narrow-main";
 
 const meta = {
-  title: "Components/Narrow Main",
+  title: "Narrow Main",
   component: NarrowMain,
   parameters: {
     layout: "fullscreen",

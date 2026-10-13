@@ -5,7 +5,7 @@ import { EmptyState } from "@/components/empty-state";
 import { Link } from "@/components/link";
 
 const meta = {
-  title: "Components/Empty State",
+  title: "Empty State",
   component: EmptyState,
   parameters: {
     layout: "padded",

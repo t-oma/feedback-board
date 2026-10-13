@@ -9,7 +9,7 @@ const publicUrl = "https://feedbackboard.app/p/orbit-cli";
 const copiedText = fn();
 
 const meta = {
-  title: "Features/Products/Owner Overview",
+  title: "Dashboard/Owner Overview",
   component: OwnerOverview,
   args: { productName: "Orbit CLI", publicUrl },
   parameters: {

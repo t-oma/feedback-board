@@ -7,7 +7,7 @@ import { FormError } from "@/components/form-error";
 const message = "We couldn’t complete your request. Please try again.";
 
 const meta = {
-  title: "Components/Form Error",
+  title: "Form Error",
   component: FormError,
   parameters: {
     layout: "padded",

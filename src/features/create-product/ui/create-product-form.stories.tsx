@@ -8,7 +8,7 @@ import { CreateProductForm } from "./create-product-form";
 import { CreateProductProvider } from "./create-product-provider";
 
 const meta = {
-  title: "Features/Products/Create Product Form",
+  title: "Create Product/Form",
   render: () => (
     <CreateProductProvider>
       <CreateProductForm publicHost="feedbackboard.app" />

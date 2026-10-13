@@ -6,7 +6,7 @@ import { Button } from "@/components/button";
 import { expectFocusRing, tabTo } from "@/components/focus-ring.testing";
 
 const meta = {
-  title: "Components/Button",
+  title: "Button",
   component: Button,
   parameters: {
     layout: "centered",
