@@ -3,16 +3,43 @@ import { expect } from "storybook/test";
 
 import { NarrowMain } from "@/components/narrow-main";
 import {
+  expectSkeletonGeometry,
+  SkeletonGeometry,
+} from "@/components/skeleton/skeleton.testing";
+import {
   buildSignInHref,
   getAuthBackTarget,
   parseReturnTo,
   type SignInQuery,
 } from "@/entities/user/navigation";
 
-import { AuthContentSkeleton } from "./_ui/auth-content-skeleton";
-import { AuthHeader, AuthHeaderSkeleton } from "./_ui/auth-header";
+import { AuthHeader } from "./_ui/auth-header";
 import { AuthIntro } from "./_ui/auth-intro";
 import { AuthTabs } from "./_ui/auth-tabs";
+import SignInLoading from "./loading";
+
+// What the page renders once it has parsed the query. The page itself is
+// async and reads `searchParams`, so the stories compose its parts instead.
+function SignInPage({ returnTo, intent, mode }: SignInQuery) {
+  return (
+    <>
+      <AuthHeader backTarget={getAuthBackTarget(returnTo)} />
+      <NarrowMain>
+        <AuthIntro mode={mode} intent={intent} />
+        <AuthTabs
+          mode={mode}
+          returnTo={returnTo}
+          signInHref={buildSignInHref({ returnTo, intent })}
+          createAccountHref={buildSignInHref({
+            returnTo,
+            intent,
+            mode: "create-account",
+          })}
+        />
+      </NarrowMain>
+    </>
+  );
+}
 
 const meta = {
   title: "Features/Auth/SignIn",
@@ -31,24 +58,7 @@ const meta = {
     intent: null,
     mode: "sign-in",
   },
-  render: ({ returnTo, intent, mode }) => (
-    <>
-      <AuthHeader backTarget={getAuthBackTarget(returnTo)} />
-      <NarrowMain>
-        <AuthIntro mode={mode} intent={intent} />
-        <AuthTabs
-          mode={mode}
-          returnTo={returnTo}
-          signInHref={buildSignInHref({ returnTo, intent })}
-          createAccountHref={buildSignInHref({
-            returnTo,
-            intent,
-            mode: "create-account",
-          })}
-        />
-      </NarrowMain>
-    </>
-  ),
+  render: (args) => <SignInPage {...args} />,
 } satisfies Meta<SignInQuery>;
 
 export default meta;
@@ -113,18 +123,43 @@ export const OnTablet: Story = {
 };
 
 export const Loading: Story = {
-  render: () => (
-    <>
-      <AuthHeaderSkeleton />
-      <NarrowMain>
-        <AuthContentSkeleton />
-      </NarrowMain>
-    </>
-  ),
+  render: () => <SignInLoading />,
   play: async ({ canvas }) => {
     const status = canvas.getByRole("status");
 
     await expect(status).toHaveTextContent("Loading sign-in");
     await expect(status).toHaveAttribute("aria-busy", "true");
+  },
+};
+
+// The page above the loading state that stands in for it. Two `main`
+// landmarks on one page fail axe, so the a11y test is off here; the `Loading`
+// story checks the loading state on its own.
+const loadingLinesUp = {
+  parameters: {
+    a11y: { test: "off" },
+  },
+  render: (args) => (
+    <SkeletonGeometry
+      content={<SignInPage {...args} />}
+      skeleton={<SignInLoading />}
+    />
+  ),
+  play: async ({ canvasElement }) => {
+    await expectSkeletonGeometry(canvasElement);
+  },
+} satisfies Story;
+
+export const LoadingLinesUpOnPhone: Story = {
+  ...loadingLinesUp,
+  globals: {
+    viewport: { value: "mobile1" },
+  },
+};
+
+export const LoadingLinesUpInCard: Story = {
+  ...loadingLinesUp,
+  globals: {
+    viewport: { value: "tablet" },
   },
 };

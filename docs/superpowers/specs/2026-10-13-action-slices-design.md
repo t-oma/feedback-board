@@ -72,8 +72,8 @@ src/
 │   │   │                        copy-link-button, and their stories
 │   │   └── layout.tsx, loading.tsx, page.tsx
 │   └── sign-in/
-│       ├── _ui/                 auth-content-skeleton, auth-header, auth-intro,
-│       │                        auth-tabs, and their stories
+│       ├── _ui/                 auth-header, auth-intro, auth-tabs, and their
+│       │                        stories
 │       └── loading.tsx, page.tsx, sign-in.stories.tsx
 ├── features/
 │   ├── create-account/          actions.ts, schemas.ts, ui/create-account-form.tsx
@@ -116,8 +116,11 @@ page under `/dashboard` can render the dashboard header. When a second route
 needs a component, it moves down to `features`, `entities` or
 `src/components`.
 
-`sign-in.stories.tsx` repeats what the sign-in page and its loading state
-compose, so it sits beside them in `src/app/sign-in/`.
+`sign-in.stories.tsx` repeats what the sign-in page composes, renders its
+`loading.tsx`, and checks that the two line up, so it sits beside them in
+`src/app/sign-in/`. The loading state is written out in `loading.tsx`: it
+stands in for the whole page, and the skeletons it is built from sit beside
+the parts they stand in for.
 `src/app/dashboard/dashboard-header.tsx` moves into `_ui/`.
 
 ## Contracts
