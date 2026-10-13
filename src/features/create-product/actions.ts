@@ -3,6 +3,7 @@
 import { refresh } from "next/cache";
 import { unstable_rethrow } from "next/navigation";
 
+import { classifyProductError } from "@/entities/product/errors";
 import { getSession } from "@/entities/user/session.server";
 import { toUnexpectedActionError } from "@/server/action-errors";
 import { db } from "@/server/db";
@@ -12,7 +13,6 @@ import {
   toValidationActionError,
 } from "@/shared/action-result";
 
-import { classifyProductError } from "./errors";
 import { type CreateProductInput, createProductSchema } from "./schemas";
 
 export type CreateProductResult = ActionResult<undefined, CreateProductInput>;
