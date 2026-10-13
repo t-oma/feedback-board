@@ -39,8 +39,8 @@ export function AuthIntro({ intent, mode }: AuthIntroProps) {
 
 // The skeleton cannot know the mode and intent the request asks for, so it
 // shows the plain sign-in intro in the space the supporting text reserves. It
-// repeats the classes that place and size `AuthIntro`; the geometry stories of
-// `AuthContentSkeleton` check that the two line up.
+// repeats the classes that place and size `AuthIntro`; the `LoadingLinesUp`
+// stories in `../sign-in.stories.tsx` check that the two line up.
 export function AuthIntroSkeleton() {
   return (
     <div className="flex flex-col gap-y-2">
