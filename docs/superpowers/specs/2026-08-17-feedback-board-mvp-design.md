@@ -46,38 +46,40 @@ Platform-specific firewall rules remain optional and out of scope unless the dep
 
 The application has one Next.js deployment and one PostgreSQL database. Server Components call feature query functions directly; they do not call the application's own HTTP endpoints. Server Actions are the client-callable interface for mutations: they validate input, resolve the session, authorize the operation, perform or delegate the database change, and refresh affected server-rendered data. A separate mutation module is extracted only when its implementation becomes complex or is reused outside one action. The only Route Handler required by the MVP is Better Auth's catch-all handler at `/api/auth/[...all]`.
 
-The code is organized feature-first:
+The code is organized in layers taken from Feature-Sliced Design. Each layer imports only from the ones below it, and the [action slices specification](2026-10-13-action-slices-design.md) gives the rules and the lint check that holds them:
 
 - `src/server/db` owns the Drizzle client, schema, relations, and migration-facing exports.
-- `src/server/auth` owns Better Auth configuration and server-side session helpers.
+- `src/server/auth.ts` owns the Better Auth configuration.
 - `src/server/env.ts` owns validated server environment variables.
 - `src/shared/action-result.ts` owns the client-safe expected-error contract for forms and interactive controls.
-- `src/features/auth` owns account-creation, sign-in, and sign-out actions.
-- `src/features/products` owns product validation, queries, creation, and settings mutations.
-- `src/features/feedback` owns public and owner queries, creation, editing, status changes, and hide/restore.
-- `src/features/votes` owns viewer vote reads and idempotent add/remove mutations.
-- `src/app` owns routing, Server Component composition, loading boundaries, error boundaries, and not-found UI.
+- `src/entities` holds one slice per domain concept. `user` owns the account's field rules, the session, and the way to the sign-in page; `product` owns product validation, normalization, and queries; `feedback` will own public and owner queries; `vote` will own viewer vote reads.
+- `src/features` holds one slice per user action, with its Server Action, its input schema, and its UI: signing in, creating an account, signing out, and creating a product now; changing product settings, creating, editing, and hiding or restoring feedback, changing its status, and idempotently adding or removing a vote later.
+- `src/app` owns routing, Server Component composition, loading boundaries, error boundaries, and not-found UI, and keeps UI that only one route renders in that route's `_ui/`.
 
-Feature modules use file names to communicate their allowed import direction. The suffix is a project convention rather than special Next.js syntax:
+Slices use file names to communicate their allowed import direction. The suffix is a project convention rather than special Next.js syntax:
 
 - `*.server.ts` contains implementation that ordinary Client Components must not import, such as database queries. Every such module also imports `server-only` so the restriction is enforced at build time.
 - `actions.ts` starts with the file-level `"use server"` directive. Client Components may import its exported async functions as Server Action references, while their implementation continues to execute only on the server.
-- `schemas.ts` owns the feature's Zod schemas and the types inferred from them, so an inferred type always sits beside the schema it comes from.
-- `contracts.ts` owns hand-written constants and types that carry no validation logic, such as the feedback status values, the sort and filter keys, and the mapping between URL and database spellings.
+- `schemas.ts` owns the slice's Zod schemas and the types inferred from them, so an inferred type always sits beside the schema it comes from.
+- `contracts.ts` owns hand-written constants and types that carry no validation logic, such as the feedback status values, the sort and filter keys, and the mapping between URL and database spellings. It imports nothing, so every layer may read it.
 
 Both are client-safe and must not import server-only dependencies. A schema that depends on server-only code uses the `*.server.ts` suffix instead. The dependency between the two runs one way: `schemas.ts` may import `contracts.ts`, never the reverse. Without that rule the two files form a cycle, because schemas need the shared constants while inferred types need the schemas.
 
-A representative feature remains flat at the MVP scale:
+A representative entity and action remain flat at the MVP scale, apart from the action's `ui/`:
 
 ```text
-src/features/feedback/
-├── actions.ts
+src/entities/feedback/
 ├── contracts.ts
 ├── queries.server.ts
 └── schemas.ts
+
+src/features/create-feedback/
+├── actions.ts
+├── schemas.ts
+└── ui/
 ```
 
-Additional folders inside a feature are introduced only after the number or responsibilities of its files make the flat layout harder to navigate.
+Additional folders inside a slice are introduced only after the number or responsibilities of its files make the flat layout harder to navigate.
 
 ## Routes and route behavior
 
