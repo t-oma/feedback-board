@@ -7,7 +7,9 @@ import { sb } from "storybook/test";
 // so every story that renders a form would fail before it starts. Each mock
 // sits in `__mocks__` beside its module. Storybook resolves these paths itself,
 // relative to this file, and finds nothing without the extension.
-sb.mock("../src/features/auth/actions.ts");
+sb.mock("../src/features/create-account/actions.ts");
+sb.mock("../src/features/sign-in/actions.ts");
+sb.mock("../src/features/sign-out/actions.ts");
 sb.mock("../src/features/products/actions.ts");
 
 const preview: Preview = {

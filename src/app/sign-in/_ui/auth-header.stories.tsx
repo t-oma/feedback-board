@@ -2,8 +2,8 @@ import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 import { expect, within } from "storybook/test";
 
 import { expectFocusRing, tabTo } from "@/components/focus-ring.testing";
+import { getAuthBackTarget, parseReturnTo } from "@/entities/user/navigation";
 
-import { getAuthBackTarget, parseReturnTo } from "../navigation";
 import { AuthHeader, AuthHeaderSkeleton } from "./auth-header";
 
 const meta = {

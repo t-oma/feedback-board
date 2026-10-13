@@ -3,7 +3,7 @@
 import { refresh } from "next/cache";
 import { unstable_rethrow } from "next/navigation";
 
-import { getSession } from "@/features/auth/session.server";
+import { getSession } from "@/entities/user/session.server";
 import { toUnexpectedActionError } from "@/server/action-errors";
 import { db } from "@/server/db";
 import { products } from "@/server/db/schema/products";

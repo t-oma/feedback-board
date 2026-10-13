@@ -5,10 +5,9 @@ import Link from "next/link";
 import { useState } from "react";
 
 import { Tabs } from "@/components/tabs";
-
-import type { AuthMode } from "../schemas";
-import { CreateAccountForm } from "./create-account-form";
-import { SignInForm } from "./sign-in-form";
+import type { AuthMode } from "@/entities/user/schemas";
+import { CreateAccountForm } from "@/features/create-account/ui/create-account-form";
+import { SignInForm } from "@/features/sign-in/ui/sign-in-form";
 
 type AuthTabsProps = {
   mode: AuthMode;

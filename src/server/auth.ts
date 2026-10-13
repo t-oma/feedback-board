@@ -7,7 +7,7 @@ import { nextCookies } from "better-auth/next-js";
 import {
   MAX_PASSWORD_LENGTH,
   MIN_PASSWORD_LENGTH,
-} from "@/features/auth/contracts";
+} from "@/entities/user/contracts";
 
 import { db } from "./db";
 import { schema } from "./db/relations";

@@ -1,6 +1,5 @@
 import { SkeletonText } from "@/components/skeleton";
-
-import type { AuthIntent, AuthMode } from "../schemas";
+import type { AuthIntent, AuthMode } from "@/entities/user/schemas";
 
 type AuthIntroProps = {
   mode: AuthMode;

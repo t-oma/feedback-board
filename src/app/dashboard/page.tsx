@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 
 import { NarrowMain } from "@/components/narrow-main";
-import { requireSession } from "@/features/auth/session.server";
+import { requireSession } from "@/entities/user/session.server";
 import { getOwnerProduct } from "@/features/products/queries.server";
 import { CreateProductForm } from "@/features/products/ui/create-product-form";
 import { CreateProductProvider } from "@/features/products/ui/create-product-provider";

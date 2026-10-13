@@ -1,6 +1,7 @@
 import { NarrowMain } from "@/components/narrow-main";
-import { AuthContentSkeleton } from "@/features/auth/ui/auth-content-skeleton";
-import { AuthHeaderSkeleton } from "@/features/auth/ui/auth-header";
+
+import { AuthContentSkeleton } from "./_ui/auth-content-skeleton";
+import { AuthHeaderSkeleton } from "./_ui/auth-header";
 
 export default function SignInLoading() {
   return (
