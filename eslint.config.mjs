@@ -7,6 +7,35 @@ import tseslint from "typescript-eslint";
 const OUTLINE_NONE_MESSAGE =
   "`outline-none` leaves no focus indicator in forced-colors mode. Use `outline-hidden`, or a visible `focus-visible:outline-*`.";
 
+const LAYERS_SPEC = "docs/superpowers/specs/2026-10-13-action-slices-design.md";
+
+const NO_UPPER_LAYER = {
+  regex: "^@/(app|features)(/|$)",
+  message: `Import only from a lower layer, and inside a slice use a relative path. See ${LAYERS_SPEC}.`,
+};
+
+const NO_ENTITY_BUT_CONTRACTS = {
+  regex: "^@/entities/(?![^/]+/contracts$)",
+  message: `Only an entity's \`contracts.ts\` is open to its own layer and the one below. See ${LAYERS_SPEC}.`,
+};
+
+// A file `depth` folders below its slice's root leaves the slice with one
+// more `../` than that.
+function noLeavingSlice(depth) {
+  return {
+    regex: `^(\\.\\./){${String(depth + 1)}}`,
+    message:
+      "A relative path stays inside its slice. Reach another layer through `@/`.",
+  };
+}
+
+function restrictImports(files, patterns) {
+  return {
+    files,
+    rules: { "no-restricted-imports": ["error", { patterns }] },
+  };
+}
+
 const eslintConfig = defineConfig([
   ...nextVitals,
 
@@ -90,6 +119,58 @@ const eslintConfig = defineConfig([
       ],
     },
   },
+
+  // The import direction of the layers. For the files two blocks match, the
+  // later block's options replace the earlier ones rather than add to them,
+  // so each block lists every pattern its files need, and the slices get one
+  // block per layer and folder depth. A folder deeper than the depths below
+  // needs blocks of its own.
+  restrictImports(
+    ["src/{components,shared,server}/**/*.{ts,tsx}"],
+    [NO_UPPER_LAYER, NO_ENTITY_BUT_CONTRACTS],
+  ),
+  ...[0, 1].flatMap((depth) => {
+    const files = `${"*/".repeat(depth)}*.{ts,tsx}`;
+
+    return [
+      restrictImports(
+        [`src/features/*/${files}`],
+        [NO_UPPER_LAYER, noLeavingSlice(depth)],
+      ),
+      restrictImports(
+        [`src/entities/*/${files}`],
+        [NO_UPPER_LAYER, NO_ENTITY_BUT_CONTRACTS, noLeavingSlice(depth)],
+      ),
+    ];
+  }),
+  // Every layer may read a `contracts.ts`, which is safe only while it reads
+  // nothing itself.
+  restrictImports(
+    ["src/{features,entities}/*/contracts.ts"],
+    [
+      {
+        regex: ".",
+        message:
+          "`contracts.ts` imports nothing, so that every layer can read it.",
+      },
+    ],
+  ),
+  // A route reaches its own files relatively. Climbing to `../_ui/` reaches
+  // the UI of a segment above, which a nested route may use; climbing into
+  // another folder reaches another route's.
+  restrictImports(
+    ["src/app/**/*.{ts,tsx}"],
+    [
+      {
+        regex: "^@/app(/|$)",
+        message: "Import a route's own files with a relative path.",
+      },
+      {
+        regex: "^(\\.\\./)+[^./_][^/]*/",
+        message: `A route uses its own \`_ui/\` and those of the segments above it. Move what two routes share down a layer. See ${LAYERS_SPEC}.`,
+      },
+    ],
+  ),
 
   prettierConfig,
   // eslint-config-next already ignores `.next`, `out`, `build` and
