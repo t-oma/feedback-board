@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 
 import {
+  isProductSlug,
   normalizeProductDescription,
   normalizeProductName,
   normalizeProductSlug,
@@ -50,5 +51,28 @@ describe("suggestProductSlug", () => {
 
   it("drops the hyphen a cut leaves at the end", () => {
     expect(suggestProductSlug(`${"a".repeat(47)} b`)).toBe("a".repeat(47));
+  });
+});
+
+describe("isProductSlug", () => {
+  it.each(["orbit-cli", "abc", "a1-b2-c3", "a".repeat(48)])(
+    "accepts %j",
+    (value) => {
+      expect(isProductSlug(value)).toBe(true);
+    },
+  );
+
+  it.each([
+    "Orbit-CLI",
+    "orbit--cli",
+    "-orbit",
+    "orbit-",
+    "orbit cli",
+    "orbit_cli",
+    "ab",
+    "a".repeat(49),
+    "",
+  ])("rejects %j", (value) => {
+    expect(isProductSlug(value)).toBe(false);
   });
 });

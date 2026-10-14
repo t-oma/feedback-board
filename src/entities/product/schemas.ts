@@ -6,7 +6,21 @@ import {
   MAX_PRODUCT_SLUG_LENGTH,
   MIN_PRODUCT_NAME_LENGTH,
   MIN_PRODUCT_SLUG_LENGTH,
+  PRODUCT_SLUG_PATTERN,
 } from "./contracts";
+
+const productSlugRegExp = new RegExp(`^${PRODUCT_SLUG_PATTERN}$`);
+
+// Whether a value is a slug exactly as one is stored, without normalizing it.
+// A board URL with "Orbit-CLI" in it does not lead to "orbit-cli": the
+// address is the one the owner chose.
+export function isProductSlug(value: string) {
+  return (
+    value.length >= MIN_PRODUCT_SLUG_LENGTH &&
+    value.length <= MAX_PRODUCT_SLUG_LENGTH &&
+    productSlugRegExp.test(value)
+  );
+}
 
 export function normalizeProductName(value: string) {
   return value.trim().replace(/\s+/g, " ");
