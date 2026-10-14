@@ -105,6 +105,72 @@ test("signs out from a tab whose session has already ended", async ({
   await expectPath(page, "/");
 });
 
+test("sends a signed-in visitor past sign-in", async ({ page }) => {
+  const target = "/dashboard?tab=planned&sort=top";
+
+  await createAccount(
+    page,
+    `signed-in-${crypto.randomUUID()}@example.com`,
+    "test password 123",
+  );
+
+  // Account creation is the mode that matters most: its form would switch
+  // the visitor to a new user.
+  await page.goto("/sign-in?mode=create-account");
+  await expectPath(page, "/dashboard");
+  await expect(
+    page.getByRole("heading", { level: 1, name: "Create your board" }),
+  ).toBeVisible();
+
+  await page.goto(`/sign-in?${new URLSearchParams({ returnTo: target })}`);
+  await expect
+    .poll(() => {
+      const url = new URL(page.url());
+      return `${url.pathname}${url.search}`;
+    })
+    .toBe(target);
+});
+
+// The cookie comes from the app, and the session behind it ends the way the
+// app ends one: the second context holds a copy, and signing out in the first
+// deletes the session. The dashboard rejects that cookie mid-render and sends
+// it to sign in, and the proxy must show it the form rather than send it back.
+test("shows sign-in to a cookie whose session has ended", async ({
+  browser,
+  context,
+  page,
+}) => {
+  await createAccount(
+    page,
+    `stale-${crypto.randomUUID()}@example.com`,
+    "test password 123",
+  );
+  const staleContext = await browser.newContext({
+    storageState: await context.storageState(),
+  });
+
+  try {
+    await page.getByRole("button", { name: "Sign out" }).click();
+    await expectPath(page, "/");
+
+    const stalePage = await staleContext.newPage();
+    await stalePage.goto("/dashboard");
+
+    await expectDashboardReturnTo(stalePage);
+    await expect(
+      stalePage.getByRole("heading", { level: 1, name: "Sign in" }),
+    ).toBeVisible();
+    // Better Auth expires a cookie it finds no session behind, and the
+    // browser only drops it if the proxy passed that on. The same path
+    // carries a cookie the lookup refreshes.
+    expect(
+      (await staleContext.cookies()).map((cookie) => cookie.name),
+    ).not.toContain("better-auth.session_token");
+  } finally {
+    await staleContext.close();
+  }
+});
+
 test("returns a guest to the exact view they asked for", async ({ page }) => {
   const email = `return-to-${crypto.randomUUID()}@example.com`;
   const password = "test password 123";
