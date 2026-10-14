@@ -1,28 +1,47 @@
+import { ArrowUpRightIcon } from "lucide-react";
+
 import { EmptyState } from "@/components/empty-state";
+import { Link } from "@/components/link";
 
 import { CopyLinkButton } from "./copy-link-button";
 import { OwnerHeading } from "./owner-heading";
 
 type OwnerOverviewProps = {
   productName: string;
-  publicUrl: string;
+  productSlug: string;
+  // The origin the public address starts with.
+  origin: string;
 };
 
-export function OwnerOverview({ productName, publicUrl }: OwnerOverviewProps) {
-  const { host, pathname } = new URL(publicUrl);
+export function OwnerOverview({
+  productName,
+  productSlug,
+  origin,
+}: OwnerOverviewProps) {
+  const boardPath = `/p/${productSlug}` as const;
+  const { host, href } = new URL(boardPath, origin);
 
   return (
     <>
       <OwnerHeading productName={productName} />
-      <div className="flex flex-col gap-3 rounded-lg border border-border-subtle bg-background p-3 sm:flex-row sm:items-center sm:justify-between">
+      <div className="flex flex-col gap-3 rounded-lg border border-border-subtle bg-background p-3">
         <div className="flex min-w-0 flex-col gap-1">
           <p className="text-xs text-foreground-subtle">Public address</p>
           <p className="font-mono text-sm break-all">
             {host}
-            {pathname}
+            {boardPath}
           </p>
         </div>
-        <CopyLinkButton url={publicUrl} />
+        <div className="flex flex-col gap-2 sm:flex-row">
+          <CopyLinkButton url={href} />
+          {/* A new tab, as the design's arrow marks it, so the dashboard
+              stays where the owner left it. */}
+          <Link variant="secondary" href={boardPath} target="_blank">
+            View public board
+            <span className="sr-only"> (opens in a new tab)</span>
+            <ArrowUpRightIcon aria-hidden="true" size={16} />
+          </Link>
+        </div>
       </div>
 
       <div className="py-6">

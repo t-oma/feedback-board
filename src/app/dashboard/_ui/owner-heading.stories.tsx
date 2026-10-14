@@ -33,7 +33,8 @@ function DashboardWithServer() {
       ) : (
         <OwnerOverview
           productName={productName}
-          publicUrl="https://feedbackboard.app/p/orbit-cli"
+          productSlug="orbit-cli"
+          origin="https://feedbackboard.app"
         />
       )}
     </CreateProductProvider>
