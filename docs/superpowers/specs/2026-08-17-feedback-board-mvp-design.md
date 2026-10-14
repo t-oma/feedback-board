@@ -317,7 +317,7 @@ Under this model every route prerenders a static shell at build time and streams
 
 The shell carries layout, static headings, filter controls, and the skeletons for everything above, so these fallbacks are the same loading states the UI workstream already owns.
 
-Product slugs are not known at build time, so the board routes declare no `generateStaticParams`; under Cache Components that function may not return an empty list. Their `params` promise is passed into a boundary instead of being awaited at the top of the component, which lets the shell prerender for slugs the build has never seen.
+Product slugs are not known at build time, so the board routes declare no `generateStaticParams`; under Cache Components that function may not return an empty list. Their `params` are read only inside a Suspense boundary, the route's `loading.tsx` or one inside the page, which lets the shell prerender for slugs the build has never seen.
 
 Synchronous non-deterministic calls such as `new Date()`, `Math.random()`, and `crypto.randomUUID()` fail the prerender with a build error that no opt-out clears. The data model already avoids this by generating UUIDv7 identifiers and completion timestamps in PostgreSQL, and application code preserves that property. A route not yet ready for its boundary work may set `instant = false` on its segment as a temporary opt-out, but no route ships that way.
 
