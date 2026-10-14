@@ -1,10 +1,10 @@
 import { expect, type Page, test } from "@playwright/test";
 
 import { E2E_BASE_URL } from "../test/environment";
-import { createAccount } from "./accounts";
+import { createAccount, expectPath } from "./accounts";
 
 // The onboarding form is laid out for phones, so the journey runs at a
-// phone's width, with the submit button stuck to the bottom of the screen.
+// phone's width.
 test.use({ viewport: { width: 390, height: 844 } });
 
 const board = {
@@ -82,6 +82,24 @@ test("creates the owner's board from the dashboard", async ({ page }) => {
     page.getByRole("heading", { level: 1, name: board.name }),
   ).toBeVisible();
   await expect(notice).toHaveCount(0);
+
+  const boardPagePromise = page.context().waitForEvent("page");
+  await page.getByRole("link", { name: "View public board" }).click();
+  const boardPage = await boardPagePromise;
+
+  await expectPath(boardPage, `/p/${slug}`);
+  await expect(
+    boardPage.getByRole("heading", {
+      level: 1,
+      name: "What should we build next?",
+    }),
+  ).toBeVisible();
+  await expect(boardPage.getByRole("banner")).toContainText(board.name);
+  await expect(boardPage.getByText(board.description)).toBeVisible();
+  await expect(
+    boardPage.getByRole("heading", { level: 2, name: "No feedback yet" }),
+  ).toBeVisible();
+  await expect(boardPage).toHaveTitle(`${board.name} · Feedback Board`);
 });
 
 test("keeps what was typed when the address is taken", async ({

@@ -11,7 +11,11 @@ const copiedText = fn();
 const meta = {
   title: "Dashboard/Owner Overview",
   component: OwnerOverview,
-  args: { productName: "Orbit CLI", publicUrl },
+  args: {
+    productName: "Orbit CLI",
+    productSlug: "orbit-cli",
+    origin: "https://feedbackboard.app",
+  },
   parameters: {
     layout: "padded",
   },
@@ -28,6 +32,17 @@ const meta = {
 
 export default meta;
 type Story = StoryObj<typeof meta>;
+
+export const ViewPublicBoard: Story = {
+  play: async ({ canvas }) => {
+    const link = canvas.getByRole("link", {
+      name: "View public board (opens in a new tab)",
+    });
+
+    await expect(link).toHaveAttribute("href", "/p/orbit-cli");
+    await expect(link).toHaveAttribute("target", "_blank");
+  },
+};
 
 export const CopyLink: Story = {
   beforeEach: () => {

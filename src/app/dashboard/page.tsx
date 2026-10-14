@@ -29,7 +29,8 @@ export default async function Dashboard() {
         ) : (
           <OwnerOverview
             productName={product.name}
-            publicUrl={new URL(`/p/${product.slug}`, origin).href}
+            productSlug={product.slug}
+            origin={origin.origin}
           />
         )}
       </CreateProductProvider>
