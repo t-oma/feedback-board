@@ -45,7 +45,8 @@ function boxes(root: Element, selector: string) {
 
 // Replacing the skeleton moves nothing: each control starts where the block
 // marked `data-skeleton-control` for it starts and is as tall, and the two
-// take the same height overall.
+// take the same height overall. Content without controls, such as an empty
+// state, is compared on its height alone.
 export async function expectSkeletonGeometry(canvasElement: HTMLElement) {
   const content = canvasElement.querySelector(
     '[data-skeleton-geometry="content"]',
@@ -57,9 +58,9 @@ export async function expectSkeletonGeometry(canvasElement: HTMLElement) {
     throw new Error("Render the story through `SkeletonGeometry`.");
   }
 
-  const controls = boxes(content, controlSelector);
-  await expect(controls.length).toBeGreaterThan(0);
-  await expect(boxes(skeleton, "[data-skeleton-control]")).toEqual(controls);
+  await expect(boxes(skeleton, "[data-skeleton-control]")).toEqual(
+    boxes(content, controlSelector),
+  );
   await expect(Math.round(skeleton.getBoundingClientRect().height)).toBe(
     Math.round(content.getBoundingClientRect().height),
   );

@@ -1,8 +1,12 @@
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 import { expect } from "storybook/test";
 
-import { EmptyState } from "@/components/empty-state";
+import { EmptyState, EmptyStateSkeleton } from "@/components/empty-state";
 import { Link } from "@/components/link";
+import {
+  expectSkeletonGeometry,
+  SkeletonGeometry,
+} from "@/components/skeleton/skeleton.testing";
 
 const meta = {
   title: "Empty State",
@@ -54,5 +58,24 @@ export const WithoutEyebrow: Story = {
     await expect(
       canvas.getByRole("heading", { level: 2, name: "No feedback yet" }),
     ).toBeVisible();
+  },
+};
+
+export const Skeleton: Story = {
+  args: {
+    title: "No feedback yet",
+    description: "Be the first to say what Orbit CLI should do next.",
+    headingLevel: 2,
+  },
+  render: (args) => (
+    <SkeletonGeometry
+      content={<EmptyState {...args} />}
+      skeleton={
+        <EmptyStateSkeleton title={args.title} description={args.description} />
+      }
+    />
+  ),
+  play: async ({ canvasElement }) => {
+    await expectSkeletonGeometry(canvasElement);
   },
 };
