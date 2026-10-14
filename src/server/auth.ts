@@ -1,7 +1,10 @@
 import "server-only";
 
 import { drizzleAdapter } from "@better-auth/drizzle-adapter/relations-v2";
-import { betterAuth } from "better-auth";
+// `minimal` leaves out Kysely, which Better Auth needs only to connect to a
+// database by itself and to run its own migrations. Here the database comes
+// through the Drizzle adapter, and drizzle-kit owns the migrations.
+import { betterAuth } from "better-auth/minimal";
 import { nextCookies } from "better-auth/next-js";
 
 import {
