@@ -84,7 +84,7 @@ Additional folders inside a slice are introduced only after the number or respon
 ## Routes and route behavior
 
 - `/` is the portfolio/marketing entry point defined by the UI workstream.
-- `/sign-in` contains sign-in and account-creation modes. A separate `/sign-up` route is not required. It accepts the independently validated `returnTo`, `intent`, and `mode` query parameters described below.
+- `/sign-in` contains sign-in and account-creation modes. A separate `/sign-up` route is not required. It accepts the independently validated `returnTo`, `intent`, and `mode` query parameters described below. A visitor who is already signed in is sent on instead, as described under Authentication.
 - `/dashboard` requires a valid session. A user without a product sees onboarding; a user with a product sees owner management.
 - `/dashboard/settings` requires a valid session and an existing owned product. A signed-in user without a product is redirected to `/dashboard`, where onboarding is the correct destination; having no product yet is a stage of the flow, not a missing page, so this route never renders not-found UI for that case.
 - `/p/[productSlug]` is the public board with URL-backed filtering and sorting.
@@ -106,7 +106,8 @@ The MVP behavior is:
 - automatic sign-in after successful registration;
 - redirect to `/dashboard` after normal registration;
 - sign-out returns the user to `/`;
-- a validated internal `returnTo` path returns a user to the public page that prompted authentication, whether they arrived by following the guest control's link or through the popover that enhances it.
+- a validated internal `returnTo` path returns a user to the public page that prompted authentication, whether they arrived by following the guest control's link or through the popover that enhances it;
+- a visitor with a valid session who opens `/sign-in`, in either mode, goes straight to the validated `returnTo`, or to `/dashboard` without one, and sees neither form. Either form would only start a second session beside the first, and account creation would also switch the visitor to a new user without saying so. Signing in as someone else means signing out first.
 
 An auth-entry link may separately carry `intent=vote|feedback|board`. In sign-in mode the value selects only the contextual supporting sentence: sign in to vote, add feedback, or create a board. It never changes authorization, form behavior, or the redirect destination, and it is never inferred from `returnTo`, because the same board URL can prompt more than one action. An absent or unknown value produces no contextual intent; the UI then shows the neutral default, "Sign in to vote, add feedback, or manage your board." Account-creation mode always uses its fixed privacy explanation. The supporting-text area reserves at least two lines and may grow, so changing mode or intent does not move the form when the copy occupies one or two lines.
 
@@ -119,13 +120,13 @@ The same link may carry `mode=sign-in|create-account`. Missing, empty, unknown, 
 
 The two checks overlap deliberately. The first rejects `//evil.com` and `/\evil.com` outright, and it names `\` because a URL parser treats that character as `/` in HTTP schemes, which would otherwise resolve the value to `https://evil.com`. The second catches what a prefix check cannot see: a parser strips tab, newline, and carriage-return characters from the input entirely, so a tab placed between the leading `/` and a second `/` survives the first check and then collapses to `//evil.com`, while a `javascript:` value parses with the origin `"null"`. Both end up cross-origin and are rejected. A percent-encoded form such as `/%2F%2Fevil.com` stays same-origin and is accepted, which is correct: browsers do not decode `%2F` before resolving, so the value remains an internal path.
 
-The redirect then uses the parsed URL's `pathname + search + hash`, never the raw input. Validating one string and redirecting with another is the usual way this check is defeated. Paths under `/api` are rejected because no user-facing page lives there. A rejected or absent value never surfaces an error: normal sign-in falls back to `/`, while account creation follows its explicit post-registration default of `/dashboard`.
+The redirect then uses the parsed URL's `pathname + search + hash`, never the raw input. Validating one string and redirecting with another is the usual way this check is defeated. Paths under `/api` are rejected because no user-facing page lives there. A rejected or absent value never surfaces an error: normal sign-in falls back to `/`, account creation follows its explicit post-registration default of `/dashboard`, and a signed-in visitor sent on from `/sign-in` goes to `/dashboard` as well.
 
 Because `returnTo` reaches the server as untrusted form data on a Server Action POST, it is validated inside the action that performs the redirect, not only at the point where a sign-in link is rendered.
 
 Auth forms may call Better Auth's server API through Server Actions with its Next.js cookie integration. The Better Auth Route Handler remains mounted as required by the library.
 
-The dashboard validates the full session in its server layout or page. Every protected Server Action independently validates the full session again. The MVP does not depend on `proxy.ts` for security. The proxy only sends a guest to sign in on a page request; a Server Action is a POST to the same route, and it answers a missing session itself with `UNAUTHENTICATED` rather than being redirected.
+The dashboard validates the full session in its server layout or page. Every protected Server Action independently validates the full session again. The MVP does not depend on `proxy.ts` for security; the proxy only decides where a page request goes. It sends a guest from the dashboard to sign in when the session cookie is absent, and it sends a signed-in visitor on from `/sign-in` only after reading the full session. The second check cannot go by the cookie alone: the dashboard answers a cookie whose session has ended by sending it to sign in, and a check by presence would send it straight back, in a loop. The proxy reads that session from Better Auth's own `/api/auth/get-session` endpoint, passing on any cookie change in the answer, rather than importing the auth configuration: the proxy is bundled apart from the application, and the import would put a second copy of the database client's classes into the same process. A Server Action is a POST to the route that renders its form, and the proxy lets it through in both cases: a protected action answers a missing session itself with `UNAUTHENTICATED`, and an auth action runs as submitted.
 
 ## Access model
 
@@ -401,6 +402,7 @@ Vitest covers inexpensive domain and database integration behavior:
 - `returnTo` validation, accepting internal paths with query and hash while rejecting `//evil.com`, `/\evil.com`, `\/evil.com`, a tab-prefixed variant that normalizes to `//`, `https://evil.com`, `javascript:alert(1)`, and `/api` paths, each falling back to the default destination;
 - auth intent validation, accepting only `vote`, `feedback`, and `board`, while unknown or absent values produce no contextual supporting sentence and never affect `returnTo`; the neutral default sentence is a UI fallback rather than parser output;
 - auth mode parsing and URL canonicalization, accepting `sign-in` and `create-account`, defaulting untrusted values to `sign-in`, omitting the default mode from generated URLs, and preserving valid `intent` and explicit `returnTo` values when modes are combined;
+- the proxy's routing: the paths it runs on, a guest's dashboard request sent to sign in with its path and query as `returnTo`, a signed-in request for `/sign-in` sent to the validated `returnTo` or to `/dashboard`, a cookie without a session let through to the form, the cookie changes in Better Auth's answer passed on, and a POST let through either way;
 - field-length validation boundaries;
 - status values and `completedAt` transitions;
 - database conflict mapping;
@@ -419,6 +421,8 @@ Playwright covers four critical browser journeys:
 2. Register a second user, create feedback on the owner's board from the modal, confirm the board stays put and the new item appears at the top of the default view carrying one vote, withdraw that vote and add it back, then vote on another item and observe correct counts throughout.
 3. As owner, edit feedback, change it to completed, verify changelog inclusion and a closed vote control with its count intact, leave completed and verify voting reopens, hide it, verify public absence, and restore it.
 4. As a visitor, read board/detail/changelog content, exercise URL-backed status and sort controls, open the sign-in popover from a protected control, reach sign-in from it, switch to account creation and back while preserving `intent` and `returnTo`, and land back on the originating board afterwards. The same journey asserts that the protected controls and hydrated auth tabs are reachable by keyboard and that protected controls are never rendered disabled.
+
+Alongside the journeys, the browser suite checks the auth redirects against the production build, including a session cookie that outlives its session: it must reach the sign-in form rather than loop between `/dashboard` and `/sign-in`.
 
 Tests use a dedicated database named `feedback_board_test`, served by the local PostgreSQL container rather than by a managed provider. Any reset utility must still first query and verify that exact database name and require an explicit test-reset environment flag, and it refuses to run against development or production. A local container narrows what the utility can destroy but does not remove the need for the guard, since `DATABASE_URL` is what decides where it points and nothing stops that variable from holding a production value. Test data uses unique emails and slugs and does not depend on spec execution order.
 
