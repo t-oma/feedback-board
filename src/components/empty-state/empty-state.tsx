@@ -26,7 +26,9 @@ export function EmptyState({
         </p>
       )}
       <Heading className="font-serif text-lg font-semibold">{title}</Heading>
-      <p className="max-w-72 text-sm text-foreground-muted">{description}</p>
+      <p className="max-w-72 text-sm wrap-anywhere text-foreground-muted">
+        {description}
+      </p>
       {children !== undefined && (
         <div className="mt-2 flex w-full flex-col gap-2 sm:w-auto sm:flex-row">
           {children}
