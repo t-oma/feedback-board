@@ -1,7 +1,6 @@
 "use server";
 
-import { refresh } from "next/cache";
-import { unstable_rethrow } from "next/navigation";
+import { redirect, RedirectType, unstable_rethrow } from "next/navigation";
 
 import { classifyProductError } from "@/entities/product/errors";
 import { getSession } from "@/entities/user/session.server";
@@ -9,13 +8,14 @@ import { toUnexpectedActionError } from "@/server/action-errors";
 import { db } from "@/server/db";
 import { products } from "@/server/db/schema/products";
 import {
-  type ActionResult,
+  type ActionError,
   toValidationActionError,
 } from "@/shared/action-result";
 
 import { type CreateProductInput, createProductSchema } from "./schemas";
 
-export type CreateProductResult = ActionResult<undefined, CreateProductInput>;
+// Only failures come back: a created board redirects to the dashboard.
+export type CreateProductResult = ActionError<CreateProductInput>;
 
 export async function createProductAction(
   _previousState: CreateProductResult | null,
@@ -53,10 +53,8 @@ export async function createProductAction(
     switch (classifyProductError(error)) {
       // Also when the slug is taken as well: PostgreSQL checks unique indexes
       // in the order they were created, so the owner's comes first. It does
-      // not document that order, and `actions.db.test.ts` pins it. The refresh
-      // shows the board that already exists.
+      // not document that order, and `actions.db.test.ts` pins it.
       case "ownerHasProduct":
-        refresh();
         return {
           ok: false,
           code: "CONFLICT",
@@ -75,6 +73,7 @@ export async function createProductAction(
     }
   }
 
-  refresh();
-  return { ok: true, data: undefined };
+  // `replace`, so going back does not return to a form for a board that
+  // exists. The parameter tells the dashboard to say the board is live.
+  redirect("/dashboard?created=1", RedirectType.replace);
 }

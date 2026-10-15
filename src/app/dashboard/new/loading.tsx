@@ -2,7 +2,7 @@ import { NarrowMain } from "@/components/narrow-main";
 import { CreateProductFormSkeleton } from "@/features/create-product/ui/create-product-form-skeleton";
 import { env } from "@/server/env";
 
-export default function DashboardLoading() {
+export default function NewBoardLoading() {
   return (
     <NarrowMain>
       <CreateProductFormSkeleton

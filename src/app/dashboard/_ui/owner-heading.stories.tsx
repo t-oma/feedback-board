@@ -1,56 +1,28 @@
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
-import { useEffect, useState } from "react";
-import { expect, mocked, userEvent } from "storybook/test";
+import { expect, spyOn, userEvent } from "storybook/test";
 
 import { NarrowMain } from "@/components/narrow-main";
-import {
-  createProductAction,
-  type CreateProductResult,
-} from "@/features/create-product/actions";
-import { CreateProductForm } from "@/features/create-product/ui/create-product-form";
-import { CreateProductProvider } from "@/features/create-product/ui/create-product-provider";
 
 import { OwnerOverview } from "./owner-overview";
 
-// The mocked action calls this the way the real one's `refresh()` makes the
-// server render the owner state: in the same transition as its result.
-const ownerState: { show: (name: string) => void } = {
-  show: () => undefined,
-};
-
-// What the dashboard page renders, with the server's choice made here.
-function DashboardWithServer() {
-  const [productName, setProductName] = useState<string | null>(null);
-
-  useEffect(() => {
-    ownerState.show = setProductName;
-  }, []);
-
-  return (
-    <CreateProductProvider>
-      {productName === null ? (
-        <CreateProductForm publicHost="feedbackboard.app" />
-      ) : (
-        <OwnerOverview
-          productName={productName}
-          productSlug="orbit-cli"
-          origin="https://feedbackboard.app"
-        />
-      )}
-    </CreateProductProvider>
+// Storybook's own address must stay as it is.
+function stubReplaceState() {
+  return spyOn(window.history, "replaceState").mockImplementation(
+    () => undefined,
   );
 }
 
-function answerWith(result: CreateProductResult) {
-  mocked(createProductAction).mockImplementation(() => {
-    ownerState.show("Orbit CLI");
-    return Promise.resolve(result);
-  });
-}
+let replaceState: ReturnType<typeof stubReplaceState>;
 
 const meta = {
   title: "Dashboard/Owner Heading",
-  render: () => <DashboardWithServer />,
+  render: () => (
+    <OwnerOverview
+      productName="Orbit CLI"
+      productSlug="orbit-cli"
+      origin="https://feedbackboard.app"
+    />
+  ),
   parameters: {
     layout: "fullscreen",
   },
@@ -63,35 +35,37 @@ const meta = {
       </div>
     ),
   ],
+  beforeEach: () => {
+    replaceState = stubReplaceState();
+    return () => {
+      replaceState.mockRestore();
+    };
+  },
 } satisfies Meta;
 
 export default meta;
 type Story = StoryObj<typeof meta>;
-type Canvas = Parameters<NonNullable<Story["play"]>>[0]["canvas"];
 
-async function createBoard(canvas: Canvas) {
-  await userEvent.type(
-    canvas.getByRole("textbox", { name: "Product name" }),
-    "Orbit CLI",
-  );
-  await userEvent.click(canvas.getByRole("button", { name: "Create board" }));
-}
-
+// The create-product action redirects here with `?created=1`.
 export const AfterCreating: Story = {
-  beforeEach: () => {
-    answerWith({ ok: true, data: undefined });
+  parameters: {
+    nextjs: {
+      navigation: { pathname: "/dashboard", query: { created: "1" } },
+    },
   },
   play: async ({ canvas }) => {
-    await createBoard(canvas);
-
-    const heading = await canvas.findByRole("heading", {
+    const heading = canvas.getByRole("heading", {
       level: 1,
       name: "Orbit CLI",
     });
-    // The form's submit button had focus, and it is gone.
     const notice = canvas.getByText("Your board is live").closest("[role]");
     await expect(notice).toHaveAttribute("role", "status");
     await expect(notice).toHaveFocus();
+
+    // The address loses the parameter, so a reload says nothing.
+    await expect(replaceState).toHaveBeenCalledOnce();
+    const [, , url] = replaceState.mock.calls[0] ?? [];
+    await expect(new URL(String(url)).searchParams.has("created")).toBe(false);
 
     await userEvent.click(canvas.getByRole("button", { name: "Dismiss" }));
     await expect(canvas.queryByText("Your board is live")).toBeNull();
@@ -99,25 +73,17 @@ export const AfterCreating: Story = {
   },
 };
 
-// A second tab created the board first. The page shows that board, and the
-// notice says why the form went away.
-export const SecondBoardRefused: Story = {
-  beforeEach: () => {
-    answerWith({
-      ok: false,
-      code: "CONFLICT",
-      message: "You already have a board.",
-    });
+export const OnLaterVisits: Story = {
+  parameters: {
+    nextjs: {
+      navigation: { pathname: "/dashboard", query: {} },
+    },
   },
   play: async ({ canvas }) => {
-    await createBoard(canvas);
-
     await expect(
-      await canvas.findByRole("heading", { level: 1, name: "Orbit CLI" }),
+      canvas.getByRole("heading", { level: 1, name: "Orbit CLI" }),
     ).toBeVisible();
-    await expect(
-      canvas.getByText("You already have a board.").closest("[role]"),
-    ).toHaveFocus();
     await expect(canvas.queryByText("Your board is live")).toBeNull();
+    await expect(replaceState).not.toHaveBeenCalled();
   },
 };

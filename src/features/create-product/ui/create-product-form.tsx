@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useActionState, useState } from "react";
 
 import { Button } from "@/components/button";
 import { Field } from "@/components/field";
@@ -22,9 +22,9 @@ import { buildSignInHref } from "@/entities/user/navigation";
 import { fieldValidator } from "@/shared/field-validator";
 import { useFocusAfterFormError } from "@/shared/use-focus-after-form-error";
 
+import { createProductAction } from "../actions";
 import { createProductSchema } from "../schemas";
 import { CreateProductIntro } from "./create-product-intro";
-import { useCreateProduct } from "./create-product-provider";
 import { PublicAddressControl } from "./public-address-control";
 
 const validateName = fieldValidator(createProductSchema.shape.name);
@@ -39,7 +39,10 @@ type CreateProductFormProps = {
 };
 
 export function CreateProductForm({ publicHost }: CreateProductFormProps) {
-  const { state, formAction, pending } = useCreateProduct();
+  const [error, formAction, pending] = useActionState(
+    createProductAction,
+    null,
+  );
   // React resets the form after every action, failed ones included, so every
   // value is held here and survives it.
   const [name, setName] = useState("");
@@ -49,7 +52,6 @@ export function CreateProductForm({ publicHost }: CreateProductFormProps) {
   const [description, setDescription] = useState("");
   const slug = editedSlug ?? suggestProductSlug(name);
 
-  const error = state?.ok === false ? state : null;
   // Every value survives a failed submit, so submitting again is the next
   // step.
   const bannerRef = useFocusAfterFormError<HTMLDivElement>(error);
@@ -62,9 +64,16 @@ export function CreateProductForm({ publicHost }: CreateProductFormProps) {
       {error?.code === "UNAUTHENTICATED" && (
         <Link
           variant="secondary"
-          href={buildSignInHref({ returnTo: "/dashboard" })}
+          href={buildSignInHref({ returnTo: "/dashboard/new" })}
         >
           Sign in again
+        </Link>
+      )}
+      {/* A conflict with a message of its own is about the account, not a
+          field: another tab created this account's board first. */}
+      {error?.code === "CONFLICT" && error.message !== undefined && (
+        <Link variant="secondary" href="/dashboard">
+          Go to your board
         </Link>
       )}
 

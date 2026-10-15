@@ -29,9 +29,11 @@ export async function createAccountAction(
     return toValidationActionError(parsedInput.error);
   }
 
+  // Someone who signs up to vote arrives with a board in `returnTo`. Without
+  // one, the account is most likely for a board of its own.
   const returnTo =
     parseReturnTo(formData.get("returnTo"), env.BETTER_AUTH_URL) ??
-    "/dashboard";
+    "/dashboard/new";
 
   try {
     await auth.api.signUpEmail({

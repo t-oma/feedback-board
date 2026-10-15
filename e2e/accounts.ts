@@ -5,7 +5,8 @@ export async function expectPath(page: Page, pathname: string) {
 }
 
 // Through the real form, so the session comes from the app rather than from a
-// cookie the test sets itself. Account creation ends on the dashboard.
+// cookie the test sets itself. Without a `returnTo`, account creation ends on
+// the form for a new board.
 export async function createAccount(
   page: Page,
   email: string,
@@ -19,5 +20,5 @@ export async function createAccount(
   await panel.getByLabel("Password", { exact: true }).fill(password);
   await panel.getByRole("button", { name: "Create account" }).click();
 
-  await expectPath(page, "/dashboard");
+  await expectPath(page, "/dashboard/new");
 }

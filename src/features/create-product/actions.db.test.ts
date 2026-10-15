@@ -6,13 +6,16 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 
 const mocks = vi.hoisted(() => ({
   getSession: vi.fn(),
-  refresh: vi.fn(),
+  redirect: vi.fn(),
 }));
 
 vi.mock("server-only", () => ({}));
 
-vi.mock("next/cache", () => ({
-  refresh: mocks.refresh,
+// `unstable_rethrow` stays real, so the tests exercise how the action treats
+// an error Next.js throws on purpose.
+vi.mock("next/navigation", async (importOriginal) => ({
+  ...(await importOriginal<typeof Navigation>()),
+  redirect: mocks.redirect,
 }));
 
 vi.mock("@/entities/user/session.server", () => ({
@@ -26,6 +29,8 @@ import { insertTestUser, uniqueSlug } from "@/server/db/users.testing";
 import { createProductAction } from "./actions";
 
 const navigation = await vi.importActual<typeof Navigation>("next/navigation");
+
+const redirectSignal = new Error("NEXT_REDIRECT");
 
 const consoleError = vi
   .spyOn(console, "error")
@@ -67,6 +72,9 @@ function productsWithSlug(slug: string) {
 describe("createProductAction", () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    mocks.redirect.mockImplementation(() => {
+      throw redirectSignal;
+    });
   });
 
   it("creates the signed-in user's product from the normalized input", async () => {
@@ -84,7 +92,7 @@ describe("createProductAction", () => {
         description: " Tell us\r\nwhat is missing. ",
         ownerId: someoneElse.id,
       }),
-    ).resolves.toStrictEqual({ ok: true, data: undefined });
+    ).rejects.toBe(redirectSignal);
 
     await expect(productsOwnedBy(owner.id)).resolves.toMatchObject([
       {
@@ -94,7 +102,11 @@ describe("createProductAction", () => {
       },
     ]);
     await expect(productsOwnedBy(someoneElse.id)).resolves.toEqual([]);
-    expect(mocks.refresh).toHaveBeenCalledOnce();
+    // `replace`, so going back does not return to the form.
+    expect(mocks.redirect).toHaveBeenCalledExactlyOnceWith(
+      "/dashboard?created=1",
+      "replace",
+    );
   });
 
   it("stores an empty description when the request has none", async () => {
@@ -103,7 +115,7 @@ describe("createProductAction", () => {
 
     await expect(
       createProduct({ name: "Orbit CLI", slug: uniqueSlug() }),
-    ).resolves.toStrictEqual({ ok: true, data: undefined });
+    ).rejects.toBe(redirectSignal);
     await expect(productsOwnedBy(owner.id)).resolves.toMatchObject([
       { description: "" },
     ]);
@@ -135,10 +147,10 @@ describe("createProductAction", () => {
       message: "Your session has ended. Sign in again to create your board.",
     });
     await expect(productsWithSlug(slug)).resolves.toEqual([]);
-    expect(mocks.refresh).not.toHaveBeenCalled();
+    expect(mocks.redirect).not.toHaveBeenCalled();
   });
 
-  it("refuses a second product and refreshes the page to show the first", async () => {
+  it("refuses a second product and keeps the first", async () => {
     const owner = await insertTestUser();
     const firstSlug = uniqueSlug();
     await db
@@ -152,7 +164,7 @@ describe("createProductAction", () => {
     await expect(productsOwnedBy(owner.id)).resolves.toMatchObject([
       { slug: firstSlug },
     ]);
-    expect(mocks.refresh).toHaveBeenCalledOnce();
+    expect(mocks.redirect).not.toHaveBeenCalled();
     expect(consoleError).not.toHaveBeenCalled();
   });
 
@@ -187,7 +199,7 @@ describe("createProductAction", () => {
       createProduct({ name: "Second", slug, description: "" }),
     ).resolves.toStrictEqual(slugTakenError);
     await expect(productsOwnedBy(secondOwner.id)).resolves.toEqual([]);
-    expect(mocks.refresh).not.toHaveBeenCalled();
+    expect(mocks.redirect).not.toHaveBeenCalled();
   });
 
   it("keeps one product when the same owner submits twice at once", async () => {
@@ -196,13 +208,19 @@ describe("createProductAction", () => {
       .mockResolvedValueOnce(sessionFor(owner.id))
       .mockResolvedValueOnce(sessionFor(owner.id));
 
-    const results = await Promise.all([
+    const results = await Promise.allSettled([
       createProduct({ name: "First", slug: uniqueSlug(), description: "" }),
       createProduct({ name: "Second", slug: uniqueSlug(), description: "" }),
     ]);
 
-    expect(results).toContainEqual({ ok: true, data: undefined });
-    expect(results).toContainEqual(ownerHasProductError);
+    expect(results).toContainEqual({
+      status: "rejected",
+      reason: redirectSignal,
+    });
+    expect(results).toContainEqual({
+      status: "fulfilled",
+      value: ownerHasProductError,
+    });
     await expect(productsOwnedBy(owner.id)).resolves.toHaveLength(1);
   });
 
@@ -216,13 +234,19 @@ describe("createProductAction", () => {
       .mockResolvedValueOnce(sessionFor(firstOwner.id))
       .mockResolvedValueOnce(sessionFor(secondOwner.id));
 
-    const results = await Promise.all([
+    const results = await Promise.allSettled([
       createProduct({ name: "First", slug, description: "" }),
       createProduct({ name: "Second", slug, description: "" }),
     ]);
 
-    expect(results).toContainEqual({ ok: true, data: undefined });
-    expect(results).toContainEqual(slugTakenError);
+    expect(results).toContainEqual({
+      status: "rejected",
+      reason: redirectSignal,
+    });
+    expect(results).toContainEqual({
+      status: "fulfilled",
+      value: slugTakenError,
+    });
     await expect(productsWithSlug(slug)).resolves.toHaveLength(1);
   });
 
@@ -242,7 +266,7 @@ describe("createProductAction", () => {
       "createProductAction failed unexpectedly",
       expect.any(Error),
     );
-    expect(mocks.refresh).not.toHaveBeenCalled();
+    expect(mocks.redirect).not.toHaveBeenCalled();
   });
 
   it("rethrows a Next.js control-flow error raised while reading the session", async () => {

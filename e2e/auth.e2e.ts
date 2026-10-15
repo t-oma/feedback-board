@@ -25,12 +25,12 @@ test("completes the credential session lifecycle", async ({ page }) => {
   await expect(
     page.getByRole("heading", { level: 1, name: "Create your board" }),
   ).toBeVisible();
-  await expect(page).toHaveTitle("Dashboard · Feedback Board");
+  await expect(page).toHaveTitle("Create your board · Feedback Board");
 
   const signOutPaused: PromiseWithResolvers<void> = Promise.withResolvers();
   const signOutRelease: PromiseWithResolvers<void> = Promise.withResolvers();
 
-  await page.route("**/dashboard", async (route) => {
+  await page.route("**/dashboard/new", async (route) => {
     if (route.request().method() !== "POST") {
       await route.continue();
       return;
@@ -82,12 +82,12 @@ test("completes the credential session lifecycle", async ({ page }) => {
 
   await expectPath(page, "/dashboard");
   await expect(
-    page.getByRole("heading", { level: 1, name: "Create your board" }),
+    page.getByRole("heading", { level: 1, name: "You don’t have a board yet" }),
   ).toBeVisible();
 });
 
-// The tab still shows the dashboard after the session ended elsewhere. Its
-// sign-out is a POST to `/dashboard`, which the proxy must leave to the action
+// The tab still shows a dashboard page after the session ended elsewhere. Its
+// sign-out is a POST to that page, which the proxy must leave to the action
 // instead of sending it to sign in like a page request.
 test("signs out from a tab whose session has already ended", async ({
   page,
@@ -119,7 +119,7 @@ test("sends a signed-in visitor past sign-in", async ({ page }) => {
   await page.goto("/sign-in?mode=create-account");
   await expectPath(page, "/dashboard");
   await expect(
-    page.getByRole("heading", { level: 1, name: "Create your board" }),
+    page.getByRole("heading", { level: 1, name: "You don’t have a board yet" }),
   ).toBeVisible();
 
   await page.goto(`/sign-in?${new URLSearchParams({ returnTo: target })}`);

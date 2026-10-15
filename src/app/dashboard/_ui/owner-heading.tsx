@@ -2,22 +2,24 @@
 
 import { useEffect, useRef, useState } from "react";
 
-import { Notice, type NoticeMessage } from "@/components/notice";
+import { Notice } from "@/components/notice";
+
+import { useCreatedNotice } from "./use-created-notice";
 
 type OwnerHeadingProps = {
   productName: string;
-  notice: NoticeMessage | null;
 };
 
-export function OwnerHeading({ productName, notice }: OwnerHeadingProps) {
+export function OwnerHeading({ productName }: OwnerHeadingProps) {
+  const notice = useCreatedNotice();
   const headingRef = useRef<HTMLHeadingElement>(null);
   const noticeRef = useRef<HTMLDivElement>(null);
   const [dismissed, setDismissed] = useState(false);
   const shown = notice !== null && !dismissed;
 
-  // A notice reports what an action on this page just did, and the control
-  // that ran it is gone by the time the notice appears, so focus would fall
-  // to the page body.
+  // A notice reports what an action just did, and the control that ran it is
+  // gone by the time the notice appears, so focus would fall to the page
+  // body.
   useEffect(() => {
     if (shown) noticeRef.current?.focus();
   }, [shown]);
