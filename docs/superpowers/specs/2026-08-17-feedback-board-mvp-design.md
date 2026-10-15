@@ -85,8 +85,9 @@ Additional folders inside a slice are introduced only after the number or respon
 
 - `/` is the portfolio/marketing entry point defined by the UI workstream.
 - `/sign-in` contains sign-in and account-creation modes. A separate `/sign-up` route is not required. It accepts the independently validated `returnTo`, `intent`, and `mode` query parameters described below. A visitor who is already signed in is sent on instead, as described under Authentication.
-- `/dashboard` requires a valid session. A user without a product sees onboarding; a user with a product sees owner management.
-- `/dashboard/settings` requires a valid session and an existing owned product. A signed-in user without a product is redirected to `/dashboard`, where onboarding is the correct destination; having no product yet is a stage of the flow, not a missing page, so this route never renders not-found UI for that case.
+- `/dashboard` requires a valid session. A user with a product sees owner management; a user without one sees an offer to create a board, linking to `/dashboard/new`.
+- `/dashboard/new` requires a valid session. A user without a product sees onboarding; a user who already owns one sees a link to `/dashboard`.
+- `/dashboard/settings` requires a valid session and an existing owned product. A signed-in user without a product sees the same offer as on `/dashboard`; having no product yet is a stage of the flow, not a missing page, so this route never renders not-found UI for that case.
 - `/p/[productSlug]` is the public board with URL-backed filtering and sorting.
 - `/p/[productSlug]/feedback/[feedbackId]` is the public feedback detail page.
 - `/p/[productSlug]/changelog` lists completed, visible feedback.
@@ -104,7 +105,7 @@ The MVP behavior is:
 - no password reset;
 - no OAuth providers;
 - automatic sign-in after successful registration;
-- redirect to `/dashboard` after normal registration;
+- redirect to `/dashboard/new`, where the account's board is created, after normal registration;
 - sign-out returns the user to `/`;
 - a validated internal `returnTo` path returns a user to the public page that prompted authentication, whether they arrived by following the guest control's link or through the popover that enhances it;
 - a visitor with a valid session who opens `/sign-in`, in either mode, goes straight to the validated `returnTo`, or to `/dashboard` without one, and sees neither form. Either form would only start a second session beside the first, and account creation would also switch the visitor to a new user without saying so. Signing in as someone else means signing out first.
@@ -120,7 +121,7 @@ The same link may carry `mode=sign-in|create-account`. Missing, empty, unknown, 
 
 The two checks overlap deliberately. The first rejects `//evil.com` and `/\evil.com` outright, and it names `\` because a URL parser treats that character as `/` in HTTP schemes, which would otherwise resolve the value to `https://evil.com`. The second catches what a prefix check cannot see: a parser strips tab, newline, and carriage-return characters from the input entirely, so a tab placed between the leading `/` and a second `/` survives the first check and then collapses to `//evil.com`, while a `javascript:` value parses with the origin `"null"`. Both end up cross-origin and are rejected. A percent-encoded form such as `/%2F%2Fevil.com` stays same-origin and is accepted, which is correct: browsers do not decode `%2F` before resolving, so the value remains an internal path.
 
-The redirect then uses the parsed URL's `pathname + search + hash`, never the raw input. Validating one string and redirecting with another is the usual way this check is defeated. Paths under `/api` are rejected because no user-facing page lives there. A rejected or absent value never surfaces an error: normal sign-in falls back to `/`, account creation follows its explicit post-registration default of `/dashboard`, and a signed-in visitor sent on from `/sign-in` goes to `/dashboard` as well.
+The redirect then uses the parsed URL's `pathname + search + hash`, never the raw input. Validating one string and redirecting with another is the usual way this check is defeated. Paths under `/api` are rejected because no user-facing page lives there. A rejected or absent value never surfaces an error: normal sign-in falls back to `/`, account creation follows its explicit post-registration default of `/dashboard/new`, and a signed-in visitor sent on from `/sign-in` goes to `/dashboard` as well.
 
 Because `returnTo` reaches the server as untrusted form data on a Server Action POST, it is validated inside the action that performs the redirect, not only at the point where a sign-in link is rendered.
 
@@ -372,7 +373,7 @@ Route behavior includes:
 
 - a loading fallback at every streaming boundary named in the rendering model, plus route-level `loading.tsx` where a whole segment is replaced during navigation;
 - not-found UI for unknown product slugs, mismatched feedback IDs, and hidden feedback;
-- onboarding instead of an error when a signed-in user has no product;
+- an offer to create a board instead of an error when a signed-in user has no product;
 - a first-feedback empty state for an empty board;
 - a reset-filter empty state when valid filters produce no rows;
 - an empty changelog state when no visible completed feedback exists;
