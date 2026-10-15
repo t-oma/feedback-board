@@ -1,18 +1,26 @@
 "use client";
 
-import { CircleCheck, Info, X } from "lucide-react";
-import { type RefObject, useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
-import { useCreateProduct } from "@/features/create-product/ui/create-product-provider";
+import { Notice, type NoticeMessage } from "@/components/notice";
 
 type OwnerHeadingProps = {
   productName: string;
+  notice: NoticeMessage | null;
 };
 
-// The page heading, and under it what the create-product action just did, if
-// this visit ran it.
-export function OwnerHeading({ productName }: OwnerHeadingProps) {
+export function OwnerHeading({ productName, notice }: OwnerHeadingProps) {
   const headingRef = useRef<HTMLHeadingElement>(null);
+  const noticeRef = useRef<HTMLDivElement>(null);
+  const [dismissed, setDismissed] = useState(false);
+  const shown = notice !== null && !dismissed;
+
+  // A notice reports what an action on this page just did, and the control
+  // that ran it is gone by the time the notice appears, so focus would fall
+  // to the page body.
+  useEffect(() => {
+    if (shown) noticeRef.current?.focus();
+  }, [shown]);
 
   return (
     <>
@@ -23,62 +31,17 @@ export function OwnerHeading({ productName }: OwnerHeadingProps) {
       >
         {productName}
       </h1>
-      <CreateProductNotice headingRef={headingRef} />
+      {shown && (
+        <Notice
+          ref={noticeRef}
+          message={notice}
+          onDismiss={() => {
+            setDismissed(true);
+            // The notice had focus and leaves with it.
+            headingRef.current?.focus();
+          }}
+        />
+      )}
     </>
-  );
-}
-
-type CreateProductNoticeProps = {
-  headingRef: RefObject<HTMLHeadingElement | null>;
-};
-
-function CreateProductNotice({ headingRef }: CreateProductNoticeProps) {
-  const { state } = useCreateProduct();
-  const [dismissed, setDismissed] = useState(false);
-  const noticeRef = useRef<HTMLDivElement>(null);
-
-  // A board just created, or the one that already existed when a second was
-  // refused. Anything else leaves the owner state to speak for itself.
-  const notice =
-    state === null
-      ? null
-      : state.ok
-        ? { text: "Your board is live", Icon: CircleCheck }
-        : state.message === undefined
-          ? null
-          : { text: state.message, Icon: Info };
-
-  // The submit button that had focus is gone with the form, and focus would
-  // fall to the page body.
-  const shown = notice !== null && !dismissed;
-  useEffect(() => {
-    if (shown) noticeRef.current?.focus();
-  }, [shown]);
-
-  if (!shown) return null;
-
-  const { text, Icon } = notice;
-
-  return (
-    <div
-      ref={noticeRef}
-      role="status"
-      tabIndex={-1}
-      className="flex items-center gap-3 rounded-lg border border-border-subtle bg-surface-muted py-2 pr-2 pl-3 text-sm text-foreground-secondary focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
-    >
-      <Icon aria-hidden="true" className="size-4 shrink-0 text-accent" />
-      <p className="flex-1 font-medium">{text}</p>
-      <button
-        type="button"
-        aria-label="Dismiss"
-        onClick={() => {
-          setDismissed(true);
-          headingRef.current?.focus();
-        }}
-        className="inline-flex size-11 shrink-0 items-center justify-center rounded-md text-foreground-subtle hover:bg-surface hover:text-foreground focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-accent"
-      >
-        <X aria-hidden="true" size={18} />
-      </button>
-    </div>
   );
 }

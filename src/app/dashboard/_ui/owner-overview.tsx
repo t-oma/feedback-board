@@ -4,7 +4,7 @@ import { EmptyState } from "@/components/empty-state";
 import { Link } from "@/components/link";
 
 import { CopyLinkButton } from "./copy-link-button";
-import { OwnerHeading } from "./owner-heading";
+import { CreateProductOwnerHeading } from "./create-product-owner-heading";
 
 type OwnerOverviewProps = {
   productName: string;
@@ -23,7 +23,7 @@ export function OwnerOverview({
 
   return (
     <>
-      <OwnerHeading productName={productName} />
+      <CreateProductOwnerHeading productName={productName} />
       <div className="flex flex-col gap-3 rounded-lg border border-border-subtle bg-background p-3">
         <div className="flex min-w-0 flex-col gap-1">
           <p className="text-xs text-foreground-subtle">Public address</p>
