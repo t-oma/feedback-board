@@ -16,13 +16,12 @@ type CreateProductFormSkeletonProps = {
   publicHost: string;
 };
 
-// Stands in for `/dashboard` while it streams. It takes the shape of the
-// onboarding form, the first state a new account sees there.
+// Stands in for the onboarding form while its page streams.
 export function CreateProductFormSkeleton({
   publicHost,
 }: CreateProductFormSkeletonProps) {
   return (
-    <Skeleton label="Loading your dashboard">
+    <Skeleton label="Loading board creation">
       <FormSkeleton>
         <CreateProductIntroSkeleton />
         <Field.Skeleton

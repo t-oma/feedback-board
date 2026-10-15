@@ -124,7 +124,7 @@ describe("createAccountAction", () => {
     );
   });
 
-  it("falls back to the dashboard when the return target is unsafe", async () => {
+  it("falls back to the form for a new board when the return target is unsafe", async () => {
     const formData = new FormData();
     formData.set("name", "Ada Lovelace");
     formData.set("email", "ada@example.com");
@@ -135,7 +135,7 @@ describe("createAccountAction", () => {
       redirectSignal,
     );
 
-    expect(mocks.redirect).toHaveBeenCalledExactlyOnceWith("/dashboard");
+    expect(mocks.redirect).toHaveBeenCalledExactlyOnceWith("/dashboard/new");
   });
 
   it("returns an email conflict when the account already exists", async () => {

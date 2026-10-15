@@ -9,7 +9,6 @@ import {
 
 import { CreateProductForm } from "./create-product-form";
 import { CreateProductFormSkeleton } from "./create-product-form-skeleton";
-import { CreateProductProvider } from "./create-product-provider";
 
 const publicHost = "feedbackboard.app";
 
@@ -34,7 +33,7 @@ export const Loading: Story = {
   play: async ({ canvas }) => {
     const status = canvas.getByRole("status");
 
-    await expect(status).toHaveTextContent("Loading your dashboard");
+    await expect(status).toHaveTextContent("Loading board creation");
     await expect(status).toHaveAttribute("aria-busy", "true");
   },
 };
@@ -49,11 +48,7 @@ const geometry: Story = {
   render: () => (
     <SkeletonGeometry
       frame={(children) => <NarrowMain>{children}</NarrowMain>}
-      content={
-        <CreateProductProvider>
-          <CreateProductForm publicHost={publicHost} />
-        </CreateProductProvider>
-      }
+      content={<CreateProductForm publicHost={publicHost} />}
       skeleton={<CreateProductFormSkeleton publicHost={publicHost} />}
     />
   ),

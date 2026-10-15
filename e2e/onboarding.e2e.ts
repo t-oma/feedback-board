@@ -48,7 +48,7 @@ async function expectBoardKept(page: Page, slug: string) {
   await expect(description).toHaveValue(board.description);
 }
 
-test("creates the owner's board from the dashboard", async ({ page }) => {
+test("creates the owner's board", async ({ page }) => {
   await signUp(page);
   await expect(
     page.getByRole("heading", { level: 1, name: "Create your board" }),
@@ -69,6 +69,13 @@ test("creates the owner's board from the dashboard", async ({ page }) => {
     .getByRole("status")
     .filter({ hasText: "Your board is live" });
   await expect(notice).toBeFocused();
+  // The address no longer says the board was just created, so a reload or a
+  // copied link does not announce it again.
+  await expect
+    .poll(() => page.url())
+    .toBe(new URL("/dashboard", page.url()).href);
+  // The notice is this visit's, so it outlives the parameter.
+  await expect(notice).toBeVisible();
   await expect(
     page.getByText(`${new URL(E2E_BASE_URL).host}/p/${slug}`),
   ).toBeVisible();
@@ -100,6 +107,44 @@ test("creates the owner's board from the dashboard", async ({ page }) => {
     boardPage.getByRole("heading", { level: 2, name: "No feedback yet" }),
   ).toBeVisible();
   await expect(boardPage).toHaveTitle(`${board.name} · Feedback Board`);
+
+  await page.goto("/dashboard/new");
+  await expect(
+    page.getByRole("heading", { level: 1, name: "You already have a board" }),
+  ).toBeVisible();
+  await expect(
+    page.getByRole("link", { name: "Go to your board" }),
+  ).toHaveAttribute("href", "/dashboard");
+});
+
+// Two tabs show the form, and the first one creates the board.
+test("points the second tab to the board the first created", async ({
+  context,
+  page,
+}) => {
+  await signUp(page);
+  const otherPage = await context.newPage();
+  await otherPage.goto("/dashboard/new");
+
+  await fillBoard(page, uniqueSlug());
+  await page.getByRole("button", { name: "Create board" }).click();
+  await expect(
+    page.getByRole("heading", { level: 1, name: board.name }),
+  ).toBeVisible();
+
+  const slug = uniqueSlug();
+  await fillBoard(otherPage, slug);
+  await otherPage.getByRole("button", { name: "Create board" }).click();
+
+  await expect(
+    otherPage
+      .getByRole("alert")
+      .filter({ hasText: "You already have a board." }),
+  ).toBeFocused();
+  await expectBoardKept(otherPage, slug);
+  await expect(
+    otherPage.getByRole("link", { name: "Go to your board" }),
+  ).toHaveAttribute("href", "/dashboard");
 });
 
 test("keeps what was typed when the address is taken", async ({
@@ -148,5 +193,5 @@ test("keeps what was typed when the session ended before the submit", async ({
   await expectBoardKept(page, slug);
   await expect(
     page.getByRole("link", { name: "Sign in again" }),
-  ).toHaveAttribute("href", "/sign-in?returnTo=%2Fdashboard");
+  ).toHaveAttribute("href", "/sign-in?returnTo=%2Fdashboard%2Fnew");
 });

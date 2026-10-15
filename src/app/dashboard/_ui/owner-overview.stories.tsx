@@ -1,8 +1,6 @@
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 import { expect, fn, spyOn, userEvent, waitFor } from "storybook/test";
 
-import { CreateProductProvider } from "@/features/create-product/ui/create-product-provider";
-
 import { OwnerOverview } from "./owner-overview";
 
 const publicUrl = "https://feedbackboard.app/p/orbit-cli";
@@ -21,11 +19,9 @@ const meta = {
   },
   decorators: [
     (Story) => (
-      <CreateProductProvider>
-        <div className="mx-auto flex w-full max-w-155 flex-col gap-y-5">
-          <Story />
-        </div>
-      </CreateProductProvider>
+      <div className="mx-auto flex w-full max-w-155 flex-col gap-y-5">
+        <Story />
+      </div>
     ),
   ],
 } satisfies Meta<typeof OwnerOverview>;

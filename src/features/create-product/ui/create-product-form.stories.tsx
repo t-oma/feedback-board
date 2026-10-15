@@ -5,15 +5,10 @@ import { NarrowMain } from "@/components/narrow-main";
 
 import { createProductAction, type CreateProductResult } from "../actions";
 import { CreateProductForm } from "./create-product-form";
-import { CreateProductProvider } from "./create-product-provider";
 
 const meta = {
   title: "Create Product/Form",
-  render: () => (
-    <CreateProductProvider>
-      <CreateProductForm publicHost="feedbackboard.app" />
-    </CreateProductProvider>
-  ),
+  render: () => <CreateProductForm publicHost="feedbackboard.app" />,
   parameters: {
     layout: "fullscreen",
   },
@@ -165,7 +160,27 @@ export const SessionEnded: Story = {
     await expect(await canvas.findByRole("alert")).toHaveFocus();
     await expect(
       canvas.getByRole("link", { name: "Sign in again" }),
-    ).toHaveAttribute("href", "/sign-in?returnTo=%2Fdashboard");
+    ).toHaveAttribute("href", "/sign-in?returnTo=%2Fdashboard%2Fnew");
+    await expectValuesKept(canvas);
+  },
+};
+
+// Another tab created this account's board first.
+export const BoardAlreadyCreated: Story = {
+  beforeEach: () => {
+    mocked(createProductAction).mockResolvedValue({
+      ok: false,
+      code: "CONFLICT",
+      message: "You already have a board.",
+    } satisfies CreateProductResult);
+  },
+  play: async ({ canvas }) => {
+    await fillAndSubmit(canvas);
+
+    await expect(await canvas.findByRole("alert")).toHaveFocus();
+    await expect(
+      canvas.getByRole("link", { name: "Go to your board" }),
+    ).toHaveAttribute("href", "/dashboard");
     await expectValuesKept(canvas);
   },
 };
