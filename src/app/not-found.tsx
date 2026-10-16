@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 
 import { EmptyState } from "@/components/empty-state";
 import { Link } from "@/components/link";
+import { PageMain } from "@/components/page-main";
 
 export const metadata: Metadata = {
   title: "Page not found",
@@ -9,7 +10,7 @@ export const metadata: Metadata = {
 
 export default function NotFound() {
   return (
-    <main className="flex flex-1 flex-col justify-center px-5 py-12">
+    <PageMain align="center">
       <EmptyState
         eyebrow="404"
         title="This page doesn’t exist"
@@ -20,6 +21,6 @@ export default function NotFound() {
           Go to the landing page
         </Link>
       </EmptyState>
-    </main>
+    </PageMain>
   );
 }

@@ -3,6 +3,7 @@
 import { Button } from "@/components/button";
 import { ErrorState } from "@/components/error-state";
 import { Link } from "@/components/link";
+import { PageMain } from "@/components/page-main";
 
 type RouteErrorProps = {
   retry: () => void;
@@ -10,7 +11,7 @@ type RouteErrorProps = {
 
 export default function RouteError({ retry }: RouteErrorProps) {
   return (
-    <main className="flex flex-1 flex-col justify-center px-5 py-12">
+    <PageMain align="center">
       <ErrorState
         title="We couldn’t load this page. Please try again."
         headingLevel={1}
@@ -20,6 +21,6 @@ export default function RouteError({ retry }: RouteErrorProps) {
           Go to the landing page
         </Link>
       </ErrorState>
-    </main>
+    </PageMain>
   );
 }
