@@ -10,6 +10,7 @@ import type * as formError from "./form-error";
 import type * as link from "./link";
 import type * as narrowMain from "./narrow-main";
 import type * as notice from "./notice";
+import type * as pageMain from "./page-main";
 import type * as skeleton from "./skeleton";
 import type * as tabs from "./tabs/exports";
 
@@ -33,5 +34,6 @@ expectTypeOf<AcceptingClassName<typeof formError>>().toBeNever();
 expectTypeOf<AcceptingClassName<typeof link>>().toBeNever();
 expectTypeOf<AcceptingClassName<typeof narrowMain>>().toBeNever();
 expectTypeOf<AcceptingClassName<typeof notice>>().toBeNever();
+expectTypeOf<AcceptingClassName<typeof pageMain>>().toBeNever();
 expectTypeOf<AcceptingClassName<typeof skeleton>>().toBeNever();
 expectTypeOf<AcceptingClassName<typeof tabs>>().toBeNever();
