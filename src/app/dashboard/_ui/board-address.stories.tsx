@@ -1,16 +1,15 @@
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 import { expect, fn, spyOn, userEvent, waitFor } from "storybook/test";
 
-import { OwnerOverview } from "./owner-overview";
+import { BoardAddress } from "./board-address";
 
 const publicUrl = "https://feedbackboard.app/p/orbit-cli";
 const copiedText = fn();
 
 const meta = {
-  title: "Dashboard/Owner Overview",
-  component: OwnerOverview,
+  title: "Dashboard/Board Address",
+  component: BoardAddress,
   args: {
-    productName: "Orbit CLI",
     productSlug: "orbit-cli",
     origin: "https://feedbackboard.app",
   },
@@ -19,12 +18,12 @@ const meta = {
   },
   decorators: [
     (Story) => (
-      <div className="mx-auto flex w-full max-w-155 flex-col gap-y-5">
+      <div className="mx-auto w-full max-w-110">
         <Story />
       </div>
     ),
   ],
-} satisfies Meta<typeof OwnerOverview>;
+} satisfies Meta<typeof BoardAddress>;
 
 export default meta;
 type Story = StoryObj<typeof meta>;
