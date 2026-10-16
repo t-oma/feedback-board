@@ -15,15 +15,19 @@ type OwnerOverviewProps = {
   origin: string;
 };
 
+// The heading and the address keep a readable measure; the empty state
+// centres where the feedback will be listed.
 export function OwnerOverview({
   productName,
   productSlug,
   origin,
 }: OwnerOverviewProps) {
   return (
-    <>
-      <OwnerHeading productName={productName} />
-      <BoardAddress productSlug={productSlug} origin={origin} />
+    <div className="flex flex-col gap-y-5 py-6 sm:pt-9 sm:pb-10">
+      <div className="flex max-w-140 flex-col gap-y-5">
+        <OwnerHeading productName={productName} />
+        <BoardAddress productSlug={productSlug} origin={origin} />
+      </div>
 
       <div className="py-6">
         <EmptyState
@@ -32,7 +36,7 @@ export function OwnerOverview({
           headingLevel={2}
         />
       </div>
-    </>
+    </div>
   );
 }
 
@@ -47,18 +51,25 @@ export function OwnerOverviewSkeleton({
   origin,
 }: Pick<OwnerOverviewProps, "origin">) {
   return (
-    <Skeleton label="Loading your dashboard">
-      <p className="font-serif text-2xl font-semibold">
-        <SkeletonText>{sampleOwnerBoard.productName}</SkeletonText>
-      </p>
-      <BoardAddressSkeleton
-        productSlug={sampleOwnerBoard.productSlug}
-        origin={origin}
-      />
+    <div className="py-6 sm:pt-9 sm:pb-10">
+      <Skeleton label="Loading your dashboard">
+        <div className="flex max-w-140 flex-col gap-y-5">
+          <p className="font-serif text-2xl font-semibold">
+            <SkeletonText>{sampleOwnerBoard.productName}</SkeletonText>
+          </p>
+          <BoardAddressSkeleton
+            productSlug={sampleOwnerBoard.productSlug}
+            origin={origin}
+          />
+        </div>
 
-      <div className="py-6">
-        <EmptyStateSkeleton title={emptyTitle} description={emptyDescription} />
-      </div>
-    </Skeleton>
+        <div className="py-6">
+          <EmptyStateSkeleton
+            title={emptyTitle}
+            description={emptyDescription}
+          />
+        </div>
+      </Skeleton>
+    </div>
   );
 }

@@ -3,6 +3,7 @@ import type { Metadata } from "next";
 import { EmptyState } from "@/components/empty-state";
 import { Link } from "@/components/link";
 import { NarrowMain } from "@/components/narrow-main";
+import { PageMain } from "@/components/page-main";
 import { getOwnerProduct } from "@/entities/product/queries.server";
 import { requireSession } from "@/entities/user/session.server";
 import { CreateProductForm } from "@/features/create-product/ui/create-product-form";
@@ -16,16 +17,12 @@ export default async function NewBoard() {
   const session = await requireSession({ returnTo: "/dashboard/new" });
   const product = await getOwnerProduct(session.user.id);
 
-  return (
-    <NarrowMain>
-      {product === null ? (
-        // The deployment's own origin, the one `parseReturnTo` compares
-        // against, so the address prefix does not depend on the request.
-        <CreateProductForm publicHost={new URL(env.BETTER_AUTH_URL).host} />
-      ) : (
-        // Rendered rather than redirected: the page has already started
-        // streaming, and a redirect from there reaches the browser as a
-        // client-side navigation.
+  if (product !== null) {
+    // Rendered rather than redirected: the page has already started
+    // streaming, and a redirect from there reaches the browser as a
+    // client-side navigation.
+    return (
+      <PageMain align="center">
         <EmptyState
           title="You already have a board"
           description="Each account has one board."
@@ -35,7 +32,15 @@ export default async function NewBoard() {
             Go to your board
           </Link>
         </EmptyState>
-      )}
+      </PageMain>
+    );
+  }
+
+  return (
+    <NarrowMain>
+      {/* The deployment's own origin, the one `parseReturnTo` compares
+          against, so the address prefix does not depend on the request. */}
+      <CreateProductForm publicHost={new URL(env.BETTER_AUTH_URL).host} />
     </NarrowMain>
   );
 }
