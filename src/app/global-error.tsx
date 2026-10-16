@@ -4,6 +4,7 @@ import "./globals.css";
 
 import { Button } from "@/components/button";
 import { ErrorState } from "@/components/error-state";
+import { PageMain } from "@/components/page-main";
 
 import { sourceSerif } from "./fonts";
 
@@ -20,14 +21,14 @@ export default function GlobalError({ retry }: GlobalErrorProps) {
     <html lang="en" className={`${sourceSerif.variable} h-full antialiased`}>
       <body className="flex min-h-full flex-col">
         <title>Feedback Board</title>
-        <main className="flex flex-1 flex-col justify-center px-5 py-12">
+        <PageMain align="center">
           <ErrorState
             title="We couldn’t load this page. Please try again."
             headingLevel={1}
           >
             <Button onClick={retry}>Retry</Button>
           </ErrorState>
-        </main>
+        </PageMain>
       </body>
     </html>
   );
