@@ -28,6 +28,52 @@
   --font-mono: var(--font-jetbrains-mono), ui-monospace, monospace;
 }
 
+/* The two areas of the layout grid below, as `col-full` and `col-content`. */
+@theme {
+  --grid-column-full: full;
+  --grid-column-content: content;
+}
+
+/* One grid for every page. `content` keeps 20 pixels from the edges below
+   `sm` and 40 from there, and stops growing at the `xl` breakpoint, where the
+   design draws the page: from that width on, the page centres. `full` runs to
+   the edges, for a band of colour whose content still lines up. The lines
+   named `content-start` and `content-end` make an area called `content`, so
+   a child takes it with `grid-column: content`. Children take it unless they
+   ask for another area: `:where` keeps the default weaker than any `col-*`. */
+@utility layout-grid {
+  --layout-gutter: --spacing(5);
+
+  @variant sm {
+    --layout-gutter: --spacing(10);
+  }
+
+  display: grid;
+  grid-template-columns:
+    [full-start] minmax(var(--layout-gutter), 1fr)
+    [content-start] min(
+      100% - 2 * var(--layout-gutter),
+      --theme(--breakpoint-xl) - 2 * var(--layout-gutter)
+    )
+    [content-end] minmax(var(--layout-gutter), 1fr)
+    [full-end];
+
+  :where(& > *) {
+    grid-column: content;
+  }
+}
+
+/* A full-width band inside the layout grid that keeps its columns, so what the
+   band holds lines up with the rest of the page. */
+@utility layout-subgrid {
+  grid-column: full;
+  display: grid;
+  grid-template-columns: subgrid;
+  :where(& > *) {
+    grid-column: content;
+  }
+}
+
 @layer base {
   :root {
     color-scheme: light;
