@@ -14,24 +14,20 @@ type BoardFeedbackProps = {
 // the design's first-feedback state, without its Add feedback action.
 export function BoardFeedback({ productName }: BoardFeedbackProps) {
   return (
-    <div className="px-5 py-10 sm:px-10 sm:py-14">
-      <div className="max-w-275">
-        <EmptyState
-          title={title}
-          description={describe(productName)}
-          headingLevel={2}
-        />
-      </div>
+    <div className="py-10 sm:py-14">
+      <EmptyState
+        title={title}
+        description={describe(productName)}
+        headingLevel={2}
+      />
     </div>
   );
 }
 
 export function BoardFeedbackSkeleton({ productName }: BoardFeedbackProps) {
   return (
-    <div className="px-5 py-10 sm:px-10 sm:py-14">
-      <div className="max-w-275">
-        <EmptyStateSkeleton title={title} description={describe(productName)} />
-      </div>
+    <div className="py-10 sm:py-14">
+      <EmptyStateSkeleton title={title} description={describe(productName)} />
     </div>
   );
 }

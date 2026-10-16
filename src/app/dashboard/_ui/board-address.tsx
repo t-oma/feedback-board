@@ -17,7 +17,7 @@ export function BoardAddress({ productSlug, origin }: BoardAddressProps) {
   const { host, href } = new URL(boardPath, origin);
 
   return (
-    <div className="flex flex-col gap-3 rounded-lg border border-border-subtle bg-background p-3">
+    <div className="flex flex-col gap-3 rounded-lg border border-border-subtle bg-surface p-3">
       <div className="flex min-w-0 flex-col gap-1">
         <p className="text-xs text-foreground-subtle">Public address</p>
         <p className="font-mono text-sm break-all">
@@ -47,7 +47,7 @@ export function BoardAddressSkeleton({
   const { host } = new URL(boardPath, origin);
 
   return (
-    <div className="flex flex-col gap-3 rounded-lg border border-border-subtle bg-background p-3">
+    <div className="flex flex-col gap-3 rounded-lg border border-border-subtle bg-surface p-3">
       <div className="flex min-w-0 flex-col gap-1">
         <p className="text-xs">
           <SkeletonText>Public address</SkeletonText>
