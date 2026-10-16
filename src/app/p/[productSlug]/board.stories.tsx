@@ -13,6 +13,15 @@ const meta = {
   component: Board,
   parameters: {
     layout: "fullscreen",
+    viewport: {
+      options: {
+        wide: {
+          name: "Wide screen",
+          styles: { width: "1920px", height: "1080px" },
+          type: "desktop",
+        },
+      },
+    },
   },
   decorators: [
     (Story) => (
@@ -30,6 +39,41 @@ const meta = {
 
 export default meta;
 type Story = StoryObj<typeof meta>;
+
+// The header and the page share the grid, so the board's name and its heading
+// start at the same edge. Below `sm` the intro's surface runs to the edges of
+// the screen while its text keeps to the content area.
+const linesUpWithHeader = {
+  play: async ({ canvas }) => {
+    const page = document.documentElement.clientWidth;
+    const name = canvas.getByText("Orbit CLI", { selector: "span" });
+    const heading = canvas.getByRole("heading", { level: 1 });
+    const band = heading.parentElement?.parentElement;
+
+    await expect(heading.getBoundingClientRect().left).toBe(
+      name.getBoundingClientRect().left,
+    );
+    await expect(heading.getBoundingClientRect().left).toBe(
+      Math.max(page >= 640 ? 40 : 20, (page - 1200) / 2),
+    );
+    await expect(band?.getBoundingClientRect().width).toBe(page);
+  },
+} satisfies Story;
+
+export const LinesUpOnPhone: Story = {
+  ...linesUpWithHeader,
+  globals: { viewport: { value: "mobile1" } },
+};
+
+export const LinesUpOnTablet: Story = {
+  ...linesUpWithHeader,
+  globals: { viewport: { value: "tablet" } },
+};
+
+export const LinesUpOnWideScreen: Story = {
+  ...linesUpWithHeader,
+  globals: { viewport: { value: "wide" } },
+};
 
 export const WithDescription: Story = {
   play: async ({ canvas }) => {
