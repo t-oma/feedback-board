@@ -1,3 +1,4 @@
+import { PageMain } from "@/components/page-main";
 import { Skeleton } from "@/components/skeleton";
 
 import { BoardFeedback, BoardFeedbackSkeleton } from "./board-feedback";
@@ -14,10 +15,10 @@ export function Board({ productName, description }: BoardProps) {
   return (
     <>
       <BoardHeader productName={productName} />
-      <main className="flex flex-1 flex-col">
+      <PageMain>
         <BoardIntro description={description} />
         <BoardFeedback productName={productName} />
-      </main>
+      </PageMain>
     </>
   );
 }
@@ -34,15 +35,12 @@ export function BoardSkeleton() {
   return (
     <>
       <BoardHeaderSkeleton productName={sampleBoard.productName} />
-      <main className="flex flex-1 flex-col">
+      <PageMain>
+        <BoardIntroSkeleton description={sampleBoard.description} />
         <Skeleton label="Loading the board">
-          {/* One child, so the skeleton's gap stays out of the column. */}
-          <div>
-            <BoardIntroSkeleton description={sampleBoard.description} />
-            <BoardFeedbackSkeleton productName={sampleBoard.productName} />
-          </div>
+          <BoardFeedbackSkeleton productName={sampleBoard.productName} />
         </Skeleton>
-      </main>
+      </PageMain>
     </>
   );
 }
