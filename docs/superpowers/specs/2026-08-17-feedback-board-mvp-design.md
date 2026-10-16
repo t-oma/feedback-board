@@ -359,6 +359,8 @@ Every form is one column: its banner, its fields and its submit button, 18 pixel
 
 Classes are written inline where they apply. A variable holds classes only for a look that several components share and must change together, such as the button variants that `Button` and `Link` both use. A skeleton repeats the classes of the part it stands in for, and its geometry stories, not a shared variable, check that the two line up; the skeletons design has the details.
 
+Every page that is not a form lays out on one layout grid, and its header on the same grid, so their edges line up at every width: `PageMain` for the page, the `layout-grid` utility for the header, and a `layout-subgrid` band for colour that runs to the edges of the screen. Content stops growing at the `xl` breakpoint and centres beyond it. The forms keep their card. The [layout grid design](2026-10-16-layout-grid-design.md) has the details.
+
 ## Error handling and states
 
 Expected operational failures are values, not thrown exceptions. Zod issues appear next to fields. A conflicting slug maps to the slug field. Invalid credentials use one generic message. Missing authentication prompts sign-in. Failed ownership checks return a generic unavailable-operation message. A `NOT_FOUND` result renders next to the control that produced it; only Server Component reads call `notFound()`, so route-level not-found UI is never swapped in underneath an interaction that merely addressed a stale row.
