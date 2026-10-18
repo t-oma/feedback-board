@@ -1,4 +1,4 @@
-import { SkeletonText } from "@/components/skeleton";
+import { PageIntro, PageIntroSkeleton } from "@/components/page-intro";
 import type { AuthIntent, AuthMode } from "@/entities/user/schemas";
 
 type AuthIntroProps = {
@@ -27,29 +27,21 @@ export function AuthIntro({ intent, mode }: AuthIntroProps) {
       ? signInSupportingText
       : "Your name is shown next to anything you post. Nothing else is public.";
 
+  // The supporting text follows the mode and the intent, so the room for two
+  // lines keeps the tabs below in place when it changes.
   return (
-    <div className="flex flex-col gap-y-2">
-      <h1 className="font-serif text-2xl font-semibold">{heading}</h1>
-      <p className="min-h-10 text-sm text-foreground-secondary">
-        {supportingText}
-      </p>
-    </div>
+    <PageIntro title={heading} description={supportingText} reserveTwoLines />
   );
 }
 
 // The skeleton cannot know the mode and intent the request asks for, so it
-// shows the plain sign-in intro in the space the supporting text reserves. It
-// repeats the classes that place and size `AuthIntro`; the `LoadingLinesUp`
-// stories in `../sign-in.stories.tsx` check that the two line up.
+// shows the plain sign-in intro in the space the supporting text reserves.
 export function AuthIntroSkeleton() {
   return (
-    <div className="flex flex-col gap-y-2">
-      <p className="font-serif text-2xl font-semibold">
-        <SkeletonText>Sign in</SkeletonText>
-      </p>
-      <p className="min-h-10 text-sm">
-        <SkeletonText>{neutralSupportingText}</SkeletonText>
-      </p>
-    </div>
+    <PageIntroSkeleton
+      title="Sign in"
+      description={neutralSupportingText}
+      reserveTwoLines
+    />
   );
 }

@@ -61,6 +61,9 @@ which repeats the classes that place and size the part:
 - `ButtonSkeleton`: a block of the button's height and radius.
 - `Tabs.Skeleton`: the tab strip with its names, the first one active, over the
   panel area's offset.
+- `PageIntroSkeleton`: the heading and the line under it that the sign-in and
+  onboarding intros share, with the room for two lines when the intro reserves
+  it.
 
 A feature's own part does the same: `PublicAddressControlSkeleton` beside the
 address control, `AuthIntroSkeleton` beside `AuthIntro`, and the onboarding
