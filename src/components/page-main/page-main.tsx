@@ -1,3 +1,4 @@
+import { clsx } from "clsx";
 import type { ReactNode } from "react";
 
 type PageMainProps = {
@@ -13,11 +14,10 @@ type PageMainProps = {
 export function PageMain({ align = "start", children }: PageMainProps) {
   return (
     <main
-      className={
-        align === "center"
-          ? "layout-grid flex-1 content-center py-12"
-          : "layout-grid flex-1 content-start"
-      }
+      className={clsx(
+        "layout-grid flex-1",
+        align === "center" ? "content-center py-12" : "content-start",
+      )}
     >
       {children}
     </main>

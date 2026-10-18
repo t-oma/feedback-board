@@ -2,6 +2,8 @@
 
 import "./globals.css";
 
+import { clsx } from "clsx";
+
 import { Button } from "@/components/button";
 import { ErrorState } from "@/components/error-state";
 import { PageMain } from "@/components/page-main";
@@ -18,7 +20,10 @@ type GlobalErrorProps = {
 // the heading inherits the body's sans.
 export default function GlobalError({ retry }: GlobalErrorProps) {
   return (
-    <html lang="en" className={`${sourceSerif.variable} h-full antialiased`}>
+    <html
+      lang="en"
+      className={clsx(sourceSerif.variable, "h-full antialiased")}
+    >
       <body className="flex min-h-full flex-col">
         <title>Feedback Board</title>
         <PageMain align="center">

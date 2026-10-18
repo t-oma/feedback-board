@@ -1,5 +1,6 @@
 import "./globals.css";
 
+import { clsx } from "clsx";
 import type { Metadata } from "next";
 
 import { jetbrainsMono, sourceSerif } from "./fonts";
@@ -17,7 +18,11 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html
       lang="en"
-      className={`${sourceSerif.variable} ${jetbrainsMono.variable} h-full antialiased`}
+      className={clsx(
+        sourceSerif.variable,
+        jetbrainsMono.variable,
+        "h-full antialiased",
+      )}
     >
       <body className="flex min-h-full flex-col">{children}</body>
     </html>

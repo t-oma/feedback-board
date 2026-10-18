@@ -1,3 +1,4 @@
+import { clsx } from "clsx";
 import type { ReactNode } from "react";
 
 import { SkeletonText } from "../skeleton";
@@ -21,7 +22,10 @@ export function TabsSkeleton({ labels, children }: TabsSkeletonProps) {
           <div
             key={label}
             data-skeleton-control
-            className={`inline-flex flex-1 items-center justify-center px-4 py-3 text-sm ${index === 0 ? "rounded-md bg-surface font-semibold shadow-2xs" : ""}`}
+            className={clsx(
+              "inline-flex flex-1 items-center justify-center px-4 py-3 text-sm",
+              index === 0 && "rounded-md bg-surface font-semibold shadow-2xs",
+            )}
           >
             <span>
               <SkeletonText>{label}</SkeletonText>

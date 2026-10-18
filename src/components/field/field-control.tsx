@@ -1,4 +1,5 @@
 import { Field } from "@base-ui/react/field";
+import { clsx } from "clsx";
 import type { ComponentProps } from "react";
 
 import type { WithoutClassName } from "../types";
@@ -9,7 +10,10 @@ export function FieldControl({
   ...props
 }: WithoutClassName<ComponentProps<typeof Field.Control>>) {
   return (
-    <Field.Control {...props} className={`h-12 py-0 ${textControlClassName}`}>
+    <Field.Control
+      {...props}
+      className={clsx("h-12 py-0", textControlClassName)}
+    >
       {children}
     </Field.Control>
   );

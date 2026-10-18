@@ -1,4 +1,5 @@
 import { Field } from "@base-ui/react/field";
+import { clsx } from "clsx";
 import type { ComponentProps } from "react";
 
 import type { WithoutClassName } from "../types";
@@ -17,7 +18,7 @@ export function FieldTextarea(props: FieldTextareaProps) {
     <Field.Control
       {...props}
       render={<textarea />}
-      className={`min-h-22 resize-y py-2.5 ${textControlClassName}`}
+      className={clsx("min-h-22 resize-y py-2.5", textControlClassName)}
     />
   );
 }

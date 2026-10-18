@@ -1,3 +1,4 @@
+import { clsx } from "clsx";
 export type ButtonVariant = "primary" | "secondary";
 
 // State styles key on `data-disabled`, which Base UI sets both for a natively
@@ -15,5 +16,5 @@ const variantClassNames = {
 } satisfies Record<ButtonVariant, string>;
 
 export function buttonClassName(variant: ButtonVariant) {
-  return `${baseClassName} ${variantClassNames[variant]}`;
+  return clsx(baseClassName, variantClassNames[variant]);
 }
