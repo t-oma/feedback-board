@@ -1,1 +1,1 @@
-export { Notice, type NoticeMessage } from "./notice";
+export { Notice } from "./notice";

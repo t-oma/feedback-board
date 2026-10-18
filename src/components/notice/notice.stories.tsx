@@ -9,7 +9,7 @@ const meta = {
   title: "Notice",
   component: Notice,
   args: {
-    message: { text: "Your board is live", variant: "success" },
+    text: "Your board is live",
     onDismiss: fn(),
   },
   parameters: {
@@ -20,7 +20,7 @@ const meta = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-export const Success: Story = {
+export const Dismiss: Story = {
   play: async ({ canvas, args }) => {
     await expect(canvas.getByRole("status")).toHaveTextContent(
       "Your board is live",
@@ -28,12 +28,6 @@ export const Success: Story = {
 
     await userEvent.click(canvas.getByRole("button", { name: "Dismiss" }));
     await expect(args.onDismiss).toHaveBeenCalledOnce();
-  },
-};
-
-export const Info: Story = {
-  args: {
-    message: { text: "You already have a board.", variant: "info" },
   },
 };
 
