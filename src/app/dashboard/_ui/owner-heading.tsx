@@ -36,7 +36,7 @@ export function OwnerHeading({ productName }: OwnerHeadingProps) {
       {shown && (
         <Notice
           ref={noticeRef}
-          message={notice}
+          text={notice}
           onDismiss={() => {
             setDismissed(true);
             // The notice had focus and leaves with it.
