@@ -1,4 +1,5 @@
 import { Field } from "@base-ui/react/field";
+import { clsx } from "clsx";
 
 export type FieldCounterProps = {
   count: number;
@@ -16,11 +17,10 @@ export function FieldCounter({ count, max }: FieldCounterProps) {
             shows a change of hue. An invalid field leaves the count alone,
             since its error need not be about length. */}
         <span
-          className={
-            count > max
-              ? "text-danger underline decoration-wavy underline-offset-2"
-              : undefined
-          }
+          className={clsx(
+            count > max &&
+              "text-danger underline decoration-wavy underline-offset-2",
+          )}
         >
           {count}
         </span>{" "}

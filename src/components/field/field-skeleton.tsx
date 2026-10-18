@@ -1,3 +1,4 @@
+import { clsx } from "clsx";
 import type { ReactElement } from "react";
 
 import { SkeletonText } from "../skeleton";
@@ -46,7 +47,10 @@ function FieldControlSkeleton({
     return (
       <div
         data-skeleton-control
-        className={`${control === "input" ? "h-12" : "min-h-22"} rounded-lg bg-surface-muted`}
+        className={clsx(
+          "rounded-lg bg-surface-muted",
+          control === "input" ? "h-12" : "min-h-22",
+        )}
       />
     );
   }
