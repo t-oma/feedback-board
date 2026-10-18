@@ -86,6 +86,29 @@ export const OwnerOnWideScreen: Story = {
   globals: { viewport: { value: "wide" } },
 };
 
+// A name as long as one may be, with no space to break it, breaks inside the
+// heading rather than making the page scroll sideways.
+export const LongNameOnPhone: Story = {
+  render: () => (
+    <PageMain>
+      <OwnerOverview
+        {...sampleOwnerBoard}
+        productName={"A".repeat(80)}
+        origin={origin}
+      />
+    </PageMain>
+  ),
+  globals: { viewport: { value: "mobile1" } },
+  play: async ({ canvas }) => {
+    const heading = canvas.getByRole("heading", { level: 1 });
+
+    await expect(heading.scrollWidth).toBe(heading.clientWidth);
+    await expect(document.documentElement.scrollWidth).toBe(
+      document.documentElement.clientWidth,
+    );
+  },
+};
+
 // What `loading.tsx` renders. It reads the origin from the server's
 // environment, which a story has no access to.
 export const Loading: Story = {

@@ -29,7 +29,7 @@ export function OwnerHeading({ productName }: OwnerHeadingProps) {
       <h1
         ref={headingRef}
         tabIndex={-1}
-        className="rounded-sm font-serif text-2xl font-semibold focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
+        className="rounded-sm font-serif text-2xl font-semibold wrap-anywhere focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
       >
         {productName}
       </h1>
