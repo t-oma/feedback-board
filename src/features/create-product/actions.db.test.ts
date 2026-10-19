@@ -24,7 +24,8 @@ vi.mock("@/entities/user/session.server", () => ({
 
 import { db } from "@/server/db";
 import { products } from "@/server/db/schema/products";
-import { insertTestUser, uniqueSlug } from "@/server/db/users.testing";
+import { uniqueSlug } from "@/server/db/slugs.testing";
+import { insertTestUser } from "@/server/db/users.testing";
 
 import { createProductAction } from "./actions";
 
