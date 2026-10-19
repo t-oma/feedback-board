@@ -11,6 +11,15 @@ const meta = {
   component: AuthHeader,
   parameters: {
     layout: "fullscreen",
+    viewport: {
+      options: {
+        wide: {
+          name: "Wide screen",
+          styles: { width: "1920px", height: "1080px" },
+          type: "desktop",
+        },
+      },
+    },
   },
   args: {
     backTarget: getAuthBackTarget(null),
@@ -109,4 +118,44 @@ export const Loading: Story = {
 
     await expect(navigation.queryByRole("link")).not.toBeInTheDocument();
   },
+};
+
+// Where the layout grid's content area starts at the viewport's width.
+function contentEdge() {
+  const page = document.documentElement.clientWidth;
+  return Math.max(page >= 640 ? 40 : 20, (page - 1200) / 2);
+}
+
+// The back link's arrow, and from `sm` the brand, start at the content's edge
+// of the layout grid, as on every page laid out on it.
+const linesUpWithGrid = {
+  play: async ({ canvas }) => {
+    const arrow = canvas
+      .getByRole("navigation", { name: "Exit authentication" })
+      .querySelector("svg");
+
+    await expect(arrow?.getBoundingClientRect().left).toBe(contentEdge());
+
+    const brand = canvas.queryByRole("link", { name: "Feedback Board" });
+    if (document.documentElement.clientWidth >= 640) {
+      await expect(brand?.getBoundingClientRect().left).toBe(contentEdge());
+    } else {
+      await expect(brand).not.toBeInTheDocument();
+    }
+  },
+} satisfies Story;
+
+export const LinesUpOnPhone: Story = {
+  ...linesUpWithGrid,
+  globals: { viewport: { value: "mobile1" } },
+};
+
+export const LinesUpOnTablet: Story = {
+  ...linesUpWithGrid,
+  globals: { viewport: { value: "tablet" } },
+};
+
+export const LinesUpOnWideScreen: Story = {
+  ...linesUpWithGrid,
+  globals: { viewport: { value: "wide" } },
 };
