@@ -44,7 +44,7 @@ export function FieldPasswordControl({
         onClick={() => {
           setIsPasswordVisible((isVisible) => !isVisible);
         }}
-        className="absolute inset-y-px right-px inline-flex w-12 items-center justify-center rounded-r-[7px] text-foreground-subtle hover:bg-surface-muted hover:text-accent focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-accent motion-safe:transition-[color,background-color]"
+        className="absolute inset-y-px right-px inline-flex w-12 items-center justify-center rounded-r-[7px] text-foreground-subtle focus-ring-inside hover:bg-surface-muted hover:text-accent motion-safe:transition-[color,background-color]"
       >
         <VisibilityIcon aria-hidden="true" size={20} />
       </button>

@@ -17,7 +17,7 @@ export function FormError({ message, ref }: FormErrorProps) {
       ref={ref}
       role="alert"
       tabIndex={-1}
-      className="flex items-start gap-2 rounded-lg border border-danger-border bg-danger-surface px-3 py-3 text-sm text-foreground-secondary focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
+      className="flex items-start gap-2 rounded-lg border border-danger-border bg-danger-surface px-3 py-3 text-sm text-foreground-secondary focus-ring"
     >
       <CircleAlert
         aria-hidden="true"
