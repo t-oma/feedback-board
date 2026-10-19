@@ -1,6 +1,6 @@
 import { expect, type Page, test } from "@playwright/test";
 
-import { createAccount, expectPath } from "./accounts";
+import { createAccount, expectPath, expectPathAndQuery } from "./accounts";
 
 async function expectDashboardReturnTo(page: Page) {
   await expectPath(page, "/sign-in");
@@ -123,12 +123,7 @@ test("sends a signed-in visitor past sign-in", async ({ page }) => {
   ).toBeVisible();
 
   await page.goto(`/sign-in?${new URLSearchParams({ returnTo: target })}`);
-  await expect
-    .poll(() => {
-      const url = new URL(page.url());
-      return `${url.pathname}${url.search}`;
-    })
-    .toBe(target);
+  await expectPathAndQuery(page, target);
 });
 
 // The cookie comes from the app, and the session behind it ends the way the
@@ -193,12 +188,7 @@ test("returns a guest to the exact view they asked for", async ({ page }) => {
   await signInPanel.getByLabel("Password", { exact: true }).fill(password);
   await signInPanel.getByRole("button", { name: "Sign in" }).click();
 
-  await expect
-    .poll(() => {
-      const url = new URL(page.url());
-      return `${url.pathname}${url.search}`;
-    })
-    .toBe(target);
+  await expectPathAndQuery(page, target);
 });
 
 test("leaves authentication after switching modes and remains a guest", async ({

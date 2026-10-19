@@ -4,6 +4,15 @@ export async function expectPath(page: Page, pathname: string) {
   await expect.poll(() => new URL(page.url()).pathname).toBe(pathname);
 }
 
+export async function expectPathAndQuery(page: Page, pathAndQuery: string) {
+  await expect
+    .poll(() => {
+      const url = new URL(page.url());
+      return `${url.pathname}${url.search}`;
+    })
+    .toBe(pathAndQuery);
+}
+
 // Through the real form, so the session comes from the app rather than from a
 // cookie the test sets itself. Without a `returnTo`, account creation ends on
 // the form for a new board.
