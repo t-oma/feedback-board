@@ -25,7 +25,6 @@ import { useFocusAfterFormError } from "@/shared/use-focus-after-form-error";
 import { createProductAction } from "../actions";
 import { createProductSchema } from "../schemas";
 import { CreateProductIntro } from "./create-product-intro";
-import { PublicAddressControl } from "./public-address-control";
 
 const validateName = fieldValidator(createProductSchema.shape.name);
 const validateSlug = fieldValidator(createProductSchema.shape.slug);
@@ -106,7 +105,7 @@ export function CreateProductForm({ publicHost }: CreateProductFormProps) {
         >
           Public address
         </Field.Label>
-        <PublicAddressControl
+        <Field.PrefixedControl
           prefix={`${publicHost}/p/`}
           type="text"
           autoComplete="off"

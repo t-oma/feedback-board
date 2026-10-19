@@ -9,7 +9,6 @@ import {
 } from "@/entities/product/contracts";
 
 import { CreateProductIntroSkeleton } from "./create-product-intro";
-import { PublicAddressControlSkeleton } from "./public-address-control";
 
 type CreateProductFormSkeletonProps = {
   // The start of every public address, as `CreateProductForm` takes it.
@@ -31,7 +30,7 @@ export function CreateProductFormSkeleton({
         <Field.Skeleton
           label="Public address"
           counter={MAX_PRODUCT_SLUG_LENGTH}
-          control={<PublicAddressControlSkeleton prefix={`${publicHost}/p/`} />}
+          control={{ prefix: `${publicHost}/p/` }}
           description="Lowercase letters, numbers and hyphens"
         />
         <Field.Skeleton
