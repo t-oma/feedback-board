@@ -65,11 +65,14 @@ pixels above and below, as the not-found page did.
 - The messages: the not-found, error, and global-error pages, "You don’t have
   a board yet" on `/dashboard`, and "You already have a board" on
   `/dashboard/new` render `PageMain` with `align="center"`.
-- The headers of the dashboard and of the board lay out on `layout-grid`.
+- The headers of the dashboard, of the board, and of the sign-in page lay out
+  on `layout-grid`. The sign-in header's two rows from `sm` up, the brand and
+  the back link, both start at the content's edge, and below `sm` its bar does.
 
-The forms keep `NarrowMain` and the sign-in page keeps its header for now. The
-card can become an element of the content area later, with its own frame from
-`sm` up.
+The forms keep `NarrowMain` for now. On a phone its padding already matches
+the grid's margin, and from `sm` up its card centres on the page at every
+width, so moving it would change nothing a person sees. The card can become an
+element of the content area later, with its own frame from `sm` up.
 
 ## Checking
 
@@ -79,6 +82,8 @@ card can become an element of the content area later, with its own frame from
 - The dashboard's and the board's page stories check that the header's first
   item and the page's heading start at the same edge at 320, 834, and 1920
   pixels, and the board's that its intro band spans the screen on a phone.
+- The sign-in header's stories check that the back link's arrow, and from
+  `sm` the brand, start at the content's edge at 320, 834, and 1920 pixels.
 - The geometry stories of both loading states render in `PageMain`.
 - Each of these fails when broken on purpose: a 36-pixel margin from `sm`, the
   intro band without `layout-subgrid`, and either header back on fixed padding.
@@ -88,4 +93,4 @@ and points here.
 
 ## Later
 
-`NarrowMain` and the sign-in header on the grid.
+`NarrowMain` on the grid.
