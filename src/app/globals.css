@@ -74,6 +74,24 @@
   }
 }
 
+/* The focus ring of the design: a 2px accent outline, 2px outside the
+   element, or 2px inside one whose outer ring would run past the edge of
+   what holds it. An outline rather than a `ring-*` shadow, because
+   forced-colors mode keeps outlines and drops shadows. */
+@utility focus-ring {
+  &:focus-visible {
+    outline: 2px solid var(--color-accent);
+    outline-offset: 2px;
+  }
+}
+
+@utility focus-ring-inside {
+  &:focus-visible {
+    outline: 2px solid var(--color-accent);
+    outline-offset: -2px;
+  }
+}
+
 @layer base {
   :root {
     color-scheme: light;

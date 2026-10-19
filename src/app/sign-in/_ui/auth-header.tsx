@@ -17,7 +17,7 @@ export function AuthHeader({ backTarget }: AuthHeaderProps) {
           viewport. */}
       <Link
         href={backTarget.href}
-        className="-mx-2 flex h-full min-w-0 items-center gap-x-2 rounded-sm px-2 font-serif font-semibold focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-accent sm:font-sans sm:text-sm sm:font-normal sm:text-foreground-muted"
+        className="-mx-2 flex h-full min-w-0 items-center gap-x-2 rounded-sm px-2 font-serif font-semibold focus-ring-inside sm:font-sans sm:text-sm sm:font-normal sm:text-foreground-muted"
       >
         <ArrowLeftIcon aria-hidden="true" size={20} className="shrink-0" />
         <span className="truncate">{getBackLabel(backTarget)}</span>
