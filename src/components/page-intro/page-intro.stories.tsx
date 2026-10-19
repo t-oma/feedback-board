@@ -6,6 +6,7 @@ import {
   expectSkeletonGeometry,
   SkeletonGeometry,
 } from "@/components/skeleton/skeleton.testing";
+import { themeColor } from "@/components/theme.testing";
 
 const meta = {
   title: "Page Intro",
@@ -28,12 +29,6 @@ const meta = {
 
 export default meta;
 type Story = StoryObj<typeof meta>;
-
-function themeColor(name: string) {
-  return getComputedStyle(document.documentElement)
-    .getPropertyValue(name)
-    .trim();
-}
 
 export const Default: Story = {
   play: async ({ canvas, args }) => {

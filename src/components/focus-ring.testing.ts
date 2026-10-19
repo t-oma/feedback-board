@@ -1,5 +1,7 @@
 import { expect, userEvent } from "storybook/test";
 
+import { themeColor } from "./theme.testing";
+
 type FocusRingPlacement = "outside" | "inside";
 
 // Bounded so that an element which can never take focus fails the assertion
@@ -28,15 +30,11 @@ export async function expectFocusRing(
   element: Element,
   placement: FocusRingPlacement,
 ) {
-  const accent = getComputedStyle(document.documentElement)
-    .getPropertyValue("--color-accent")
-    .trim();
-
   await expect(element).toHaveFocus();
   await expect(element).toHaveStyle({
     outlineStyle: "solid",
     outlineWidth: "2px",
-    outlineColor: accent,
+    outlineColor: themeColor("--color-accent"),
     outlineOffset: placement === "outside" ? "2px" : "-2px",
   });
 }

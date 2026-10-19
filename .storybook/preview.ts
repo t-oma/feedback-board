@@ -2,6 +2,7 @@ import "../src/app/globals.css";
 
 import type { Preview } from "@storybook/nextjs-vite";
 import { sb } from "storybook/test";
+import { MINIMAL_VIEWPORTS } from "storybook/viewport";
 
 import { jetbrainsMono, sourceSerif } from "../src/app/fonts";
 
@@ -26,6 +27,20 @@ const preview: Preview = {
   parameters: {
     nextjs: {
       appDirectory: true,
+    },
+    // Storybook's own sizes plus a wide screen, where the layout grid's
+    // content stops growing and centres. A story's own `options` add to
+    // these, and the toolbar shows Storybook's sizes only while no `options`
+    // are given, so they are listed here too.
+    viewport: {
+      options: {
+        ...MINIMAL_VIEWPORTS,
+        wide: {
+          name: "Wide screen",
+          styles: { width: "1920px", height: "1080px" },
+          type: "desktop",
+        },
+      },
     },
     // axe violations are defects, not suggestions. The addon panel reports them
     // while developing; this setting is what fails the story project in

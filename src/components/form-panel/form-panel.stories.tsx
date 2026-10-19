@@ -16,11 +16,6 @@ const meta = {
           styles: { width: "640px", height: "800px" },
           type: "tablet",
         },
-        wide: {
-          name: "Wide screen",
-          styles: { width: "1920px", height: "1080px" },
-          type: "desktop",
-        },
       },
     },
   },

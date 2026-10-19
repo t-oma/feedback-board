@@ -1,6 +1,7 @@
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 import { expect } from "storybook/test";
 
+import { contentEdge } from "@/components/layout-grid.testing";
 import {
   expectSkeletonGeometry,
   SkeletonGeometry,
@@ -13,15 +14,6 @@ const meta = {
   component: Board,
   parameters: {
     layout: "fullscreen",
-    viewport: {
-      options: {
-        wide: {
-          name: "Wide screen",
-          styles: { width: "1920px", height: "1080px" },
-          type: "desktop",
-        },
-      },
-    },
   },
   decorators: [
     (Story) => (
@@ -53,9 +45,7 @@ const linesUpWithHeader = {
     await expect(heading.getBoundingClientRect().left).toBe(
       name.getBoundingClientRect().left,
     );
-    await expect(heading.getBoundingClientRect().left).toBe(
-      Math.max(page >= 640 ? 40 : 20, (page - 1200) / 2),
-    );
+    await expect(heading.getBoundingClientRect().left).toBe(contentEdge());
     await expect(band?.getBoundingClientRect().width).toBe(page);
   },
 } satisfies Story;

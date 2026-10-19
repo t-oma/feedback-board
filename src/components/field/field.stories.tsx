@@ -8,6 +8,7 @@ import {
   expectSkeletonGeometry,
   SkeletonGeometry,
 } from "@/components/skeleton/skeleton.testing";
+import { themeColor } from "@/components/theme.testing";
 
 const meta = {
   title: "Field",
@@ -25,12 +26,6 @@ const meta = {
 
 export default meta;
 type Story = StoryObj<typeof meta>;
-
-function themeColor(name: string) {
-  return getComputedStyle(document.documentElement)
-    .getPropertyValue(name)
-    .trim();
-}
 
 export const Email: Story = {
   render: () => (
