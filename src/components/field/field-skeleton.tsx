@@ -1,5 +1,4 @@
 import { clsx } from "clsx";
-import type { ReactElement } from "react";
 
 import { SkeletonText } from "../skeleton";
 
@@ -10,8 +9,8 @@ type FieldSkeletonProps = {
   label: string;
   // The field's maximum, when its label shows a counter. A new field counts 0.
   counter?: number | undefined;
-  // A text control by kind, or the skeleton of a feature's own control.
-  control?: "input" | "textarea" | ReactElement | undefined;
+  // A text control by kind, or a prefixed control with its prefix.
+  control?: "input" | "textarea" | { prefix: string } | undefined;
   description?: string | undefined;
 };
 
@@ -55,7 +54,22 @@ function FieldControlSkeleton({
     );
   }
 
-  return control;
+  // One toned block, as tall as the control: the frame, the prefix and one
+  // line of the input are there to take their room, not drawn. The line holds
+  // a single space, since an input never wraps.
+  return (
+    <div className="flex flex-col rounded-lg border border-transparent bg-surface-muted">
+      <p className="invisible px-3 pt-2 font-mono text-xs/[1.4]">
+        {control.prefix}
+      </p>
+      <p
+        data-skeleton-control
+        className="invisible px-3 pt-0.5 pb-2.5 font-mono text-base font-medium md:text-sm"
+      >
+        &nbsp;
+      </p>
+    </div>
+  );
 }
 
 function FieldDescriptionSkeleton({

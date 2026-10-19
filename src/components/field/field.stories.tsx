@@ -26,6 +26,7 @@ const meta = {
 
 export default meta;
 type Story = StoryObj<typeof meta>;
+type Canvas = Parameters<NonNullable<Story["play"]>>[0]["canvas"];
 
 export const Email: Story = {
   render: () => (
@@ -239,10 +240,19 @@ export const OnPhone: Story = {
         <Field.Label>Description</Field.Label>
         <Field.Textarea />
       </Field.Root>
+      <Field.Root name="slug">
+        <Field.Label>Public address</Field.Label>
+        <Field.PrefixedControl prefix="feedbackboard.app/p/" />
+      </Field.Root>
     </div>
   ),
   play: async ({ canvas }) => {
-    for (const label of ["Email", "Password", "Description"]) {
+    for (const label of [
+      "Email",
+      "Password",
+      "Description",
+      "Public address",
+    ]) {
       await expect(canvas.getByLabelText(label)).toHaveStyle({
         fontSize: "16px",
       });
@@ -314,6 +324,118 @@ export const ReadOnlyPassword: Story = {
   ),
 };
 
+// A plain text control above a prefixed one in the same state, so a story
+// can hold the prefixed control's frame to the plain control's look.
+function PlainAndPrefixed({ readOnly = false }: { readOnly?: boolean }) {
+  return (
+    <div className="flex flex-col gap-y-4">
+      <Field.Root name="plain">
+        <Field.Label>Plain</Field.Label>
+        <Field.Control
+          defaultValue="orbit-cli"
+          autoComplete="off"
+          readOnly={readOnly}
+        />
+        <Field.Error />
+      </Field.Root>
+      <Field.Root name="prefixed">
+        <Field.Label>Prefixed</Field.Label>
+        <Field.PrefixedControl
+          prefix="feedbackboard.app/p/"
+          defaultValue="orbit-cli"
+          autoComplete="off"
+          readOnly={readOnly}
+        />
+        <Field.Error />
+      </Field.Root>
+    </div>
+  );
+}
+
+// The look of a frame once its colour transition has run.
+async function frameStyle(frame: Element) {
+  await Promise.all(
+    frame.getAnimations().map((animation) => animation.finished),
+  );
+  const style = getComputedStyle(frame);
+
+  return {
+    borderColor: style.borderTopColor,
+    borderWidth: style.borderTopWidth,
+    borderRadius: style.borderTopLeftRadius,
+    backgroundColor: style.backgroundColor,
+    boxShadow: style.boxShadow,
+  };
+}
+
+// The prefixed control's frame is its wrapper, which copies the text
+// control's states through `:has()`.
+function controls(canvas: Canvas) {
+  const plain = canvas.getByRole("textbox", { name: "Plain" });
+  const prefixed = canvas.getByRole("textbox", { name: "Prefixed" });
+  const prefixedFrame = prefixed.parentElement;
+  if (prefixedFrame === null) throw new Error("The control has no frame.");
+
+  return { plain, prefixed, prefixedFrame };
+}
+
+async function expectFramesToMatchAtRest(canvas: Canvas) {
+  const { plain, prefixedFrame } = controls(canvas);
+
+  await expect(await frameStyle(prefixedFrame)).toEqual(
+    await frameStyle(plain),
+  );
+}
+
+// Only one control can have focus, so each is measured in turn.
+async function expectFramesToMatchWithFocus(canvas: Canvas) {
+  const { plain, prefixed, prefixedFrame } = controls(canvas);
+
+  await tabTo(plain);
+  const focusedPlain = await frameStyle(plain);
+  await tabTo(prefixed);
+  await expect(await frameStyle(prefixedFrame)).toEqual(focusedPlain);
+}
+
+export const PrefixedControl: Story = {
+  render: () => <PlainAndPrefixed />,
+  play: async ({ canvas }) => {
+    await expect(
+      canvas.getByRole("textbox", { name: "Prefixed" }),
+    ).toHaveAccessibleDescription("feedbackboard.app/p/");
+    await expectFramesToMatchAtRest(canvas);
+    await expectFramesToMatchWithFocus(canvas);
+  },
+};
+
+export const ReadOnlyPrefixedControl: Story = {
+  render: () => <PlainAndPrefixed readOnly />,
+  play: async ({ canvas }) => {
+    await expectFramesToMatchAtRest(canvas);
+  },
+};
+
+export const InvalidPrefixedControl: Story = {
+  render: () => (
+    <Form
+      errors={{
+        plain: ["This slug is already taken."],
+        prefixed: ["This slug is already taken."],
+      }}
+    >
+      <PlainAndPrefixed />
+    </Form>
+  ),
+  play: async ({ canvas }) => {
+    await expect(
+      canvas.getByRole("textbox", { name: "Prefixed" }),
+    ).toHaveAttribute("aria-invalid", "true");
+    await expectFramesToMatchAtRest(canvas);
+    // As after a taken slug, when Base UI focuses the first invalid field.
+    await expectFramesToMatchWithFocus(canvas);
+  },
+};
+
 export const Skeleton: Story = {
   render: () => (
     <SkeletonGeometry
@@ -352,6 +474,28 @@ export const TextareaSkeleton: Story = {
         </Field.Root>
       }
       skeleton={<Field.Skeleton label="Description" control="textarea" />}
+    />
+  ),
+  play: async ({ canvasElement }) => {
+    await expectSkeletonGeometry(canvasElement);
+  },
+};
+
+export const PrefixedControlSkeleton: Story = {
+  render: () => (
+    <SkeletonGeometry
+      content={
+        <Field.Root name="slug">
+          <Field.Label>Public address</Field.Label>
+          <Field.PrefixedControl prefix="feedbackboard.app/p/" />
+        </Field.Root>
+      }
+      skeleton={
+        <Field.Skeleton
+          label="Public address"
+          control={{ prefix: "feedbackboard.app/p/" }}
+        />
+      }
     />
   ),
   play: async ({ canvasElement }) => {
