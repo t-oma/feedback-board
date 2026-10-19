@@ -1,7 +1,7 @@
 // The form validates these bounds in the browser and the database enforces
-// them in its column types, so both read them from here. They used to live in
-// the database schema, and a client module importing them from there would
-// have pulled Drizzle and the table definition into the browser bundle.
+// them in its column types, so both read them from here. A client module that
+// imported them from the database schema would pull Drizzle and the table
+// definition into the browser bundle.
 export const MIN_PRODUCT_NAME_LENGTH = 2;
 export const MAX_PRODUCT_NAME_LENGTH = 80;
 export const MIN_PRODUCT_SLUG_LENGTH = 3;

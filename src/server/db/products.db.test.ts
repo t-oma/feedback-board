@@ -8,8 +8,8 @@ import { db } from "./index";
 import { products } from "./schema/products";
 import { insertTestUser, uniqueSlug } from "./users.testing";
 
-// The name of the constraint a write violated. The create-product action tells
-// a second product from a taken slug by these names, so this pins them.
+// The name of the constraint a write violated. `classifyProductError` tells a
+// second product from a taken slug by these names, so this pins them.
 async function violatedConstraint(write: Promise<unknown>) {
   const error: unknown = await write.then(
     () => null,
