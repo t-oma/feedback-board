@@ -3,6 +3,16 @@ import "../src/app/globals.css";
 import type { Preview } from "@storybook/nextjs-vite";
 import { sb } from "storybook/test";
 
+import { jetbrainsMono, sourceSerif } from "../src/app/fonts";
+
+// The root layout puts the fonts' variables on `<html>`, and `font-serif` and
+// `font-mono` read them. Stories render without that layout, so the preview
+// sets them on the same element. `src/app/fonts.stories.tsx` checks it.
+document.documentElement.classList.add(
+  sourceSerif.variable,
+  jetbrainsMono.variable,
+);
+
 // The real modules import the database driver, which cannot load in a browser,
 // so every story that renders a form would fail before it starts. Each mock
 // sits in `__mocks__` beside its module. Storybook resolves these paths itself,
