@@ -85,21 +85,6 @@ export const LongBoardSlug: Story = {
   ),
 };
 
-export const Desktop: Story = {
-  globals: {
-    viewport: { value: "desktop" },
-  },
-  play: async ({ canvas }) => {
-    const header = within(canvas.getByRole("banner"));
-    const homeLink = header.getByRole("link", { name: "Feedback Board" });
-
-    await expect(homeLink).toHaveAttribute("href", "/");
-
-    await tabTo(homeLink);
-    await expectFocusRing(homeLink, "outside");
-  },
-};
-
 export const Loading: Story = {
   render: () => <AuthHeaderSkeleton />,
   play: async ({ canvas }) => {

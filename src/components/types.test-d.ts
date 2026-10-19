@@ -1,6 +1,7 @@
 import type { JSXElementConstructor } from "react";
 import { expectTypeOf } from "vitest";
 
+import type * as brandLink from "./brand-link";
 import type * as button from "./button";
 import type * as emptyState from "./empty-state";
 import type * as errorState from "./error-state";
@@ -26,6 +27,7 @@ type AcceptingClassName<Module> = {
     : never;
 }[keyof Module];
 
+expectTypeOf<AcceptingClassName<typeof brandLink>>().toBeNever();
 expectTypeOf<AcceptingClassName<typeof button>>().toBeNever();
 expectTypeOf<AcceptingClassName<typeof emptyState>>().toBeNever();
 expectTypeOf<AcceptingClassName<typeof errorState>>().toBeNever();

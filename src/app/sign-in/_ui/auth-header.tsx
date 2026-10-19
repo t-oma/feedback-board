@@ -2,6 +2,7 @@ import { ArrowLeftIcon } from "lucide-react";
 import Link from "next/link";
 import type { ReactNode } from "react";
 
+import { BrandLink } from "@/components/brand-link";
 import type { AuthBackTarget } from "@/entities/user/navigation";
 
 type AuthHeaderProps = {
@@ -56,12 +57,7 @@ function AuthHeaderFrame({ children }: { children: ReactNode }) {
           link keep their place when a page on the same grid leads here. */}
       <div className="layout-grid h-15 border-b border-border bg-surface max-sm:hidden">
         <div className="flex items-center">
-          <Link
-            href="/"
-            className="rounded-sm font-serif font-semibold focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
-          >
-            Feedback Board
-          </Link>
+          <BrandLink />
         </div>
       </div>
       <nav
