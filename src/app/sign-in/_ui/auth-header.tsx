@@ -52,19 +52,23 @@ function getBackLabel(target: AuthBackTarget): string {
 function AuthHeaderFrame({ children }: { children: ReactNode }) {
   return (
     <header className="shrink-0">
-      <div className="hidden h-15 items-center border-b border-border bg-surface px-5 sm:flex">
-        <Link
-          href="/"
-          className="rounded-sm font-serif font-semibold focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
-        >
-          Feedback Board
-        </Link>
+      {/* Both rows lay out on the layout grid, so the brand and the back
+          link keep their place when a page on the same grid leads here. */}
+      <div className="layout-grid h-15 border-b border-border bg-surface max-sm:hidden">
+        <div className="flex items-center">
+          <Link
+            href="/"
+            className="rounded-sm font-serif font-semibold focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
+          >
+            Feedback Board
+          </Link>
+        </div>
       </div>
       <nav
         aria-label="Exit authentication"
-        className="flex h-12 items-center border-b border-border bg-surface px-5 sm:border-b-0 sm:bg-transparent"
+        className="layout-grid h-12 border-b border-border bg-surface sm:border-b-0 sm:bg-transparent"
       >
-        {children}
+        <div className="flex min-w-0 items-center">{children}</div>
       </nav>
     </header>
   );
