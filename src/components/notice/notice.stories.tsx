@@ -2,8 +2,7 @@ import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 import { expect, fn, userEvent } from "storybook/test";
 
 import { expectFocusRing } from "@/components/focus-ring.testing";
-
-import { Notice } from "./notice";
+import { Notice } from "@/components/notice";
 
 const meta = {
   title: "Notice",

@@ -2,6 +2,7 @@ import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 import { expect, within } from "storybook/test";
 
 import { expectFocusRing, tabTo } from "@/components/focus-ring.testing";
+import { contentEdge } from "@/components/layout-grid.testing";
 import { getAuthBackTarget, parseReturnTo } from "@/entities/user/navigation";
 
 import { AuthHeader, AuthHeaderSkeleton } from "./auth-header";
@@ -11,15 +12,6 @@ const meta = {
   component: AuthHeader,
   parameters: {
     layout: "fullscreen",
-    viewport: {
-      options: {
-        wide: {
-          name: "Wide screen",
-          styles: { width: "1920px", height: "1080px" },
-          type: "desktop",
-        },
-      },
-    },
   },
   args: {
     backTarget: getAuthBackTarget(null),
@@ -119,12 +111,6 @@ export const Loading: Story = {
     await expect(navigation.queryByRole("link")).not.toBeInTheDocument();
   },
 };
-
-// Where the layout grid's content area starts at the viewport's width.
-function contentEdge() {
-  const page = document.documentElement.clientWidth;
-  return Math.max(page >= 640 ? 40 : 20, (page - 1200) / 2);
-}
 
 // The back link's arrow, and from `sm` the brand, start at the content's edge
 // of the layout grid, as on every page laid out on it.

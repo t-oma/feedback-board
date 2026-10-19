@@ -1,6 +1,7 @@
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 import { expect } from "storybook/test";
 
+import { contentEdge } from "@/components/layout-grid.testing";
 import { PageMain } from "@/components/page-main";
 import {
   expectSkeletonGeometry,
@@ -20,15 +21,6 @@ const meta = {
   title: "Dashboard/Page",
   parameters: {
     layout: "fullscreen",
-    viewport: {
-      options: {
-        wide: {
-          name: "Wide screen",
-          styles: { width: "1920px", height: "1080px" },
-          type: "desktop",
-        },
-      },
-    },
   },
   decorators: [
     (Story) => (
@@ -62,12 +54,7 @@ const ownerPage = {
 
     // The header and the page share the grid, so their edges meet.
     await expect(heading.left).toBe(brand.left);
-    await expect(heading.left).toBe(
-      Math.max(
-        document.documentElement.clientWidth >= 640 ? 40 : 20,
-        (document.documentElement.clientWidth - 1200) / 2,
-      ),
-    );
+    await expect(heading.left).toBe(contentEdge());
   },
 } satisfies Story;
 
