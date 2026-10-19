@@ -13,14 +13,11 @@ type TabsTabProps = Omit<
   value: string;
 };
 
-export function TabsTab({ children, value, ...props }: TabsTabProps) {
+export function TabsTab(props: TabsTabProps) {
   return (
     <Tabs.Tab
       {...props}
-      value={value}
       className="inline-flex flex-1 items-center justify-center rounded-lg bg-transparent px-4 py-3 text-sm transition-[font-weight] duration-150 ease-in-out focus-visible:outline-accent data-active:font-semibold"
-    >
-      {children}
-    </Tabs.Tab>
+    />
   );
 }
