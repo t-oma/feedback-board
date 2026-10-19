@@ -45,7 +45,8 @@ before this change. A height condition would fix both and is left for later.
 clipped at the card's edge rather than the viewport's.
 
 `NarrowMain` in `src/components` renders the card, so the page, its
-`loading.tsx` skeleton and the stories get the same frame.
+`loading.tsx` skeleton and the stories get the same frame. The layout grid
+design later split it into `PageMain`, the frame, and `FormPanel`, the card.
 
 ## Header
 

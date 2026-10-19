@@ -49,7 +49,20 @@ the edges while what it holds lines up with the rest of the page.
 `PageMain` in `src/components` is a page's `main` on the grid. Its children
 take the content area by default. With `align="center"` it is a page that
 holds a single message: the message sits in the middle of the screen with 48
-pixels above and below, as the not-found page did.
+pixels above and below, as the not-found page did. With `align="stretch"` its
+one child fills the screen's height; the rows of a page with more than one
+child would grow instead, so the other pages keep the rows at the top.
+
+### FormPanel
+
+`FormPanel` in `src/components` is the column a page's form sits in, inside
+`PageMain align="stretch"`. Below `sm` it is a `layout-subgrid` band of the
+surface from edge to edge and down to the bottom of the screen, with its rows
+packed at the top and 20 pixels apart; its content keeps the grid's margin.
+From `sm` up it is the card that `NarrowMain` used to be, 440 pixels of
+content, centred in the content area, as tall as what it holds. It keeps
+`overflow-x-clip` for the tab panels' sideways slide. `main` is now a page's
+frame alone, and the card a part inside it.
 
 ### Where it applies
 
@@ -69,10 +82,10 @@ pixels above and below, as the not-found page did.
   on `layout-grid`. The sign-in header's two rows from `sm` up, the brand and
   the back link, both start at the content's edge, and below `sm` its bar does.
 
-The forms keep `NarrowMain` for now. On a phone its padding already matches
-the grid's margin, and from `sm` up its card centres on the page at every
-width, so moving it would change nothing a person sees. The card can become an
-element of the content area later, with its own frame from `sm` up.
+- The forms, on `/sign-in` and `/dashboard/new`, and their loading states
+  render `FormPanel` in `PageMain align="stretch"`. Nothing a person sees
+  changes: on a phone the band's content keeps the margin `NarrowMain`'s
+  padding gave it, and from `sm` up the card centres as before.
 
 ## Checking
 
@@ -84,13 +97,14 @@ element of the content area later, with its own frame from `sm` up.
   pixels, and the board's that its intro band spans the screen on a phone.
 - The sign-in header's stories check that the back link's arrow, and from
   `sm` the brand, start at the content's edge at 320, 834, and 1920 pixels.
-- The geometry stories of both loading states render in `PageMain`.
+- The geometry stories of both loading states render in `PageMain`, and those
+  of the forms in `FormPanel` inside it.
+- `FormPanel`'s stories check the band on a phone, across the screen and down
+  to its bottom with the heading one line tall, and the card at 640 and 1920
+  pixels, 440 pixels of content in the middle and ending with its content.
+  Without the rows packed at the top, or with the card stretched, they fail.
 - Each of these fails when broken on purpose: a 36-pixel margin from `sm`, the
   intro band without `layout-subgrid`, and either header back on fixed padding.
 
 The MVP specification's user interface layer states the rule for new pages
 and points here.
-
-## Later
-
-`NarrowMain` on the grid.

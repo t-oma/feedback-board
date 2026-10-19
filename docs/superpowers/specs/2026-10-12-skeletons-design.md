@@ -48,7 +48,7 @@ In `src/components/skeleton`:
 
 - `Skeleton` takes a `label` and renders the shell every loading state repeats:
   `role="status"`, `aria-busy`, the label for screen readers, and an
-  `aria-hidden` body. The body stacks its children with the gap `NarrowMain`
+  `aria-hidden` body. The body stacks its children with the gap `FormPanel`
   puts between the content it stands in for.
 - `SkeletonText`, as above.
 
@@ -91,7 +91,7 @@ standing in for it. A skeleton marks those blocks with `data-skeleton-control`.
 Hidden controls, such as the inactive tab panel's, are skipped.
 
 Each feature skeleton has stories that render the content and the skeleton one
-under the other, each in its own `NarrowMain`, at 320px and at the tablet
+under the other, each in its own `FormPanel` inside `PageMain`, at 320px and at the tablet
 viewport, where the content sits in the 440px card. Two `main` landmarks on one
 page fail axe, so these stories turn the a11y test off; the skeleton's own
 accessibility is checked by the stories that render it on its own. Shared parts
