@@ -5,7 +5,15 @@ import simpleImportSort from "eslint-plugin-simple-import-sort";
 import tseslint from "typescript-eslint";
 
 const OUTLINE_NONE_MESSAGE =
-  "`outline-none` leaves no focus indicator in forced-colors mode. Use `outline-hidden`, or a visible `focus-visible:outline-*`.";
+  "`outline-none` leaves no focus indicator in forced-colors mode. Use `outline-hidden`, or a visible ring with `focus-ring`.";
+
+const FOCUS_RING_MESSAGE =
+  "Draw the focus ring with `focus-ring` or `focus-ring-inside`, which `src/app/globals.css` defines once.";
+
+// The width and offset of an outline on `:focus-visible`, which only the
+// focus ring utilities set. Recolouring the browser's own outline stays
+// allowed.
+const WRITTEN_OUT_RING = String.raw`/\bfocus-visible:(?:-?outline-offset-|outline-[0-9])/`;
 
 const LAYERS_SPEC = "docs/superpowers/specs/2026-10-13-action-slices-design.md";
 
@@ -115,6 +123,14 @@ const eslintConfig = defineConfig([
         {
           selector: String.raw`TemplateElement[value.raw=/\boutline-none\b/]`,
           message: OUTLINE_NONE_MESSAGE,
+        },
+        {
+          selector: `Literal[value=${WRITTEN_OUT_RING}]`,
+          message: FOCUS_RING_MESSAGE,
+        },
+        {
+          selector: `TemplateElement[value.raw=${WRITTEN_OUT_RING}]`,
+          message: FOCUS_RING_MESSAGE,
         },
       ],
     },
