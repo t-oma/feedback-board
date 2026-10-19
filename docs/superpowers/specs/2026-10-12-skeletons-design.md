@@ -104,7 +104,7 @@ added without their line, and `skeleton`.
 
 ## Out of scope
 
-Skeletons for states that do not exist yet, a shimmer or other animation, which
-the design's state sheet rules out, and the Storybook font gap: stories render
-the serif and mono text in fallback fonts, which the geometry checks share with
-the content they compare against.
+Skeletons for states that do not exist yet, and a shimmer or other animation,
+which the design's state sheet rules out. The stories render the serif and mono
+text in the app's fonts since `.storybook/preview.ts` sets their variables, so
+the geometry checks see the line breaks a page has.
