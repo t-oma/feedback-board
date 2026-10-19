@@ -12,11 +12,10 @@ type TabsPanelProps = Omit<
   value: string;
 };
 
-export function TabsPanel({ children, value, ...props }: TabsPanelProps) {
+export function TabsPanel(props: TabsPanelProps) {
   return (
     <Tabs.Panel
       {...props}
-      value={value}
       className={clsx(
         "col-start-1 row-start-1 flex w-full",
         "focus-visible:z-1 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent",
@@ -27,8 +26,6 @@ export function TabsPanel({ children, value, ...props }: TabsPanelProps) {
         "motion-safe:data-ending-style:data-[activation-direction=left]:translate-x-[50%]",
         "motion-safe:data-ending-style:data-[activation-direction=right]:translate-x-[-50%]",
       )}
-    >
-      {children}
-    </Tabs.Panel>
+    />
   );
 }
