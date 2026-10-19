@@ -412,6 +412,9 @@ export const ReadOnlyPrefixedControl: Story = {
   render: () => <PlainAndPrefixed readOnly />,
   play: async ({ canvas }) => {
     await expectFramesToMatchAtRest(canvas);
+    // As in a pending form submitted with the return key, which keeps the
+    // focus in the field it was submitted from.
+    await expectFramesToMatchWithFocus(canvas);
   },
 };
 
