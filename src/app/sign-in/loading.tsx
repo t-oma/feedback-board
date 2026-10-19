@@ -1,7 +1,8 @@
 import { ButtonSkeleton } from "@/components/button";
 import { Field } from "@/components/field";
 import { FormSkeleton } from "@/components/form";
-import { NarrowMain } from "@/components/narrow-main";
+import { FormPanel } from "@/components/form-panel";
+import { PageMain } from "@/components/page-main";
 import { Skeleton } from "@/components/skeleton";
 import { Tabs } from "@/components/tabs";
 
@@ -18,18 +19,20 @@ export default function SignInLoading() {
   return (
     <>
       <AuthHeaderSkeleton />
-      <NarrowMain>
-        <Skeleton label="Loading sign-in">
-          <AuthIntroSkeleton />
-          <Tabs.Skeleton labels={["Sign in", "Create account"]}>
-            <FormSkeleton>
-              <Field.Skeleton label="Email" />
-              <Field.Skeleton label="Password" />
-              <ButtonSkeleton />
-            </FormSkeleton>
-          </Tabs.Skeleton>
-        </Skeleton>
-      </NarrowMain>
+      <PageMain align="stretch">
+        <FormPanel>
+          <Skeleton label="Loading sign-in">
+            <AuthIntroSkeleton />
+            <Tabs.Skeleton labels={["Sign in", "Create account"]}>
+              <FormSkeleton>
+                <Field.Skeleton label="Email" />
+                <Field.Skeleton label="Password" />
+                <ButtonSkeleton />
+              </FormSkeleton>
+            </Tabs.Skeleton>
+          </Skeleton>
+        </FormPanel>
+      </PageMain>
     </>
   );
 }

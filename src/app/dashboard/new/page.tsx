@@ -1,8 +1,8 @@
 import type { Metadata } from "next";
 
 import { EmptyState } from "@/components/empty-state";
+import { FormPanel } from "@/components/form-panel";
 import { Link } from "@/components/link";
-import { NarrowMain } from "@/components/narrow-main";
 import { PageMain } from "@/components/page-main";
 import { getOwnerProduct } from "@/entities/product/queries.server";
 import { requireSession } from "@/entities/user/session.server";
@@ -37,10 +37,12 @@ export default async function NewBoard() {
   }
 
   return (
-    <NarrowMain>
-      {/* The deployment's own origin, the one `parseReturnTo` compares
+    <PageMain align="stretch">
+      <FormPanel>
+        {/* The deployment's own origin, the one `parseReturnTo` compares
           against, so the address prefix does not depend on the request. */}
-      <CreateProductForm publicHost={new URL(env.BETTER_AUTH_URL).host} />
-    </NarrowMain>
+        <CreateProductForm publicHost={new URL(env.BETTER_AUTH_URL).host} />
+      </FormPanel>
+    </PageMain>
   );
 }

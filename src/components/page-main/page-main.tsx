@@ -2,9 +2,11 @@ import { clsx } from "clsx";
 import type { ReactNode } from "react";
 
 type PageMainProps = {
-  // `center` for a page that holds a single message, such as not-found:
-  // it sits in the middle of the screen rather than under the header.
-  align?: "start" | "center";
+  // `center` for a page that holds a single message, such as not-found: it
+  // sits in the middle of the screen rather than under the header. `stretch`
+  // for a page with one child that fills the screen's height, such as
+  // `FormPanel` on a phone; with more than one, each would grow.
+  align?: "start" | "center" | "stretch";
   children: ReactNode;
 };
 
@@ -16,7 +18,8 @@ export function PageMain({ align = "start", children }: PageMainProps) {
     <main
       className={clsx(
         "layout-grid flex-1",
-        align === "center" ? "content-center py-12" : "content-start",
+        align === "start" && "content-start",
+        align === "center" && "content-center py-12",
       )}
     >
       {children}
