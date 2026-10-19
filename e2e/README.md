@@ -1,4 +1,4 @@
-# Auth E2E tests
+# End-to-end and database tests
 
 The browser suite uses the existing local PostgreSQL container but a separate database named `feedback_board_test`.
 
