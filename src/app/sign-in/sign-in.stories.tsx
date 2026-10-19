@@ -1,7 +1,8 @@
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 import { expect } from "storybook/test";
 
-import { NarrowMain } from "@/components/narrow-main";
+import { FormPanel } from "@/components/form-panel";
+import { PageMain } from "@/components/page-main";
 import {
   expectSkeletonGeometry,
   SkeletonGeometry,
@@ -24,19 +25,21 @@ function SignInPage({ returnTo, intent, mode }: SignInQuery) {
   return (
     <>
       <AuthHeader backTarget={getAuthBackTarget(returnTo)} />
-      <NarrowMain>
-        <AuthIntro mode={mode} intent={intent} />
-        <AuthTabs
-          mode={mode}
-          returnTo={returnTo}
-          signInHref={buildSignInHref({ returnTo, intent })}
-          createAccountHref={buildSignInHref({
-            returnTo,
-            intent,
-            mode: "create-account",
-          })}
-        />
-      </NarrowMain>
+      <PageMain align="stretch">
+        <FormPanel>
+          <AuthIntro mode={mode} intent={intent} />
+          <AuthTabs
+            mode={mode}
+            returnTo={returnTo}
+            signInHref={buildSignInHref({ returnTo, intent })}
+            createAccountHref={buildSignInHref({
+              returnTo,
+              intent,
+              mode: "create-account",
+            })}
+          />
+        </FormPanel>
+      </PageMain>
     </>
   );
 }
@@ -83,10 +86,14 @@ export const OnPhone: Story = {
     viewport: { value: "mobile1" },
   },
   play: async ({ canvas }) => {
-    const { left, width } = canvas.getByRole("main").getBoundingClientRect();
+    const page = document.documentElement.clientWidth;
+    const main = canvas.getByRole("main").getBoundingClientRect();
+    const tabStrip = canvas.getByRole("tablist").getBoundingClientRect();
 
-    await expect(left).toBe(0);
-    await expect(width).toBe(document.documentElement.clientWidth);
+    await expect(main.left).toBe(0);
+    await expect(main.width).toBe(page);
+    await expect(tabStrip.left).toBe(20);
+    await expect(tabStrip.right).toBe(page - 20);
     await expect(
       canvas.queryByRole("link", { name: "Feedback Board" }),
     ).not.toBeInTheDocument();
@@ -111,11 +118,12 @@ export const OnTablet: Story = {
     viewport: { value: "ipadMini" },
   },
   play: async ({ canvas }) => {
-    const { left, width } = canvas.getByRole("main").getBoundingClientRect();
     const tabStrip = canvas.getByRole("tablist").getBoundingClientRect();
 
     await expect(tabStrip.width).toBe(440);
-    await expect(left).toBe((document.documentElement.clientWidth - width) / 2);
+    await expect(tabStrip.left + tabStrip.width / 2).toBe(
+      document.documentElement.clientWidth / 2,
+    );
     await expect(
       canvas.getByRole("link", { name: "Feedback Board" }),
     ).toBeVisible();

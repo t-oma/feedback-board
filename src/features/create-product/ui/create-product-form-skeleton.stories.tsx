@@ -1,7 +1,8 @@
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 import { expect } from "storybook/test";
 
-import { NarrowMain } from "@/components/narrow-main";
+import { FormPanel } from "@/components/form-panel";
+import { PageMain } from "@/components/page-main";
 import {
   expectSkeletonGeometry,
   SkeletonGeometry,
@@ -25,9 +26,11 @@ type Story = StoryObj<typeof meta>;
 export const Loading: Story = {
   render: () => (
     <div className="flex min-h-svh flex-col">
-      <NarrowMain>
-        <CreateProductFormSkeleton publicHost={publicHost} />
-      </NarrowMain>
+      <PageMain align="stretch">
+        <FormPanel>
+          <CreateProductFormSkeleton publicHost={publicHost} />
+        </FormPanel>
+      </PageMain>
     </div>
   ),
   play: async ({ canvas }) => {
@@ -47,7 +50,11 @@ const geometry: Story = {
   },
   render: () => (
     <SkeletonGeometry
-      frame={(children) => <NarrowMain>{children}</NarrowMain>}
+      frame={(children) => (
+        <PageMain align="stretch">
+          <FormPanel>{children}</FormPanel>
+        </PageMain>
+      )}
       content={<CreateProductForm publicHost={publicHost} />}
       skeleton={<CreateProductFormSkeleton publicHost={publicHost} />}
     />

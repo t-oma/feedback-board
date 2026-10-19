@@ -1,7 +1,8 @@
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 import { expect } from "storybook/test";
 
-import { NarrowMain } from "@/components/narrow-main";
+import { FormPanel } from "@/components/form-panel";
+import { PageMain } from "@/components/page-main";
 
 import { AuthIntro } from "./auth-intro";
 
@@ -17,9 +18,11 @@ const meta = {
   decorators: [
     (Story) => (
       <div className="flex min-h-svh flex-col">
-        <NarrowMain>
-          <Story />
-        </NarrowMain>
+        <PageMain align="stretch">
+          <FormPanel>
+            <Story />
+          </FormPanel>
+        </PageMain>
       </div>
     ),
   ],
