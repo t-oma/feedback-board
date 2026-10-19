@@ -16,9 +16,3 @@ export async function insertTestUser() {
   if (user === undefined) throw new Error("The test user was not inserted");
   return user;
 }
-
-// A UUID is lowercase hexadecimal groups joined by single hyphens, so it is a
-// valid slug that no other test will claim.
-export function uniqueSlug() {
-  return randomUUID();
-}

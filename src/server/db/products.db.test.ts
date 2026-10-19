@@ -6,7 +6,8 @@ vi.mock("server-only", () => ({}));
 
 import { db } from "./index";
 import { products } from "./schema/products";
-import { insertTestUser, uniqueSlug } from "./users.testing";
+import { slugsTheTableRejects, uniqueSlug } from "./slugs.testing";
+import { insertTestUser } from "./users.testing";
 
 // The name of the constraint a write violated. `classifyProductError` tells a
 // second product from a taken slug by these names, so this pins them.
@@ -61,18 +62,15 @@ describe("products table", () => {
     ).resolves.toBe("products_slug_key");
   });
 
-  it.each(["Orbit-cli", "orbit--cli", "-orbit", "orbit-", "orbit cli", "ab"])(
-    "rejects the slug %j",
-    async (slug) => {
-      const owner = await insertTestUser();
+  it.each(slugsTheTableRejects)("rejects the slug %j", async (slug) => {
+    const owner = await insertTestUser();
 
-      await expect(
-        violatedConstraint(
-          db
-            .insert(products)
-            .values({ ownerId: owner.id, name: "Orbit CLI", slug }),
-        ),
-      ).resolves.toBe("products_slug_shape_check");
-    },
-  );
+    await expect(
+      violatedConstraint(
+        db
+          .insert(products)
+          .values({ ownerId: owner.id, name: "Orbit CLI", slug }),
+      ),
+    ).resolves.toBe("products_slug_shape_check");
+  });
 });
