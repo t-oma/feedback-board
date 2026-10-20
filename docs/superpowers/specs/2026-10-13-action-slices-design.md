@@ -73,7 +73,7 @@ src/
 │   │   └── layout.tsx, loading.tsx, page.tsx
 │   └── sign-in/
 │       ├── _ui/                 auth-header, auth-intro, auth-tabs, and their
-│       │                        stories
+│       │                        stories; sign-in, the page and its skeleton
 │       └── loading.tsx, page.tsx, sign-in.stories.tsx
 ├── features/
 │   ├── create-account/          actions.ts, schemas.ts, ui/create-account-form.tsx
@@ -116,11 +116,16 @@ page under `/dashboard` can render the dashboard header. When a second route
 needs a component, it moves down to `features`, `entities` or
 `src/components`.
 
-`sign-in.stories.tsx` repeats what the sign-in page composes, renders its
-`loading.tsx`, and checks that the two line up, so it sits beside them in
-`src/app/sign-in/`. The loading state is written out in `loading.tsx`: it
-stands in for the whole page, and the skeletons it is built from sit beside
-the parts they stand in for.
+When a story needs a page's whole composition, the page reads the request,
+such as its `searchParams`, and hands what it read to a component in `_ui/`
+that composes the page; that component's skeleton sits beside it, and
+`loading.tsx` renders the skeleton. `SignIn` and `SignInSkeleton` do this for
+`/sign-in`, as `Board` and `BoardSkeleton` do for a public board. The
+component is synchronous, so its stories render the page as it ships and
+check it against its skeleton, while the `async` page stays with the
+end-to-end tests, which the Next.js testing guide recommends for `async`
+Server Components. `sign-in.stories.tsx` sits beside the page in
+`src/app/sign-in/`.
 `src/app/dashboard/dashboard-header.tsx` moves into `_ui/`.
 
 ## Contracts
