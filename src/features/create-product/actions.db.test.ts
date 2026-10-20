@@ -22,14 +22,17 @@ vi.mock("@/entities/user/session.server", () => ({
   getSession: mocks.getSession,
 }));
 
+import {
+  formDataOf,
+  realRedirectError,
+  unexpectedActionError,
+} from "@/server/action.testing";
 import { db } from "@/server/db";
 import { products } from "@/server/db/schema/products";
 import { uniqueSlug } from "@/server/db/slugs.testing";
 import { insertTestUser } from "@/server/db/users.testing";
 
 import { createProductAction } from "./actions";
-
-const navigation = await vi.importActual<typeof Navigation>("next/navigation");
 
 const redirectSignal = new Error("NEXT_REDIRECT");
 
@@ -54,12 +57,7 @@ function sessionFor(userId: string) {
 }
 
 function createProduct(fields: Record<string, string>) {
-  const formData = new FormData();
-  for (const [name, value] of Object.entries(fields)) {
-    formData.set(name, value);
-  }
-
-  return createProductAction(null, formData);
+  return createProductAction(null, formDataOf(fields));
 }
 
 function productsOwnedBy(ownerId: string) {
@@ -258,11 +256,7 @@ describe("createProductAction", () => {
 
     await expect(
       createProduct({ name: "Orbit CLI", slug: uniqueSlug(), description: "" }),
-    ).resolves.toStrictEqual({
-      ok: false,
-      code: "UNEXPECTED",
-      message: "We couldn’t complete your request. Please try again.",
-    });
+    ).resolves.toStrictEqual(unexpectedActionError);
     expect(consoleError).toHaveBeenCalledExactlyOnceWith(
       "createProductAction failed unexpectedly",
       expect.any(Error),
@@ -271,12 +265,7 @@ describe("createProductAction", () => {
   });
 
   it("rethrows a Next.js control-flow error raised while reading the session", async () => {
-    let redirectError: unknown;
-    try {
-      navigation.redirect("/sign-in");
-    } catch (error) {
-      redirectError = error;
-    }
+    const redirectError = await realRedirectError("/sign-in");
     mocks.getSession.mockRejectedValueOnce(redirectError);
 
     await expect(

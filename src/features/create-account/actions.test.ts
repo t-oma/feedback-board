@@ -36,40 +36,26 @@ vi.mock("@/server/env", () => ({
   },
 }));
 
+import {
+  formDataOf,
+  realRedirectError,
+  requestHeaders,
+  unexpectedActionError,
+} from "@/server/action.testing";
+
 import { createAccountAction } from "./actions";
 
 const redirectSignal = new Error("NEXT_REDIRECT");
-
-const navigation = await vi.importActual<typeof Navigation>("next/navigation");
-
-function thrownBy(run: () => unknown) {
-  try {
-    run();
-  } catch (error) {
-    return error;
-  }
-
-  throw new Error("Expected the call to throw");
-}
-
-// A real redirect error, which `unstable_rethrow` recognises by its digest.
-const nextRedirectError = thrownBy(() => navigation.redirect("/dashboard"));
-
-const unexpectedActionError = {
-  ok: false,
-  code: "UNEXPECTED",
-  message: "We couldn’t complete your request. Please try again.",
-};
 
 const consoleError = vi
   .spyOn(console, "error")
   .mockImplementation(() => undefined);
 
-const requestHeaders = new Headers({
-  cookie: "session=test",
-  "user-agent": "Vitest",
-  "x-forwarded-for": "203.0.113.7",
-});
+const account = {
+  name: "Ada Lovelace",
+  email: "ada@example.com",
+  password: "pass word",
+};
 
 describe("createAccountAction", () => {
   beforeEach(() => {
@@ -82,10 +68,11 @@ describe("createAccountAction", () => {
   });
 
   it("returns field errors without calling Better Auth when input is invalid", async () => {
-    const formData = new FormData();
-    formData.set("name", "   ");
-    formData.set("email", "ada@invalid");
-    formData.set("password", "short");
+    const formData = formDataOf({
+      name: "   ",
+      email: "ada@invalid",
+      password: "short",
+    });
 
     await expect(createAccountAction(null, formData)).resolves.toStrictEqual({
       ok: false,
@@ -100,12 +87,13 @@ describe("createAccountAction", () => {
   });
 
   it("creates an account with normalized input and redirects to a valid return target", async () => {
-    const formData = new FormData();
     const password = "  pass word  ";
-    formData.set("name", "  Ada Lovelace  ");
-    formData.set("email", "  ada@example.com  ");
-    formData.set("password", password);
-    formData.set("returnTo", "/p/orbit-cli#comments");
+    const formData = formDataOf({
+      name: "  Ada Lovelace  ",
+      email: "  ada@example.com  ",
+      password,
+      returnTo: "/p/orbit-cli#comments",
+    });
 
     await expect(createAccountAction(null, formData)).rejects.toBe(
       redirectSignal,
@@ -125,11 +113,10 @@ describe("createAccountAction", () => {
   });
 
   it("falls back to the form for a new board when the return target is unsafe", async () => {
-    const formData = new FormData();
-    formData.set("name", "Ada Lovelace");
-    formData.set("email", "ada@example.com");
-    formData.set("password", "pass word");
-    formData.set("returnTo", "//evil.example/phishing");
+    const formData = formDataOf({
+      ...account,
+      returnTo: "//evil.example/phishing",
+    });
 
     await expect(createAccountAction(null, formData)).rejects.toBe(
       redirectSignal,
@@ -145,12 +132,10 @@ describe("createAccountAction", () => {
         BASE_ERROR_CODES.USER_ALREADY_EXISTS_USE_ANOTHER_EMAIL,
       ),
     );
-    const formData = new FormData();
-    formData.set("name", "Ada Lovelace");
-    formData.set("email", "ada@example.com");
-    formData.set("password", "pass word");
 
-    await expect(createAccountAction(null, formData)).resolves.toStrictEqual({
+    await expect(
+      createAccountAction(null, formDataOf(account)),
+    ).resolves.toStrictEqual({
       ok: false,
       code: "CONFLICT",
       fieldErrors: {
@@ -163,14 +148,10 @@ describe("createAccountAction", () => {
   it("logs an unexpected account-creation error and returns it as UNEXPECTED", async () => {
     const unexpectedError = new Error("Database unavailable");
     mocks.signUpEmail.mockRejectedValueOnce(unexpectedError);
-    const formData = new FormData();
-    formData.set("name", "Ada Lovelace");
-    formData.set("email", "ada@example.com");
-    formData.set("password", "pass word");
 
-    await expect(createAccountAction(null, formData)).resolves.toStrictEqual(
-      unexpectedActionError,
-    );
+    await expect(
+      createAccountAction(null, formDataOf(account)),
+    ).resolves.toStrictEqual(unexpectedActionError);
     expect(consoleError).toHaveBeenCalledWith(
       expect.any(String),
       unexpectedError,
@@ -179,14 +160,11 @@ describe("createAccountAction", () => {
   });
 
   it("rethrows a Next.js redirect raised inside the sign-up call", async () => {
-    mocks.signUpEmail.mockRejectedValueOnce(nextRedirectError);
-    const formData = new FormData();
-    formData.set("name", "Ada Lovelace");
-    formData.set("email", "ada@example.com");
-    formData.set("password", "pass word");
+    const redirectError = await realRedirectError();
+    mocks.signUpEmail.mockRejectedValueOnce(redirectError);
 
-    await expect(createAccountAction(null, formData)).rejects.toBe(
-      nextRedirectError,
+    await expect(createAccountAction(null, formDataOf(account))).rejects.toBe(
+      redirectError,
     );
     expect(consoleError).not.toHaveBeenCalled();
   });
