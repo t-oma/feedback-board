@@ -22,15 +22,11 @@ vi.mock("@/server/auth", () => ({
   },
 }));
 
+import { requestHeaders } from "@/server/action.testing";
+
 import { signOutAction } from "./actions";
 
 const redirectSignal = new Error("NEXT_REDIRECT");
-
-const requestHeaders = new Headers({
-  cookie: "session=test",
-  "user-agent": "Vitest",
-  "x-forwarded-for": "203.0.113.7",
-});
 
 describe("signOutAction", () => {
   beforeEach(() => {
