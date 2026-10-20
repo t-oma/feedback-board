@@ -1,51 +1,17 @@
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 import { expect } from "storybook/test";
 
-import { FormPanel } from "@/components/form-panel";
-import { PageMain } from "@/components/page-main";
 import {
   expectSkeletonGeometry,
   SkeletonGeometry,
 } from "@/components/skeleton/skeleton.testing";
-import {
-  buildSignInHref,
-  getAuthBackTarget,
-  parseReturnTo,
-  type SignInQuery,
-} from "@/entities/user/navigation";
+import { parseReturnTo } from "@/entities/user/navigation";
 
-import { AuthHeader } from "./_ui/auth-header";
-import { AuthIntro } from "./_ui/auth-intro";
-import { AuthTabs } from "./_ui/auth-tabs";
-import SignInLoading from "./loading";
-
-// What the page renders once it has parsed the query. The page itself is
-// async and reads `searchParams`, so the stories compose its parts instead.
-function SignInPage({ returnTo, intent, mode }: SignInQuery) {
-  return (
-    <>
-      <AuthHeader backTarget={getAuthBackTarget(returnTo)} />
-      <PageMain align="stretch">
-        <FormPanel>
-          <AuthIntro mode={mode} intent={intent} />
-          <AuthTabs
-            mode={mode}
-            returnTo={returnTo}
-            signInHref={buildSignInHref({ returnTo, intent })}
-            createAccountHref={buildSignInHref({
-              returnTo,
-              intent,
-              mode: "create-account",
-            })}
-          />
-        </FormPanel>
-      </PageMain>
-    </>
-  );
-}
+import { SignIn, SignInSkeleton } from "./_ui/sign-in";
 
 const meta = {
   title: "Sign In/Page",
+  component: SignIn,
   parameters: {
     layout: "fullscreen",
   },
@@ -61,13 +27,12 @@ const meta = {
     intent: null,
     mode: "sign-in",
   },
-  render: (args) => <SignInPage {...args} />,
-} satisfies Meta<SignInQuery>;
+} satisfies Meta<typeof SignIn>;
 
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-export const SignIn: Story = {
+export const SignInMode: Story = {
   args: {
     returnTo: parseReturnTo(
       "/p/orbit-cli?sort=top#vote",
@@ -77,7 +42,7 @@ export const SignIn: Story = {
   },
 };
 
-export const CreateAccount: Story = {
+export const CreateAccountMode: Story = {
   args: { mode: "create-account", returnTo: "/dashboard", intent: "board" },
 };
 
@@ -131,7 +96,7 @@ export const OnTablet: Story = {
 };
 
 export const Loading: Story = {
-  render: () => <SignInLoading />,
+  render: () => <SignInSkeleton />,
   play: async ({ canvas }) => {
     const status = canvas.getByRole("status");
 
@@ -149,8 +114,8 @@ const loadingLinesUp = {
   },
   render: (args) => (
     <SkeletonGeometry
-      content={<SignInPage {...args} />}
-      skeleton={<SignInLoading />}
+      content={<SignIn {...args} />}
+      skeleton={<SignInSkeleton />}
     />
   ),
   play: async ({ canvasElement }) => {
