@@ -159,11 +159,13 @@ later block's options, so each block lists every pattern its files need.
 
 ## Tests and stories
 
-Each action's test file mocks only what that action reaches. The sign-in and
-account-creation tests both need a real Next.js redirect error, and each keeps
-its own copy of the few lines that make one. The schema tests divide like the
-schemas: the field and normalization tests go to the entity, and the tests of
-each action's schema go to that action.
+Each action's test file mocks only what that action reaches, and declares
+those mocks itself, so the file shows what its action depends on. The action
+tests share data rather than behaviour: `src/server/action.testing.ts` holds
+the request headers, the unexpected-failure result, a `FormData` builder and
+a real Next.js redirect error. The schema tests divide like the schemas: the
+field and normalization tests go to the entity, and the tests of each action's
+schema go to that action.
 
 Each action keeps a mock beside it in `__mocks__/actions.ts`, and
 `.storybook/preview.ts` registers one `sb.mock` per action.
