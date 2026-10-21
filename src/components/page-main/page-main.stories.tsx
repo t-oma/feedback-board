@@ -1,4 +1,4 @@
-import type { Meta, StoryObj } from "@storybook/nextjs-vite";
+import type { Meta, StoryContext, StoryObj } from "@storybook/nextjs-vite";
 import { expect } from "storybook/test";
 
 import { PageMain } from "@/components/page-main";
@@ -42,7 +42,7 @@ const meta = {
 
 export default meta;
 type Story = StoryObj<typeof meta>;
-type Canvas = Parameters<NonNullable<Story["play"]>>[0]["canvas"];
+type Canvas = StoryContext["canvas"];
 
 function box(canvas: Canvas, testId: string) {
   const { left, width } = canvas.getByTestId(testId).getBoundingClientRect();
