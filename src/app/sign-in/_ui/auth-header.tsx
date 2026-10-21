@@ -3,7 +3,8 @@ import Link from "next/link";
 import type { ReactNode } from "react";
 
 import { BrandLink } from "@/components/brand-link";
-import type { AuthBackTarget } from "@/entities/user/navigation";
+
+import type { AuthBackTarget } from "./auth-back-target";
 
 type AuthHeaderProps = {
   backTarget: AuthBackTarget;

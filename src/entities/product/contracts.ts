@@ -9,6 +9,6 @@ export const MAX_PRODUCT_SLUG_LENGTH = 48;
 export const MAX_PRODUCT_DESCRIPTION_LENGTH = 500;
 
 // Lowercase letters and digits in words joined by single hyphens. A source
-// string rather than a `RegExp`, so that a larger pattern, such as the board
-// path `getAuthBackTarget` matches, can embed it.
+// string rather than a `RegExp`, so that a larger pattern, such as a board's
+// path, can embed it.
 export const PRODUCT_SLUG_PATTERN = "[a-z0-9]+(?:-[a-z0-9]+)*";

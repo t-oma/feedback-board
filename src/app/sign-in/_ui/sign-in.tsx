@@ -5,12 +5,9 @@ import { FormPanel } from "@/components/form-panel";
 import { PageMain } from "@/components/page-main";
 import { Skeleton } from "@/components/skeleton";
 import { Tabs } from "@/components/tabs";
-import {
-  buildSignInHref,
-  getAuthBackTarget,
-  type SignInQuery,
-} from "@/entities/user/navigation";
+import { buildSignInHref, type SignInQuery } from "@/entities/user/navigation";
 
+import { getAuthBackTarget } from "./auth-back-target";
 import { AuthHeader, AuthHeaderSkeleton } from "./auth-header";
 import { AuthIntro, AuthIntroSkeleton } from "./auth-intro";
 import { AuthTabs } from "./auth-tabs";
