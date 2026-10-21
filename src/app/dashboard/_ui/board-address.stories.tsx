@@ -39,6 +39,43 @@ export const ViewPublicBoard: Story = {
   },
 };
 
+// A slug that does not fit beside the host moves to the next line whole,
+// rather than breaking at its hyphens or between two letters.
+export const SlugOnItsOwnLineOnPhone: Story = {
+  args: { productSlug: "orbit-cli-for-teams" },
+  globals: { viewport: { value: "mobile1" } },
+  play: async ({ canvas }) => {
+    const slug = canvas.getByText("orbit-cli-for-teams");
+    const address = slug.parentElement;
+    if (address === null) throw new Error("The slug has no address around it.");
+    const lineHeight = parseFloat(getComputedStyle(address).lineHeight);
+
+    await expect(address).toHaveTextContent(
+      "feedbackboard.app/p/orbit-cli-for-teams",
+    );
+    await expect(slug.getBoundingClientRect().left).toBe(
+      address.getBoundingClientRect().left,
+    );
+    await expect(slug.getBoundingClientRect().height).toBe(lineHeight);
+  },
+};
+
+// A slug as long as one may be breaks inside itself rather than running past
+// the frame.
+export const LongSlugOnPhone: Story = {
+  args: { productSlug: "a".repeat(48) },
+  globals: { viewport: { value: "mobile1" } },
+  play: async ({ canvas }) => {
+    const address = canvas.getByText("a".repeat(48)).parentElement;
+    if (address === null) throw new Error("The slug has no address around it.");
+
+    await expect(address.scrollWidth).toBe(address.clientWidth);
+    await expect(document.documentElement.scrollWidth).toBe(
+      document.documentElement.clientWidth,
+    );
+  },
+};
+
 export const CopyLink: Story = {
   beforeEach: () => {
     const writeText = spyOn(
@@ -53,9 +90,11 @@ export const CopyLink: Story = {
     };
   },
   play: async ({ canvas }) => {
-    await expect(
-      canvas.getByText("feedbackboard.app/p/orbit-cli"),
-    ).toBeVisible();
+    // The slug is an element of its own inside the address, so the address
+    // is found by its slug and checked as a whole.
+    await expect(canvas.getByText("orbit-cli").parentElement).toHaveTextContent(
+      "feedbackboard.app/p/orbit-cli",
+    );
 
     await userEvent.click(canvas.getByRole("button", { name: "Copy link" }));
 
