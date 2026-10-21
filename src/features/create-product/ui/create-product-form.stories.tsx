@@ -4,7 +4,7 @@ import { expect, mocked, userEvent } from "storybook/test";
 import { FormPanel } from "@/components/form-panel";
 import { PageMain } from "@/components/page-main";
 
-import { createProductAction, type CreateProductResult } from "../actions";
+import { createProductAction } from "../actions";
 import { CreateProductForm } from "./create-product-form";
 
 const meta = {
@@ -113,7 +113,7 @@ export const SlugTaken: Story = {
       fieldErrors: {
         slug: ["This slug is already taken. Choose another one."],
       },
-    } satisfies CreateProductResult);
+    });
   },
   play: async ({ canvas }) => {
     await fillAndSubmit(canvas);
@@ -134,7 +134,7 @@ export const UnexpectedFailure: Story = {
       ok: false,
       code: "UNEXPECTED",
       message: "We couldn’t complete your request. Please try again.",
-    } satisfies CreateProductResult);
+    });
   },
   play: async ({ canvas }) => {
     await fillAndSubmit(canvas);
@@ -155,7 +155,7 @@ export const SessionEnded: Story = {
       ok: false,
       code: "UNAUTHENTICATED",
       message: "Your session has ended. Sign in again to create your board.",
-    } satisfies CreateProductResult);
+    });
   },
   play: async ({ canvas }) => {
     await fillAndSubmit(canvas);
@@ -175,7 +175,7 @@ export const BoardAlreadyCreated: Story = {
       ok: false,
       code: "CONFLICT",
       message: "You already have a board.",
-    } satisfies CreateProductResult);
+    });
   },
   play: async ({ canvas }) => {
     await fillAndSubmit(canvas);
