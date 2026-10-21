@@ -8,7 +8,7 @@ import {
 } from "@/components/skeleton/skeleton.testing";
 import { Tabs } from "@/components/tabs";
 
-type AuthMode = "sign-in" | "create-account";
+type SampleTab = "sign-in" | "create-account";
 
 const meta = {
   title: "Tabs",
@@ -27,7 +27,7 @@ const meta = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-function AuthTabs({ defaultValue }: { defaultValue: AuthMode }) {
+function SampleTabs({ defaultValue }: { defaultValue: SampleTab }) {
   return (
     <Tabs.Root defaultValue={defaultValue}>
       <Tabs.List>
@@ -53,7 +53,7 @@ function AuthTabs({ defaultValue }: { defaultValue: AuthMode }) {
 }
 
 export const SignInActive: Story = {
-  render: () => <AuthTabs defaultValue="sign-in" />,
+  render: () => <SampleTabs defaultValue="sign-in" />,
   play: async ({ canvas }) => {
     await expect(canvas.getByRole("tab", { name: "Sign in" })).toHaveAttribute(
       "aria-selected",
@@ -76,7 +76,7 @@ export const SignInActive: Story = {
 };
 
 export const CreateAccountActive: Story = {
-  render: () => <AuthTabs defaultValue="create-account" />,
+  render: () => <SampleTabs defaultValue="create-account" />,
   // These panels open with text, so each one stays a Tab stop and needs the
   // ring itself.
   play: async ({ canvas }) => {
@@ -127,7 +127,7 @@ export const Links: Story = {
 export const Skeleton: Story = {
   render: () => (
     <SkeletonGeometry
-      content={<AuthTabs defaultValue="sign-in" />}
+      content={<SampleTabs defaultValue="sign-in" />}
       skeleton={
         <Tabs.Skeleton labels={["Sign in", "Create account"]}>
           <p className="text-sm">Sign in to continue to your board.</p>
