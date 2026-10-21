@@ -20,14 +20,17 @@ export function BoardAddress({ productSlug, origin }: BoardAddressProps) {
     <div className="flex flex-col gap-3 rounded-lg border border-border-subtle bg-surface p-3">
       <div className="flex min-w-0 flex-col gap-1">
         <p className="text-xs text-foreground-subtle">Public address</p>
-        {/* A narrow screen breaks the address after `/p/` and keeps the slug
-            whole on the next line: a block that only wraps when it is wider
-            than the line, which a hyphen inside the slug would otherwise
-            beat. */}
+        {/* The host is quieter than the slug, the part the owner chose, as in
+            the address field they typed it into. A narrow screen breaks the
+            address after `/p/` and keeps the slug whole on the next line: a
+            block that only wraps when it is wider than the line, which a
+            hyphen inside the slug would otherwise beat. */}
         <p className="font-mono text-sm wrap-anywhere">
-          {host}/p/
+          <span className="text-foreground-subtle">{host}/p/</span>
           <wbr />
-          <span className="inline-block max-w-full">{productSlug}</span>
+          <span className="inline-block max-w-full font-medium">
+            {productSlug}
+          </span>
         </p>
       </div>
       <div className="flex flex-col gap-2 sm:flex-row">
@@ -59,7 +62,7 @@ export function BoardAddressSkeleton({
         <p className="font-mono text-sm wrap-anywhere">
           <SkeletonText>{`${host}/p/`}</SkeletonText>
           <wbr />
-          <span className="inline-block max-w-full">
+          <span className="inline-block max-w-full font-medium">
             <SkeletonText>{productSlug}</SkeletonText>
           </span>
         </p>
