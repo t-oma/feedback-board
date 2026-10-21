@@ -14,7 +14,7 @@ A comment is a claim that nothing runs. Most of the wrong comments found in this
 
 1. **Say why, not what.** A comment earns its place when the code cannot say it: a constraint, a trade-off, the bug that shaped it (`src/proxy.ts` is the model). Do not restate the code.
 2. **Verify every claim before writing it.** Check what a library does by default in its source under `node_modules`, what another file contains by opening it, and what a test covers by running it. Do it in the same change. If you cannot check a claim, do not state it as fact.
-3. **Prefer a check to a claim.** If something must always be true, make it fail when it is not: a type, a type test (`src/components/types.test-d.ts`), a unit test, a story `play` function, a lint rule. The comment then only points at the check.
+3. **Prefer a check to a claim.** If something must always be true, make it fail when it is not: a type, a type test (`src/shared/action-result.test-d.ts`), a unit test, a story `play` function, a lint rule. The comment then only points at the check.
 4. **Do not describe other code.** A claim about another file, a whole directory, or code that does not exist yet goes stale silently, because the diff that breaks it never touches the comment. Point to the other place instead of paraphrasing it, or share the code so there is nothing to keep in sync.
 5. **No counts, and no lists of things that grow.** "Roughly half of the types" or "domain and schema tests" is wrong as soon as one more is added.
 6. **History belongs in the commit message.** `git log` keeps how the code got here, tied to the diff it explains. A comment keeps only what a reader of this line needs now.
