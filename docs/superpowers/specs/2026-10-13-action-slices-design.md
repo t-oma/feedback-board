@@ -140,8 +140,8 @@ exception cannot start a cycle.
 ## No index files
 
 Slices and `_ui/` folders have no `index.ts`; an import names the file it
-needs. `src/components` keeps its directories and their `index.ts`, which the
-type test in `src/components/types.test-d.ts` relies on.
+needs. `src/components` keeps its directories and their `index.ts`, which
+`src/components/types.test.ts` type-checks one directory at a time.
 
 ## Checking the layers
 
