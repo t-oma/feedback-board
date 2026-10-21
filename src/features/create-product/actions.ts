@@ -12,6 +12,7 @@ import {
   toValidationActionError,
 } from "@/shared/action-result";
 
+import { CREATED_SEARCH_PARAM } from "./contracts";
 import { type CreateProductInput, createProductSchema } from "./schemas";
 
 // Only failures come back: a created board redirects to the dashboard.
@@ -74,6 +75,6 @@ export async function createProductAction(
   }
 
   // `replace`, so going back does not return to a form for a board that
-  // exists. The parameter tells the dashboard to say the board is live.
-  redirect("/dashboard?created=1", RedirectType.replace);
+  // exists.
+  redirect(`/dashboard?${CREATED_SEARCH_PARAM}=1`, RedirectType.replace);
 }

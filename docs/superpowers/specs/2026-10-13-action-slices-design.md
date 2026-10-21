@@ -77,8 +77,8 @@ src/
 │       └── loading.tsx, page.tsx, sign-in.stories.tsx
 ├── features/
 │   ├── create-account/          actions.ts, schemas.ts, ui/create-account-form.tsx
-│   ├── create-product/          actions.ts, schemas.ts, ui/: the form, its
-│   │                            skeleton, intro, address control and provider
+│   ├── create-product/          actions.ts, contracts.ts, schemas.ts, ui/: the
+│   │                            form, its skeleton, intro and created notice
 │   ├── sign-in/                 actions.ts, schemas.ts, ui/sign-in-form.tsx
 │   └── sign-out/                actions.ts, ui/sign-out-button.tsx
 └── entities/

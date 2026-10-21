@@ -1,12 +1,14 @@
 import { useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 
-// The create-product action redirects here with `?created=1`. The notice
-// belongs to that visit: the parameter is read once and then dropped from the
-// address, so a reload or a shared link does not announce the board again.
+import { CREATED_SEARCH_PARAM } from "../contracts";
+
+// The notice belongs to the visit `createProductAction` redirects to: the
+// parameter is read once and then dropped from the address, so a reload or a
+// shared link does not announce the board again.
 export function useCreatedNotice(): string | null {
   const searchParams = useSearchParams();
-  const [created] = useState(() => searchParams.has("created"));
+  const [created] = useState(() => searchParams.has(CREATED_SEARCH_PARAM));
 
   // `replaceState` changes the address without a request; Next.js keeps its
   // router in step with it.
@@ -14,7 +16,7 @@ export function useCreatedNotice(): string | null {
     if (!created) return;
 
     const url = new URL(window.location.href);
-    url.searchParams.delete("created");
+    url.searchParams.delete(CREATED_SEARCH_PARAM);
     window.history.replaceState(null, "", url);
   }, [created]);
 
