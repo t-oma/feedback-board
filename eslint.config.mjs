@@ -187,6 +187,18 @@ const eslintConfig = defineConfig([
       },
     ],
   ),
+  // The proxy is bundled apart from the app; `src/proxy.ts` says what broke
+  // when it imported the auth configuration.
+  restrictImports(
+    ["src/proxy.ts"],
+    [
+      {
+        regex: String.raw`^@/server/(auth|db)(/|$)|\.server$`,
+        message:
+          "The proxy must not share the app's database client. Ask Better Auth over HTTP, as `src/proxy.ts` does.",
+      },
+    ],
+  ),
 
   prettierConfig,
   // eslint-config-next already ignores `.next`, `out`, `build` and
