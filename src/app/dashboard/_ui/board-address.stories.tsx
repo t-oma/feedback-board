@@ -1,6 +1,8 @@
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 import { expect, fn, spyOn, userEvent, waitFor } from "storybook/test";
 
+import { themeColor } from "@/components/theme.testing";
+
 import { BoardAddress } from "./board-address";
 
 const publicUrl = "https://feedbackboard.app/p/orbit-cli";
@@ -36,6 +38,19 @@ export const ViewPublicBoard: Story = {
 
     await expect(link).toHaveAttribute("href", "/p/orbit-cli");
     await expect(link).toHaveAttribute("target", "_blank");
+  },
+};
+
+// The host is quieter than the slug, as in the address field of the form.
+export const SlugSetApartFromHost: Story = {
+  play: async ({ canvas }) => {
+    await expect(canvas.getByText("feedbackboard.app/p/")).toHaveStyle({
+      color: themeColor("--color-foreground-subtle"),
+    });
+    await expect(canvas.getByText("orbit-cli")).toHaveStyle({
+      color: themeColor("--color-foreground"),
+      fontWeight: "500",
+    });
   },
 };
 
