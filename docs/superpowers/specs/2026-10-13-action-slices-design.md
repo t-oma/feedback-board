@@ -72,8 +72,9 @@ src/
 │   │   │                        copy-link-button, and their stories
 │   │   └── layout.tsx, loading.tsx, page.tsx
 │   └── sign-in/
-│       ├── _ui/                 auth-header, auth-intro, auth-tabs, and their
-│       │                        stories; sign-in, the page and its skeleton
+│       ├── _ui/                 auth-back-target, auth-header, auth-intro,
+│       │                        auth-tabs, and their tests and stories;
+│       │                        sign-in, the page and its skeleton
 │       └── loading.tsx, page.tsx, sign-in.stories.tsx
 ├── features/
 │   ├── create-account/          actions.ts, schemas.ts, ui/create-account-form.tsx
@@ -131,11 +132,10 @@ Server Components. `sign-in.stories.tsx` sits beside the page in
 ## Contracts
 
 `contracts.ts` holds constants and types without logic, and it imports
-nothing. Any layer may import a slice's `contracts.ts`. Three imports need
-that today: `src/server/auth.ts` reads the password bounds,
-`src/server/db/schema/products.ts` reads the column lengths, and
-`entities/user/navigation.ts` reads the product slug pattern. A lint rule keeps
-`contracts.ts` free of imports, so the exception cannot start a cycle.
+nothing. Any layer may import a slice's `contracts.ts`, as `src/server/auth.ts`
+does for the password bounds and `src/server/db/schema/products.ts` for the
+column lengths. A lint rule keeps `contracts.ts` free of imports, so the
+exception cannot start a cycle.
 
 ## No index files
 
