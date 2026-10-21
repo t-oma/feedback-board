@@ -20,9 +20,14 @@ export function BoardAddress({ productSlug, origin }: BoardAddressProps) {
     <div className="flex flex-col gap-3 rounded-lg border border-border-subtle bg-surface p-3">
       <div className="flex min-w-0 flex-col gap-1">
         <p className="text-xs text-foreground-subtle">Public address</p>
-        <p className="font-mono text-sm break-all">
-          {host}
-          {boardPath}
+        {/* A narrow screen breaks the address after `/p/` and keeps the slug
+            whole on the next line: a block that only wraps when it is wider
+            than the line, which a hyphen inside the slug would otherwise
+            beat. */}
+        <p className="font-mono text-sm wrap-anywhere">
+          {host}/p/
+          <wbr />
+          <span className="inline-block max-w-full">{productSlug}</span>
         </p>
       </div>
       <div className="flex flex-col gap-2 sm:flex-row">
@@ -43,8 +48,7 @@ export function BoardAddressSkeleton({
   productSlug,
   origin,
 }: BoardAddressProps) {
-  const boardPath = `/p/${productSlug}`;
-  const { host } = new URL(boardPath, origin);
+  const { host } = new URL(origin);
 
   return (
     <div className="flex flex-col gap-3 rounded-lg border border-border-subtle bg-surface p-3">
@@ -52,8 +56,12 @@ export function BoardAddressSkeleton({
         <p className="text-xs">
           <SkeletonText>Public address</SkeletonText>
         </p>
-        <p className="font-mono text-sm break-all">
-          <SkeletonText>{`${host}${boardPath}`}</SkeletonText>
+        <p className="font-mono text-sm wrap-anywhere">
+          <SkeletonText>{`${host}/p/`}</SkeletonText>
+          <wbr />
+          <span className="inline-block max-w-full">
+            <SkeletonText>{productSlug}</SkeletonText>
+          </span>
         </p>
       </div>
       <div className="flex flex-col gap-2 sm:flex-row">
