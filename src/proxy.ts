@@ -78,13 +78,12 @@ function sendGuestToSignIn(request: NextRequest) {
 // no lookup.
 //
 // The session comes from Better Auth's own endpoint, not from `auth.api`. The
-// proxy is bundled apart from the app, so importing the auth configuration
-// here puts a second copy of Drizzle in the process, and outside production
-// `src/server/db/index.ts` gives both copies one shared client. The app then
-// stops recognising that client's errors as a `DrizzleQueryError`, and a taken
-// slug is reported as an unexpected error, which `e2e/onboarding.e2e.ts`
-// checks. The Next.js proxy guide advises against relying on shared modules or
-// globals.
+// proxy is bundled apart from the app but runs in the same process, and the
+// Next.js proxy guide advises against relying on shared modules or globals.
+// Importing the auth configuration here shared the app's database client
+// between the two bundles, and the app then reported a taken slug as an
+// unexpected error, which `e2e/onboarding.e2e.ts` checks. ESLint rejects
+// those imports in this file.
 async function sendSignedInVisitorOn(request: NextRequest) {
   const cookie = request.headers.get("cookie");
   if (!cookie || !getSessionCookie(request)) return NextResponse.next();
