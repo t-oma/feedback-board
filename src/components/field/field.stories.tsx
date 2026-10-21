@@ -1,5 +1,5 @@
 import { Form } from "@base-ui/react/form";
-import type { Meta, StoryObj } from "@storybook/nextjs-vite";
+import type { Meta, StoryContext, StoryObj } from "@storybook/nextjs-vite";
 import { expect, fn, userEvent } from "storybook/test";
 
 import { Field } from "@/components/field";
@@ -26,7 +26,7 @@ const meta = {
 
 export default meta;
 type Story = StoryObj<typeof meta>;
-type Canvas = Parameters<NonNullable<Story["play"]>>[0]["canvas"];
+type Canvas = StoryContext["canvas"];
 
 export const Email: Story = {
   render: () => (
