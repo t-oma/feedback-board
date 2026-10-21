@@ -16,12 +16,10 @@ import { CREATED_SEARCH_PARAM } from "./contracts";
 import { type CreateProductInput, createProductSchema } from "./schemas";
 
 // Only failures come back: a created board redirects to the dashboard.
-export type CreateProductResult = ActionError<CreateProductInput>;
-
 export async function createProductAction(
-  _previousState: CreateProductResult | null,
+  _previousState: ActionError<CreateProductInput> | null,
   formData: FormData,
-): Promise<CreateProductResult> {
+): Promise<ActionError<CreateProductInput>> {
   const parsedInput = createProductSchema.safeParse({
     name: formData.get("name"),
     slug: formData.get("slug"),
