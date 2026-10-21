@@ -7,7 +7,7 @@ import { PageMain } from "@/components/page-main";
 import { getOwnerProduct } from "@/entities/product/queries.server";
 import { requireSession } from "@/entities/user/session.server";
 import { CreateProductForm } from "@/features/create-product/ui/create-product-form";
-import { env } from "@/server/env";
+import { appOrigin } from "@/server/env";
 
 export const metadata: Metadata = {
   title: "Create your board",
@@ -39,9 +39,7 @@ export default async function NewBoard() {
   return (
     <PageMain align="stretch">
       <FormPanel>
-        {/* The deployment's own origin, the one `parseReturnTo` compares
-          against, so the address prefix does not depend on the request. */}
-        <CreateProductForm publicHost={new URL(env.BETTER_AUTH_URL).host} />
+        <CreateProductForm origin={appOrigin} />
       </FormPanel>
     </PageMain>
   );

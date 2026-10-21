@@ -5,7 +5,7 @@ import { Link } from "@/components/link";
 import { PageMain } from "@/components/page-main";
 import { getOwnerProduct } from "@/entities/product/queries.server";
 import { requireSession } from "@/entities/user/session.server";
-import { env } from "@/server/env";
+import { appOrigin } from "@/server/env";
 
 import { OwnerOverview } from "./_ui/owner-overview";
 
@@ -41,9 +41,7 @@ export default async function Dashboard() {
       <OwnerOverview
         productName={product.name}
         productSlug={product.slug}
-        // The deployment's own origin, the one `parseReturnTo` compares
-        // against, so the public address does not depend on the request.
-        origin={new URL(env.BETTER_AUTH_URL).origin}
+        origin={appOrigin}
       />
     </PageMain>
   );

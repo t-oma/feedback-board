@@ -2,7 +2,7 @@ import { getSessionCookie } from "better-auth/cookies";
 import { type NextRequest, NextResponse } from "next/server";
 
 import { buildSignInHref, parseReturnTo } from "@/entities/user/navigation";
-import { env } from "@/server/env";
+import { appOrigin, env } from "@/server/env";
 
 export async function proxy(request: NextRequest) {
   // Only a page request is redirected. A Server Action is a POST to the route
@@ -118,10 +118,8 @@ function signedInDestination(request: NextRequest) {
   const values = request.nextUrl.searchParams.getAll("returnTo");
 
   return (
-    parseReturnTo(
-      values.length === 1 ? values[0] : values,
-      env.BETTER_AUTH_URL,
-    ) ?? "/dashboard"
+    parseReturnTo(values.length === 1 ? values[0] : values, appOrigin) ??
+    "/dashboard"
   );
 }
 

@@ -7,7 +7,7 @@ import { classifyAuthError } from "@/entities/user/errors";
 import { parseReturnTo } from "@/entities/user/navigation";
 import { toUnexpectedActionError } from "@/server/action-errors";
 import { auth } from "@/server/auth";
-import { env } from "@/server/env";
+import { appOrigin } from "@/server/env";
 import {
   type ActionError,
   toValidationActionError,
@@ -28,8 +28,7 @@ export async function signInAction(
     return toValidationActionError(parsedInput.error);
   }
 
-  const returnTo =
-    parseReturnTo(formData.get("returnTo"), env.BETTER_AUTH_URL) ?? "/";
+  const returnTo = parseReturnTo(formData.get("returnTo"), appOrigin) ?? "/";
 
   try {
     await auth.api.signInEmail({

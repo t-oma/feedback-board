@@ -11,13 +11,14 @@ import {
 import { CreateProductIntroSkeleton } from "./create-product-intro";
 
 type CreateProductFormSkeletonProps = {
-  // The start of every public address, as `CreateProductForm` takes it.
-  publicHost: string;
+  // The origin every public address starts with, as `CreateProductForm`
+  // takes it.
+  origin: string;
 };
 
 // Stands in for the onboarding form while its page streams.
 export function CreateProductFormSkeleton({
-  publicHost,
+  origin,
 }: CreateProductFormSkeletonProps) {
   return (
     <Skeleton label="Loading board creation">
@@ -30,7 +31,7 @@ export function CreateProductFormSkeleton({
         <Field.Skeleton
           label="Public address"
           counter={MAX_PRODUCT_SLUG_LENGTH}
-          control={{ prefix: `${publicHost}/p/` }}
+          control={{ prefix: `${new URL(origin).host}/p/` }}
           description="Lowercase letters, numbers and hyphens"
         />
         <Field.Skeleton

@@ -7,7 +7,7 @@ import { classifyAuthError } from "@/entities/user/errors";
 import { parseReturnTo } from "@/entities/user/navigation";
 import { toUnexpectedActionError } from "@/server/action-errors";
 import { auth } from "@/server/auth";
-import { env } from "@/server/env";
+import { appOrigin } from "@/server/env";
 import {
   type ActionError,
   toValidationActionError,
@@ -32,8 +32,7 @@ export async function createAccountAction(
   // Someone who signs up to vote arrives with a board in `returnTo`. Without
   // one, the account is most likely for a board of its own.
   const returnTo =
-    parseReturnTo(formData.get("returnTo"), env.BETTER_AUTH_URL) ??
-    "/dashboard/new";
+    parseReturnTo(formData.get("returnTo"), appOrigin) ?? "/dashboard/new";
 
   try {
     await auth.api.signUpEmail({

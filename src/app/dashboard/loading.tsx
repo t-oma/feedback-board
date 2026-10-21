@@ -1,5 +1,5 @@
 import { PageMain } from "@/components/page-main";
-import { env } from "@/server/env";
+import { appOrigin } from "@/server/env";
 
 import { OwnerOverviewSkeleton } from "./_ui/owner-overview";
 
@@ -7,7 +7,7 @@ import { OwnerOverviewSkeleton } from "./_ui/owner-overview";
 export default function DashboardLoading() {
   return (
     <PageMain>
-      <OwnerOverviewSkeleton origin={new URL(env.BETTER_AUTH_URL).origin} />
+      <OwnerOverviewSkeleton origin={appOrigin} />
     </PageMain>
   );
 }
