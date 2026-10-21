@@ -8,6 +8,16 @@ type SkeletonGeometryProps = {
   frame?: (children: ReactNode) => ReactNode;
 };
 
+// Says which half of the story a reader is looking at. It stands outside the
+// blocks `expectSkeletonGeometry` measures, so it moves neither of them.
+function GeometryLabel({ children }: { children: string }) {
+  return (
+    <p className="border-y border-dashed border-border bg-surface-muted px-4 py-1.5 font-mono text-xs text-foreground-subtle">
+      {children}
+    </p>
+  );
+}
+
 // The content and its skeleton one under the other, at the same width. Side
 // by side they would share the viewport's width and wrap differently from a
 // page.
@@ -18,9 +28,11 @@ export function SkeletonGeometry({
 }: SkeletonGeometryProps) {
   return (
     <div className="flex flex-col">
+      <GeometryLabel>Content</GeometryLabel>
       <div data-skeleton-geometry="content" className="flex flex-col">
         {frame(content)}
       </div>
+      <GeometryLabel>Skeleton, while the content loads</GeometryLabel>
       <div data-skeleton-geometry="skeleton" className="flex flex-col">
         {frame(skeleton)}
       </div>
