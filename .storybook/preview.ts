@@ -1,6 +1,7 @@
 import "../src/app/globals.css";
 
 import type { Preview } from "@storybook/nextjs-vite";
+import { createElement } from "react";
 import { sb } from "storybook/test";
 import { MINIMAL_VIEWPORTS } from "storybook/viewport";
 
@@ -49,6 +50,19 @@ const preview: Preview = {
       test: "error",
     },
   },
+  // A story with the fullscreen layout is a page. It renders in a column at
+  // least as tall as the screen, as a page does in the root layout's
+  // `<body>`, so `PageMain` grows to fill it.
+  decorators: [
+    (Story, { parameters }) =>
+      parameters.layout === "fullscreen"
+        ? createElement(
+            "div",
+            { className: "flex min-h-svh flex-col" },
+            createElement(Story),
+          )
+        : createElement(Story),
+  ],
 };
 
 export default preview;

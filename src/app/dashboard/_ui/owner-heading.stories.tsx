@@ -29,11 +29,9 @@ const meta = {
   },
   decorators: [
     (Story) => (
-      <div className="flex min-h-svh flex-col">
-        <PageMain>
-          <Story />
-        </PageMain>
-      </div>
+      <PageMain>
+        <Story />
+      </PageMain>
     ),
   ],
   beforeEach: () => {

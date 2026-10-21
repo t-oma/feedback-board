@@ -15,13 +15,11 @@ const meta = {
   },
   decorators: [
     (Story) => (
-      <div className="flex min-h-svh flex-col">
-        <PageMain align="stretch">
-          <FormPanel>
-            <Story />
-          </FormPanel>
-        </PageMain>
-      </div>
+      <PageMain align="stretch">
+        <FormPanel>
+          <Story />
+        </FormPanel>
+      </PageMain>
     ),
   ],
 } satisfies Meta;
