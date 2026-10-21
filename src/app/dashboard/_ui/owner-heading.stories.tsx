@@ -2,6 +2,7 @@ import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 import { expect, spyOn, userEvent } from "storybook/test";
 
 import { PageMain } from "@/components/page-main";
+import { CREATED_SEARCH_PARAM } from "@/features/create-product/contracts";
 
 import { OwnerOverview } from "./owner-overview";
 
@@ -46,11 +47,13 @@ const meta = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-// The create-product action redirects here with `?created=1`.
 export const AfterCreating: Story = {
   parameters: {
     nextjs: {
-      navigation: { pathname: "/dashboard", query: { created: "1" } },
+      navigation: {
+        pathname: "/dashboard",
+        query: { [CREATED_SEARCH_PARAM]: "1" },
+      },
     },
   },
   play: async ({ canvas }) => {
@@ -65,7 +68,9 @@ export const AfterCreating: Story = {
     // The address loses the parameter, so a reload says nothing.
     await expect(replaceState).toHaveBeenCalledOnce();
     const [, , url] = replaceState.mock.calls[0] ?? [];
-    await expect(new URL(String(url)).searchParams.has("created")).toBe(false);
+    await expect(
+      new URL(String(url)).searchParams.has(CREATED_SEARCH_PARAM),
+    ).toBe(false);
 
     await userEvent.click(canvas.getByRole("button", { name: "Dismiss" }));
     await expect(canvas.queryByText("Your board is live")).toBeNull();

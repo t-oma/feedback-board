@@ -3,8 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 
 import { Notice } from "@/components/notice";
-
-import { useCreatedNotice } from "./use-created-notice";
+import { useCreatedNotice } from "@/features/create-product/ui/use-created-notice";
 
 type OwnerHeadingProps = {
   productName: string;
