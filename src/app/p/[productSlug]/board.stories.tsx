@@ -15,13 +15,6 @@ const meta = {
   parameters: {
     layout: "fullscreen",
   },
-  decorators: [
-    (Story) => (
-      <div className="flex min-h-svh flex-col">
-        <Story />
-      </div>
-    ),
-  ],
   args: {
     productName: "Orbit CLI",
     description:

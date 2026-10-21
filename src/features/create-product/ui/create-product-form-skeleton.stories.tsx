@@ -25,13 +25,11 @@ type Story = StoryObj<typeof meta>;
 
 export const Loading: Story = {
   render: () => (
-    <div className="flex min-h-svh flex-col">
-      <PageMain align="stretch">
-        <FormPanel>
-          <CreateProductFormSkeleton origin={origin} />
-        </FormPanel>
-      </PageMain>
-    </div>
+    <PageMain align="stretch">
+      <FormPanel>
+        <CreateProductFormSkeleton origin={origin} />
+      </FormPanel>
+    </PageMain>
   ),
   play: async ({ canvas }) => {
     const status = canvas.getByRole("status");

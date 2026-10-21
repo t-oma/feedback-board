@@ -21,11 +21,9 @@ const meta = {
   },
   decorators: [
     (Story) => (
-      <div className="flex min-h-svh flex-col">
-        <PageMain align="stretch">
-          <Story />
-        </PageMain>
-      </div>
+      <PageMain align="stretch">
+        <Story />
+      </PageMain>
     ),
   ],
   args: {

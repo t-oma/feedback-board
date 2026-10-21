@@ -18,13 +18,6 @@ const meta = {
       },
     },
   },
-  decorators: [
-    (Story) => (
-      <div className="flex min-h-svh flex-col">
-        <Story />
-      </div>
-    ),
-  ],
   args: {
     children: (
       <>
