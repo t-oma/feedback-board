@@ -9,7 +9,7 @@ import { CreateProductForm } from "./create-product-form";
 
 const meta = {
   title: "Create Product/Form",
-  render: () => <CreateProductForm publicHost="feedbackboard.app" />,
+  render: () => <CreateProductForm origin="https://feedbackboard.app" />,
   parameters: {
     layout: "fullscreen",
   },

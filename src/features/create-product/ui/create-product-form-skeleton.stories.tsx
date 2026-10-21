@@ -11,7 +11,7 @@ import {
 import { CreateProductForm } from "./create-product-form";
 import { CreateProductFormSkeleton } from "./create-product-form-skeleton";
 
-const publicHost = "feedbackboard.app";
+const origin = "https://feedbackboard.app";
 
 const meta = {
   title: "Create Product/Form Skeleton",
@@ -28,7 +28,7 @@ export const Loading: Story = {
     <div className="flex min-h-svh flex-col">
       <PageMain align="stretch">
         <FormPanel>
-          <CreateProductFormSkeleton publicHost={publicHost} />
+          <CreateProductFormSkeleton origin={origin} />
         </FormPanel>
       </PageMain>
     </div>
@@ -55,8 +55,8 @@ const geometry: Story = {
           <FormPanel>{children}</FormPanel>
         </PageMain>
       )}
-      content={<CreateProductForm publicHost={publicHost} />}
-      skeleton={<CreateProductFormSkeleton publicHost={publicHost} />}
+      content={<CreateProductForm origin={origin} />}
+      skeleton={<CreateProductFormSkeleton origin={origin} />}
     />
   ),
   play: async ({ canvasElement }) => {

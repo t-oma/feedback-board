@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 
 import { parseSignInQuery } from "@/entities/user/navigation";
-import { env } from "@/server/env";
+import { appOrigin } from "@/server/env";
 
 import { SignIn } from "./_ui/sign-in";
 
@@ -14,7 +14,5 @@ export const metadata: Metadata = {
 export default async function SignInPage({
   searchParams,
 }: PageProps<"/sign-in">) {
-  return (
-    <SignIn {...parseSignInQuery(await searchParams, env.BETTER_AUTH_URL)} />
-  );
+  return <SignIn {...parseSignInQuery(await searchParams, appOrigin)} />;
 }

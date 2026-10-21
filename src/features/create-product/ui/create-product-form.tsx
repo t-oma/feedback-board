@@ -33,11 +33,11 @@ const validateDescription = fieldValidator(
 );
 
 type CreateProductFormProps = {
-  // The start of every public address, such as `feedbackboard.app`.
-  publicHost: string;
+  // The origin every public address starts with.
+  origin: string;
 };
 
-export function CreateProductForm({ publicHost }: CreateProductFormProps) {
+export function CreateProductForm({ origin }: CreateProductFormProps) {
   const [error, formAction, pending] = useActionState(
     createProductAction,
     null,
@@ -106,7 +106,7 @@ export function CreateProductForm({ publicHost }: CreateProductFormProps) {
           Public address
         </Field.Label>
         <Field.PrefixedControl
-          prefix={`${publicHost}/p/`}
+          prefix={`${new URL(origin).host}/p/`}
           type="text"
           autoComplete="off"
           autoCapitalize="none"

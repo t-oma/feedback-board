@@ -11,6 +11,7 @@ vi.mock("@/server/env", () => ({
   env: {
     BETTER_AUTH_URL: "https://feedback.example",
   },
+  appOrigin: "https://feedback.example",
 }));
 
 import { config, proxy } from "./proxy";

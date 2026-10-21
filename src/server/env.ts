@@ -23,3 +23,9 @@ if (!parsed.success) {
 }
 
 export const env = parsed.data;
+
+// The deployment's own origin, which every public address starts with. A
+// skeleton that shows an address is prerendered at build time, with no
+// request to take a host from, and the page it stands in for has to show the
+// same address.
+export const appOrigin = new URL(env.BETTER_AUTH_URL).origin;
