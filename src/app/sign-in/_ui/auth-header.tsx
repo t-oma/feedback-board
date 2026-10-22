@@ -1,8 +1,9 @@
-import { ArrowLeftIcon } from "lucide-react";
-import Link from "next/link";
-import type { ReactNode } from "react";
-
 import { BrandLink } from "@/components/brand-link";
+import {
+  BackLink,
+  BackLinkSkeleton,
+  SiteHeader,
+} from "@/components/site-header";
 
 import type { AuthBackTarget } from "./auth-back-target";
 
@@ -12,29 +13,21 @@ type AuthHeaderProps = {
 
 export function AuthHeader({ backTarget }: AuthHeaderProps) {
   return (
-    <AuthHeaderFrame>
-      {/* The ring is drawn inside: the link fills the bar, and below `sm` the
-          bar is the top of the page, so an outer ring would run past the
-          viewport. */}
-      <Link
-        href={backTarget.href}
-        className="-mx-2 flex h-full min-w-0 items-center gap-x-2 rounded-sm px-2 font-serif font-semibold focus-ring-inside sm:font-sans sm:text-sm sm:font-normal sm:text-foreground-muted"
-      >
-        <ArrowLeftIcon aria-hidden="true" size={20} className="shrink-0" />
-        <span className="truncate">{getBackLabel(backTarget)}</span>
-      </Link>
-    </AuthHeaderFrame>
+    <SiteHeader
+      back={
+        <BackLink href={backTarget.href} label={getBackLabel(backTarget)} />
+      }
+    >
+      <BrandLink />
+    </SiteHeader>
   );
 }
 
 export function AuthHeaderSkeleton() {
   return (
-    <AuthHeaderFrame>
-      <span
-        aria-hidden="true"
-        className="h-5 w-44 rounded-md bg-surface-muted"
-      />
-    </AuthHeaderFrame>
+    <SiteHeader back={<BackLinkSkeleton />}>
+      <BrandLink />
+    </SiteHeader>
   );
 }
 
@@ -49,24 +42,4 @@ function getBackLabel(target: AuthBackTarget): string {
     case "changelog":
       return "Back to changelog";
   }
-}
-
-function AuthHeaderFrame({ children }: { children: ReactNode }) {
-  return (
-    <header className="shrink-0">
-      {/* Both rows lay out on the layout grid, so the brand and the back
-          link keep their place when a page on the same grid leads here. */}
-      <div className="layout-grid h-15 border-b border-border bg-surface max-sm:hidden">
-        <div className="flex items-center">
-          <BrandLink />
-        </div>
-      </div>
-      <nav
-        aria-label="Exit authentication"
-        className="layout-grid h-12 border-b border-border bg-surface sm:border-b-0 sm:bg-transparent"
-      >
-        <div className="flex min-w-0 items-center">{children}</div>
-      </nav>
-    </header>
-  );
 }

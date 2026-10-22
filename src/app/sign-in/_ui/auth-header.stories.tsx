@@ -25,10 +25,7 @@ type Story = StoryObj<typeof meta>;
 function checkBackLink(label: string): NonNullable<Story["play"]> {
   return async ({ args, canvas }) => {
     const header = within(canvas.getByRole("banner"));
-    const navigation = within(
-      header.getByRole("navigation", { name: "Exit authentication" }),
-    );
-    const link = navigation.getByRole("link", { name: label });
+    const link = header.getByRole("link", { name: label });
 
     await expect(link).toHaveAttribute("href", args.backTarget.href);
     await expect(link).toBeVisible();
@@ -90,11 +87,10 @@ export const Loading: Story = {
   render: () => <AuthHeaderSkeleton />,
   play: async ({ canvas }) => {
     const header = within(canvas.getByRole("banner"));
-    const navigation = within(
-      header.getByRole("navigation", { name: "Exit authentication" }),
-    );
 
-    await expect(navigation.queryByRole("link")).not.toBeInTheDocument();
+    await expect(
+      header.queryByRole("link", { name: /^Back to/ }),
+    ).not.toBeInTheDocument();
   },
 };
 
@@ -103,7 +99,7 @@ export const Loading: Story = {
 const linesUpWithGrid = {
   play: async ({ canvas }) => {
     const arrow = canvas
-      .getByRole("navigation", { name: "Exit authentication" })
+      .getByRole("link", { name: "Back to Feedback Board" })
       .querySelector("svg");
 
     await expect(arrow?.getBoundingClientRect().left).toBe(contentEdge());
