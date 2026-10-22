@@ -1,17 +1,18 @@
 import { BrandLink } from "@/components/brand-link";
+import { SiteHeader } from "@/components/site-header";
 import { signOutAction } from "@/features/sign-out/actions";
 import { SignOutButton } from "@/features/sign-out/ui/sign-out-button";
 
 export function DashboardHeader() {
   return (
-    <header className="layout-grid h-15 shrink-0 border-b border-border bg-surface">
-      <div className="flex items-center justify-between gap-x-4">
-        <BrandLink />
-
+    <SiteHeader
+      end={
         <form action={signOutAction}>
           <SignOutButton />
         </form>
-      </div>
-    </header>
+      }
+    >
+      <BrandLink />
+    </SiteHeader>
   );
 }

@@ -31,7 +31,7 @@ type Story = StoryObj<typeof meta>;
 const linesUpWithHeader = {
   play: async ({ canvas }) => {
     const page = document.documentElement.clientWidth;
-    const name = canvas.getByText("Orbit CLI", { selector: "span" });
+    const name = canvas.getByText("Orbit CLI", { selector: "p" });
     const heading = canvas.getByRole("heading", { level: 1 });
     const band = heading.parentElement?.parentElement;
 
@@ -60,9 +60,7 @@ export const LinesUpOnWideScreen: Story = {
 
 export const WithDescription: Story = {
   play: async ({ canvas }) => {
-    await expect(canvas.getByRole("banner")).toHaveTextContent(
-      "Orbit CLIfeedback",
-    );
+    await expect(canvas.getByRole("banner")).toHaveTextContent(/^Orbit CLI$/);
     await expect(
       canvas.getByRole("heading", {
         level: 1,
@@ -107,10 +105,9 @@ export const LongWordsOnPhone: Story = {
     viewport: { value: "mobile1" },
   },
   play: async ({ canvas }) => {
-    const name = canvas.getByText("A".repeat(80), { selector: "span" });
+    const name = canvas.getByText("A".repeat(80), { selector: "p" });
 
     await expect(name.scrollWidth).toBeGreaterThan(name.clientWidth);
-    await expect(canvas.getByText("feedback")).toBeVisible();
     await expect(document.documentElement.scrollWidth).toBe(
       document.documentElement.clientWidth,
     );
