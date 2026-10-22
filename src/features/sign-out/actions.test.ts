@@ -22,7 +22,11 @@ vi.mock("@/server/auth", () => ({
   },
 }));
 
-import { requestHeaders } from "@/server/action.testing";
+vi.mock("@/server/env", () => ({
+  appOrigin: "https://feedback.example",
+}));
+
+import { formDataOf, requestHeaders } from "@/server/action.testing";
 
 import { signOutAction } from "./actions";
 
@@ -38,13 +42,35 @@ describe("signOutAction", () => {
     });
   });
 
-  it("signs out the current request and redirects home", async () => {
-    await expect(signOutAction()).rejects.toBe(redirectSignal);
+  it("signs out the current request and returns to the page it was on", async () => {
+    await expect(
+      signOutAction(formDataOf({ returnTo: "/p/orbit-cli?sort=top" })),
+    ).rejects.toBe(redirectSignal);
 
     expect(mocks.headers).toHaveBeenCalledExactlyOnceWith();
     expect(mocks.signOut).toHaveBeenCalledExactlyOnceWith({
       headers: requestHeaders,
     });
+    expect(mocks.redirect).toHaveBeenCalledExactlyOnceWith(
+      "/p/orbit-cli?sort=top",
+    );
+  });
+
+  it("goes home without a page to return to", async () => {
+    await expect(signOutAction(new FormData())).rejects.toBe(redirectSignal);
+
+    expect(mocks.redirect).toHaveBeenCalledExactlyOnceWith("/");
+  });
+
+  it.each([
+    "https://evil.example/p/orbit-cli",
+    "//evil.example/p/orbit-cli",
+    "/api/auth/get-session",
+  ])("goes home rather than to %j", async (returnTo) => {
+    await expect(signOutAction(formDataOf({ returnTo }))).rejects.toBe(
+      redirectSignal,
+    );
+
     expect(mocks.redirect).toHaveBeenCalledExactlyOnceWith("/");
   });
 
@@ -52,7 +78,9 @@ describe("signOutAction", () => {
     const unexpectedError = new Error("Database unavailable");
     mocks.signOut.mockRejectedValueOnce(unexpectedError);
 
-    await expect(signOutAction()).rejects.toBe(unexpectedError);
+    await expect(
+      signOutAction(formDataOf({ returnTo: "/p/orbit-cli" })),
+    ).rejects.toBe(unexpectedError);
     expect(mocks.redirect).not.toHaveBeenCalled();
   });
 });
