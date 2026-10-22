@@ -199,6 +199,31 @@ const eslintConfig = defineConfig([
       },
     ],
   ),
+  // Client components link to sign-in through this module, and the schemas'
+  // values would bring Zod with them; their types cost nothing.
+  {
+    files: ["src/entities/user/sign-in-href.ts"],
+    rules: {
+      "@typescript-eslint/no-restricted-imports": [
+        "error",
+        {
+          paths: [
+            {
+              name: "./schemas",
+              allowTypeImports: true,
+              message:
+                "Take only types from the schemas here, so a client component that links to sign-in does not load Zod.",
+            },
+            {
+              name: "zod",
+              message:
+                "A client component that links to sign-in would load Zod with this module.",
+            },
+          ],
+        },
+      ],
+    },
+  },
 
   prettierConfig,
   // eslint-config-next already ignores `.next`, `out`, `build` and

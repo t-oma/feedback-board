@@ -14,32 +14,11 @@ export type SignInQuery = {
   mode: AuthMode;
 };
 
-type BuildSignInHrefInput = {
-  returnTo?: string | null | undefined;
-  intent?: AuthIntent | null | undefined;
-  mode?: AuthMode | undefined;
-};
-
 type SignInQueryInput = {
   returnTo?: unknown;
   intent?: unknown;
   mode?: unknown;
 };
-
-export function buildSignInHref({
-  returnTo,
-  intent,
-  mode,
-}: BuildSignInHrefInput = {}): Route {
-  const searchParams = new URLSearchParams();
-
-  if (returnTo) searchParams.set("returnTo", returnTo);
-  if (intent) searchParams.set("intent", intent);
-  if (mode === "create-account") searchParams.set("mode", mode);
-
-  const query = searchParams.toString();
-  return query ? `/sign-in?${query}` : "/sign-in";
-}
 
 function hasSafePrefix(returnTo: string) {
   return (

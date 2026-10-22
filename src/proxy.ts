@@ -1,7 +1,8 @@
 import { getSessionCookie } from "better-auth/cookies";
 import { type NextRequest, NextResponse } from "next/server";
 
-import { buildSignInHref, parseReturnTo } from "@/entities/user/navigation";
+import { parseReturnTo } from "@/entities/user/navigation";
+import { buildSignInHref } from "@/entities/user/sign-in-href";
 import { appOrigin, env } from "@/server/env";
 
 export async function proxy(request: NextRequest) {

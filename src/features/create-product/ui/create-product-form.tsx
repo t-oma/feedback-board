@@ -18,7 +18,7 @@ import {
   normalizeProductSlug,
   suggestProductSlug,
 } from "@/entities/product/schemas";
-import { buildSignInHref } from "@/entities/user/navigation";
+import { buildSignInHref } from "@/entities/user/sign-in-href";
 import { fieldValidator } from "@/shared/field-validator";
 import { useFocusAfterFormError } from "@/shared/use-focus-after-form-error";
 

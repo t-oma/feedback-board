@@ -7,7 +7,7 @@ import { cache } from "react";
 
 import { auth } from "@/server/auth";
 
-import { buildSignInHref } from "./navigation";
+import { buildSignInHref } from "./sign-in-href";
 
 type RequireSessionInput = {
   returnTo: Route;
