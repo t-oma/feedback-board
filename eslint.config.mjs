@@ -18,7 +18,14 @@ const WRITTEN_OUT_RING = String.raw`/\bfocus-visible:(?:-?outline-offset-|outlin
 const LAYERS_SPEC = "docs/superpowers/specs/2026-10-13-action-slices-design.md";
 
 const NO_UPPER_LAYER = {
-  regex: "^@/(app|features)(/|$)",
+  regex: "^@/(app|widgets|features)(/|$)",
+  message: `Import only from a lower layer, and inside a slice use a relative path. See ${LAYERS_SPEC}.`,
+};
+
+// A widget composes features and entities, so the only layers closed to it
+// are its own and the routes above it.
+const NO_ROUTE_OR_WIDGET = {
+  regex: "^@/(app|widgets)(/|$)",
   message: `Import only from a lower layer, and inside a slice use a relative path. See ${LAYERS_SPEC}.`,
 };
 
@@ -149,6 +156,10 @@ const eslintConfig = defineConfig([
     const files = `${"*/".repeat(depth)}*.{ts,tsx}`;
 
     return [
+      restrictImports(
+        [`src/widgets/*/${files}`],
+        [NO_ROUTE_OR_WIDGET, noLeavingSlice(depth)],
+      ),
       restrictImports(
         [`src/features/*/${files}`],
         [NO_UPPER_LAYER, noLeavingSlice(depth)],
