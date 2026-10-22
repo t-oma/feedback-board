@@ -38,15 +38,22 @@ Design, keeps Next.js's own conventions for pages, and keeps direct imports.
 
 ## Layers
 
-| Layer      | Holds                                                   | Imports from      |
-| ---------- | ------------------------------------------------------- | ----------------- |
-| `app`      | routes, and UI only one route renders                   | every layer below |
-| `features` | one slice per user action                               | entities, bottom  |
-| `entities` | one slice per domain concept                            | bottom            |
-| bottom     | `src/components`, `src/shared` and `src/server`, as now | bottom            |
+| Layer      | Holds                                                            | Imports from               |
+| ---------- | ---------------------------------------------------------------- | -------------------------- |
+| `app`      | routes, and UI only one route renders                            | every layer below          |
+| `widgets`  | UI that several routes render, composed of features and entities | features, entities, bottom |
+| `features` | one slice per user action                                        | entities, bottom           |
+| `entities` | one slice per domain concept                                     | bottom                     |
+| bottom     | `src/components`, `src/shared` and `src/server`, as now          | bottom                     |
 
 A slice never imports another slice of its own layer, and nothing outside
 `src/app` imports from it. `src/proxy.ts` belongs with `src/app`.
+
+`widgets` came with the [site header](2026-10-22-site-header-design.md): the
+control for the viewer combines the session from `entities/user` with signing
+out from `features/sign-out`, and every route with a header renders it. A
+feature may not import another feature, and `app` holds UI for one route, so
+neither could hold it. Feature-Sliced Design names this layer the same.
 
 The bottom layer keeps its names. Feature-Sliced Design would call it `shared`,
 which `src/shared` already is with a narrower meaning; renaming the three
@@ -114,7 +121,7 @@ UI that one route renders sits in a private folder of that route, `_ui/`,
 which Next.js leaves out of routing. The name repeats the `ui/` of a slice. A
 route may use the `_ui/` of its own segment and of the segments above it, so a
 page under `/dashboard` can render the dashboard header. When a second route
-needs a component, it moves down to `features`, `entities` or
+needs a component, it moves down to `widgets`, `features`, `entities` or
 `src/components`.
 
 When a story needs a page's whole composition, the page reads the request,
@@ -147,11 +154,12 @@ needs. `src/components` keeps its directories and their `index.ts`, which
 
 ESLint's `no-restricted-imports` rejects, by the importing file's location:
 
-- in the bottom layer, any `@/app`, `@/features` or `@/entities` path other
-  than `@/entities/<slice>/contracts`;
-- in `entities`, any `@/app` or `@/features` path, and any `@/entities` path
-  other than a `contracts` module;
-- in `features`, any `@/app` or `@/features` path;
+- in the bottom layer, any `@/app`, `@/widgets`, `@/features` or `@/entities`
+  path other than `@/entities/<slice>/contracts`;
+- in `entities`, any `@/app`, `@/widgets` or `@/features` path, and any
+  `@/entities` path other than a `contracts` module;
+- in `features`, any `@/app`, `@/widgets` or `@/features` path;
+- in `widgets`, any `@/app` or `@/widgets` path;
 - in a slice, a relative path that leaves the slice;
 - in `contracts.ts`, every import;
 - in `src/app`, an `@/app` path, and a relative path that climbs into another
@@ -176,8 +184,8 @@ Each action keeps a mock beside it in `__mocks__/actions.ts`, and
 `.storybook/preview.ts` registers one `sb.mock` per action.
 
 A story's title starts with its layer. `.storybook/main.ts` lists each layer's
-directory with a `titlePrefix`, `Components`, `Entities`, `Features` or
-`Pages`, and a story's own `title` names only its slice or route and its
+directory with a `titlePrefix`, `Components`, `Entities`, `Features`,
+`Widgets` or `Pages`, and a story's own `title` names only its slice or route and its
 component, such as `Sign In/Header`. A story that moves to another layer moves
 in the sidebar with it.
 

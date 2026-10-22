@@ -12,6 +12,7 @@ const config: StorybookConfig = {
     { directory: "../src/components", files, titlePrefix: "Components" },
     { directory: "../src/entities", files, titlePrefix: "Entities" },
     { directory: "../src/features", files, titlePrefix: "Features" },
+    { directory: "../src/widgets", files, titlePrefix: "Widgets" },
     { directory: "../src/app", files, titlePrefix: "Pages" },
   ],
   addons: ["@storybook/addon-a11y", "@storybook/addon-vitest"],
