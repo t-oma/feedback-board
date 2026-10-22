@@ -3,7 +3,7 @@ import { expect, fn, mocked, userEvent, waitFor, within } from "storybook/test";
 
 import { FormPanel } from "@/components/form-panel";
 import { PageMain } from "@/components/page-main";
-import { buildSignInHref } from "@/entities/user/navigation";
+import { buildSignInHref } from "@/entities/user/sign-in-href";
 import { createAccountAction } from "@/features/create-account/actions";
 import { signInAction } from "@/features/sign-in/actions";
 
