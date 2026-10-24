@@ -1,6 +1,12 @@
 import { expect, type Page, test } from "@playwright/test";
 
-import { createAccount, expectPath, expectPathAndQuery } from "./accounts";
+import {
+  createAccount,
+  expectPath,
+  expectPathAndQuery,
+  signInAgainHref,
+  signOut,
+} from "./accounts";
 
 async function expectDashboardReturnTo(page: Page) {
   await expectPath(page, "/sign-in");
@@ -41,24 +47,25 @@ test("completes the credential session lifecycle", async ({ page }) => {
     await route.continue();
   });
 
-  const signOutButton = page.getByRole("button", { name: "Sign out" });
-  await expect(signOutButton).toBeVisible();
+  await page.getByRole("button", { name: "Account" }).click();
+  // Its name changes while the action runs.
+  const signOutItem = page.getByRole("menuitem", { name: /^Sign(ing)? out/ });
 
-  const signOutSubmission = signOutButton.click();
+  const signOutSubmission = signOutItem.click();
   await signOutPaused.promise;
 
   try {
     // What only a real submission can show: `useFormStatus` is wired, so the
-    // button reads the pending state. What that state looks like is the
-    // Button's own contract and is asserted in its `Pending` story.
-    await expect(signOutButton).toBeDisabled();
-    await expect(signOutButton).toHaveAttribute("aria-busy", "true");
+    // item reads the pending state. What that state looks like is the item's
+    // own contract and is asserted in its `StaysOpenWhilePending` story.
+    await expect(signOutItem).toHaveText("Signing out…");
+    await expect(signOutItem).toHaveAttribute("aria-busy", "true");
   } finally {
     signOutRelease.resolve();
   }
 
   await signOutSubmission;
-  await expectPath(page, "/");
+  await expectPathAndQuery(page, signInAgainHref("/dashboard/new"));
 
   await page.goto("/dashboard");
   await expectDashboardReturnTo(page);
@@ -100,9 +107,9 @@ test("signs out from a tab whose session has already ended", async ({
   );
   await context.clearCookies();
 
-  await page.getByRole("button", { name: "Sign out" }).click();
+  await signOut(page);
 
-  await expectPath(page, "/");
+  await expectPathAndQuery(page, signInAgainHref("/dashboard/new"));
 });
 
 test("sends a signed-in visitor past sign-in", async ({ page }) => {
@@ -145,8 +152,8 @@ test("shows sign-in to a cookie whose session has ended", async ({
   });
 
   try {
-    await page.getByRole("button", { name: "Sign out" }).click();
-    await expectPath(page, "/");
+    await signOut(page);
+    await expectPathAndQuery(page, signInAgainHref("/dashboard/new"));
 
     const stalePage = await staleContext.newPage();
     await stalePage.goto("/dashboard");
@@ -176,8 +183,8 @@ test("returns a guest to the exact view they asked for", async ({ page }) => {
   const target = "/dashboard?tab=planned&sort=top";
 
   await createAccount(page, email, password);
-  await page.getByRole("button", { name: "Sign out" }).click();
-  await expectPath(page, "/");
+  await signOut(page);
+  await expectPathAndQuery(page, signInAgainHref("/dashboard/new"));
 
   await page.goto(target);
   await expectPath(page, "/sign-in");

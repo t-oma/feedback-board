@@ -1,13 +1,17 @@
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
-import { expect } from "storybook/test";
+import { expect, within } from "storybook/test";
 
 import { contentEdge } from "@/components/layout-grid.testing";
 import {
   expectSkeletonGeometry,
   SkeletonGeometry,
 } from "@/components/skeleton/skeleton.testing";
+import { SignInLink } from "@/widgets/viewer/ui/sign-in-link";
 
 import { Board, BoardSkeleton, sampleBoard } from "./_ui/board";
+
+// What `ViewerControl` renders for a guest, most of a board's visitors.
+const guest = <SignInLink />;
 
 const meta = {
   title: "Board/Page",
@@ -19,6 +23,7 @@ const meta = {
     productName: "Orbit CLI",
     description:
       "Orbit CLI is a deploy tool for small teams.\n\nTell us what is missing.",
+    viewer: guest,
   },
 } satisfies Meta<typeof Board>;
 
@@ -60,7 +65,12 @@ export const LinesUpOnWideScreen: Story = {
 
 export const WithDescription: Story = {
   play: async ({ canvas }) => {
-    await expect(canvas.getByRole("banner")).toHaveTextContent(/^Orbit CLI$/);
+    const header = within(canvas.getByRole("banner"));
+    await expect(
+      header.getByText("Orbit CLI", { selector: "p" }),
+    ).toBeVisible();
+    await expect(canvas.getByRole("banner")).not.toHaveTextContent("feedback");
+    await expect(header.getByRole("link", { name: "Sign in" })).toBeVisible();
     await expect(
       canvas.getByRole("heading", {
         level: 1,
@@ -128,7 +138,7 @@ export const Loading: Story = {
 // landmarks on one page fail axe, so the a11y test is off here; `Loading`
 // checks the loading state on its own.
 const loadingLinesUp = {
-  args: sampleBoard,
+  args: { ...sampleBoard, viewer: guest },
   parameters: {
     a11y: { test: "off" },
   },

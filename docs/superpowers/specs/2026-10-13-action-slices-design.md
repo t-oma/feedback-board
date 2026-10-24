@@ -83,17 +83,22 @@ src/
 │       │                        auth-tabs, and their tests and stories;
 │       │                        sign-in, the page and its skeleton
 │       └── loading.tsx, page.tsx, sign-in.stories.tsx
+├── widgets/
+│   └── viewer/                  ui/: viewer-control, account-menu,
+│                                lazy-account-menu, sign-in-link, and their
+│                                stories
 ├── features/
 │   ├── create-account/          actions.ts, schemas.ts, ui/create-account-form.tsx
 │   ├── create-product/          actions.ts, contracts.ts, schemas.ts, ui/: the
 │   │                            form, its skeleton, intro and created notice
 │   ├── sign-in/                 actions.ts, schemas.ts, ui/sign-in-form.tsx
-│   └── sign-out/                actions.ts, ui/sign-out-button.tsx
+│   └── sign-out/                actions.ts, ui/sign-out-menu-item.tsx
 └── entities/
     ├── product/                 contracts.ts, errors.ts, queries.server.ts,
     │                            schemas.ts
     └── user/                    contracts.ts, errors.ts, navigation.ts,
-                                 schemas.ts, session.server.ts
+                                 schemas.ts, session.server.ts,
+                                 sign-in-href.ts
 ```
 
 How today's modules divide:

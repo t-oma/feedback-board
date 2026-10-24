@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 
 import { getProductBySlug } from "@/entities/product/queries.server";
+import { ViewerControl } from "@/widgets/viewer/ui/viewer-control";
 
 import { Board } from "./_ui/board";
 
@@ -30,5 +31,11 @@ export async function generateMetadata({
 export default async function BoardPage({ params }: BoardPageProps) {
   const product = await getBoardProduct(params);
 
-  return <Board productName={product.name} description={product.description} />;
+  return (
+    <Board
+      productName={product.name}
+      description={product.description}
+      viewer={<ViewerControl />}
+    />
+  );
 }

@@ -1,17 +1,17 @@
+import type { ReactNode } from "react";
+
 import { BrandLink } from "@/components/brand-link";
 import { SiteHeader } from "@/components/site-header";
-import { signOutAction } from "@/features/sign-out/actions";
-import { SignOutButton } from "@/features/sign-out/ui/sign-out-button";
 
-export function DashboardHeader() {
+type DashboardHeaderProps = {
+  // The layout passes `ViewerControl`, which reads the session, and a story
+  // passes what it renders.
+  viewer: ReactNode;
+};
+
+export function DashboardHeader({ viewer }: DashboardHeaderProps) {
   return (
-    <SiteHeader
-      end={
-        <form action={signOutAction}>
-          <SignOutButton />
-        </form>
-      }
-    >
+    <SiteHeader end={viewer}>
       <BrandLink />
     </SiteHeader>
   );

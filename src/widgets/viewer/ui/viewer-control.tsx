@@ -3,7 +3,7 @@ import { Suspense } from "react";
 import { AvatarSkeleton } from "@/components/avatar";
 import { getSession } from "@/entities/user/session.server";
 
-import { AccountMenu } from "./account-menu";
+import { LazyAccountMenu } from "./lazy-account-menu";
 import { SignInLink } from "./sign-in-link";
 
 type ViewerControlProps = {
@@ -28,5 +28,7 @@ async function Viewer() {
   if (session === null) return <SignInLink />;
 
   // Only what the menu shows crosses to the client, not the session itself.
-  return <AccountMenu name={session.user.name} email={session.user.email} />;
+  return (
+    <LazyAccountMenu name={session.user.name} email={session.user.email} />
+  );
 }

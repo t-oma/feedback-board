@@ -31,3 +31,24 @@ export async function createAccount(
 
   await expectPath(page, "/dashboard/new");
 }
+
+// Through the real form on `/dashboard/new`, where `createAccount` ends.
+export async function createBoard(page: Page, slug: string) {
+  await page.getByRole("textbox", { name: "Product name" }).fill("Orbit CLI");
+  await page.getByRole("textbox", { name: "Public address" }).fill(slug);
+  await page.getByRole("button", { name: "Create board" }).click();
+
+  await expectPath(page, "/dashboard");
+}
+
+// Through the account menu in the header, as a visitor signs out.
+export async function signOut(page: Page) {
+  await page.getByRole("button", { name: "Account" }).click();
+  await page.getByRole("menuitem", { name: "Sign out" }).click();
+}
+
+// Where signing out of a protected page ends: the proxy asks to sign in again
+// and keeps the page as the way back.
+export function signInAgainHref(returnTo: string) {
+  return `/sign-in?${new URLSearchParams({ returnTo })}`;
+}

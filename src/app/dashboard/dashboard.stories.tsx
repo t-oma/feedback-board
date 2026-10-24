@@ -7,6 +7,7 @@ import {
   expectSkeletonGeometry,
   SkeletonGeometry,
 } from "@/components/skeleton/skeleton.testing";
+import { AccountMenu } from "@/widgets/viewer/ui/account-menu";
 
 import { DashboardHeader } from "./_ui/dashboard-header";
 import {
@@ -27,11 +28,14 @@ const meta = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-// What the layout and the page render for an owner.
+// What the layout and the page render for an owner. `ViewerControl` reads the
+// session, so the story renders the menu it shows.
 const ownerPage = {
   render: () => (
     <>
-      <DashboardHeader />
+      <DashboardHeader
+        viewer={<AccountMenu name="Marta Kowal" email="marta@orbit.dev" />}
+      />
       <PageMain>
         <OwnerOverview {...sampleOwnerBoard} origin={origin} />
       </PageMain>
@@ -41,6 +45,9 @@ const ownerPage = {
     const brand = canvas
       .getByRole("link", { name: "Feedback Board" })
       .getBoundingClientRect();
+    const account = canvas
+      .getByRole("button", { name: "Account" })
+      .getBoundingClientRect();
     const heading = canvas
       .getByRole("heading", { level: 1, name: sampleOwnerBoard.productName })
       .getBoundingClientRect();
@@ -48,6 +55,9 @@ const ownerPage = {
     // The header and the page share the grid, so their edges meet.
     await expect(heading.left).toBe(brand.left);
     await expect(heading.left).toBe(contentEdge());
+    await expect(account.right).toBe(
+      document.documentElement.clientWidth - contentEdge(),
+    );
   },
 } satisfies Story;
 
