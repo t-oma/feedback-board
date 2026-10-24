@@ -1,3 +1,5 @@
+import type { ReactNode } from "react";
+
 import { PageMain } from "@/components/page-main";
 import { Skeleton } from "@/components/skeleton";
 
@@ -9,12 +11,15 @@ type BoardProps = {
   productName: string;
   // Empty when the owner wrote none.
   description: string;
+  // The page passes `ViewerControl`, which reads the session, and a story
+  // passes what it renders.
+  viewer: ReactNode;
 };
 
-export function Board({ productName, description }: BoardProps) {
+export function Board({ productName, description, viewer }: BoardProps) {
   return (
     <>
-      <BoardHeader productName={productName} />
+      <BoardHeader productName={productName} viewer={viewer} />
       <PageMain>
         <BoardIntro description={description} />
         <BoardFeedback productName={productName} />
@@ -29,7 +34,7 @@ export const sampleBoard = {
   productName: "Orbit CLI",
   description:
     "Orbit CLI is a deploy tool for small teams. Tell us what is missing and vote on what matters most.",
-} satisfies BoardProps;
+} satisfies Omit<BoardProps, "viewer">;
 
 export function BoardSkeleton() {
   return (

@@ -1,4 +1,5 @@
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
+import { getRouter } from "@storybook/nextjs-vite/navigation.mock";
 import { expect, mocked, screen, userEvent, waitFor } from "storybook/test";
 
 import { Menu } from "@/components/menu";
@@ -11,9 +12,6 @@ const meta = {
   component: SignOutMenuItem,
   parameters: {
     layout: "centered",
-    nextjs: {
-      navigation: { pathname: "/p/orbit-cli", query: { sort: "top" } },
-    },
   },
   decorators: [
     (Story) => (
@@ -30,19 +28,14 @@ const meta = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-function submittedReturnTo() {
-  const [formData] = mocked(signOutAction).mock.calls[0] ?? [];
-  return formData?.get("returnTo");
-}
-
-export const ReturnsToThisPage: Story = {
+export const RefreshesThisPage: Story = {
   play: async () => {
     await userEvent.click(
       await screen.findByRole("menuitem", { name: "Sign out" }),
     );
 
-    await waitFor(() => expect(signOutAction).toHaveBeenCalledOnce());
-    await expect(submittedReturnTo()).toBe("/p/orbit-cli?sort=top");
+    await waitFor(() => expect(getRouter().refresh).toHaveBeenCalledOnce());
+    await expect(signOutAction).toHaveBeenCalledOnce();
   },
 };
 
@@ -62,7 +55,7 @@ export const SignsOutFromKeyboard: Story = {
 };
 
 // The action never settles here, so the story sees what the visitor sees
-// until the redirect.
+// until the page refreshes, which waits for the session to end.
 export const StaysOpenWhilePending: Story = {
   beforeEach: () => {
     mocked(signOutAction).mockReturnValue(new Promise(() => undefined));
@@ -81,5 +74,6 @@ export const StaysOpenWhilePending: Story = {
     // A closing menu stays in the document while it animates out, so its
     // state is what tells.
     await expect(screen.getByRole("menu")).toHaveAttribute("data-open");
+    await expect(getRouter().refresh).not.toHaveBeenCalled();
   },
 };
