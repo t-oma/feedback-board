@@ -35,3 +35,12 @@ export const DEFAULT_BOARD_VIEW = {
   status: "all",
   sort: "new",
 } as const satisfies BoardView;
+
+// An address spells a status with a hyphen, and the enum with an underscore.
+export const FEEDBACK_STATUS_BY_FILTER = {
+  all: null,
+  open: "open",
+  planned: "planned",
+  "in-progress": "in_progress",
+  completed: "completed",
+} as const satisfies Record<BoardStatusFilter, FeedbackStatus | null>;
