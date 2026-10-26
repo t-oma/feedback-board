@@ -206,13 +206,16 @@ it.
 ### The demo board
 
 `pnpm db:seed --owner-email you@example.com [--replace]` runs
-`tsx --conditions=react-server --env-file=.env scripts/seed-demo-board.ts`.
+`tsx --conditions=react-server --env-file-if-exists=.env scripts/seed-demo-board.ts`.
 `tsx` is a new development dependency: plain Node resolves neither the `@/`
 paths nor, without the `react-server` condition, `server-only`, which throws
 on import. A probe ran the database client this way against the development
 database, and the same probe without the condition failed on `server-only`.
-In production the same script runs once after deployment, against the
-production database's variables.
+In production the same script runs once after deployment, with the
+production database's variables in the shell. Node keeps a variable the
+environment already holds over the file's value, and a missing `.env` is no
+error; a run with the test database's variables exported seeded the test
+database, not the one `.env` names.
 
 `seedDemoBoard({ ownerEmail, slug, replace })` does the work in one
 transaction:
@@ -236,8 +239,10 @@ transaction:
    creates as many voters as the largest count needs, and every item has its
    author's vote, as creating feedback gives it.
 
-The demo's text sits in its own module beside the script, apart from the
-logic.
+`seedDemoBoard` sits in `src/server/db/seed/`, with the demo's text in a
+module of its own beside it, and with its database test, since the `db`
+Vitest project collects `src/**/*.db.test.ts`. `scripts/seed-demo-board.ts`
+only reads the arguments.
 
 ### Departures from the design
 
