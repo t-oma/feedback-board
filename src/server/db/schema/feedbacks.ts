@@ -1,6 +1,7 @@
 import { sql } from "drizzle-orm";
 import {
   check,
+  index,
   pgEnum,
   pgTable,
   text,
@@ -60,5 +61,10 @@ export const feedbacks = pgTable(
       "feedbacks_status_completed_at_check",
       sql`(${table.status} = 'completed') = (${table.completedAt} IS NOT NULL)`,
     ),
+    // The public board's list filters on these, and never shows hidden rows.
+    // The reading feedback design says why it holds no sort columns.
+    index("feedbacks_board_list_idx")
+      .on(table.productId, table.status)
+      .where(sql`${table.hiddenAt} IS NULL`),
   ],
 );

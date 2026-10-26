@@ -62,11 +62,17 @@ error instead of a page that does not exist.
 
 A migration adds two indexes:
 
-- On `feedbacks`, for the public list, a partial index; a query for every
-  status uses its `product_id` prefix:
-  `(product_id, status, created_at DESC, id DESC) WHERE hidden_at IS NULL`.
+- On `feedbacks`, for the public list, a partial index on
+  `(product_id, status) WHERE hidden_at IS NULL`; a query for every status
+  uses its `product_id` prefix.
 - `votes (feedback_id)`. The primary key `(user_id, feedback_id)` begins with
   the user, so it cannot serve a count of one item's votes.
+
+The list's index holds no sort columns. The query groups its rows to count
+votes and sorts the groups, so PostgreSQL sorts after the aggregate whatever
+order the index keeps. Its plan, with sequential scans turned off, showed a
+`Sort` above the `HashAggregate` with `created_at DESC, id DESC` in the
+index as well as without them; the index served only the filter.
 
 The changelog's index on completion time arrives with the changelog, its
 only reader.

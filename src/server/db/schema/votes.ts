@@ -1,4 +1,4 @@
-import { pgTable, primaryKey, text, uuid } from "drizzle-orm/pg-core";
+import { index, pgTable, primaryKey, text, uuid } from "drizzle-orm/pg-core";
 
 import { users } from "./auth";
 import { timestamptz } from "./columns";
@@ -19,5 +19,10 @@ export const votes = pgTable(
       }),
     createdAt: timestamptz("created_at").defaultNow().notNull(),
   },
-  (table) => [primaryKey({ columns: [table.userId, table.feedbackId] })],
+  (table) => [
+    primaryKey({ columns: [table.userId, table.feedbackId] }),
+    // The primary key begins with the user, so counting one item's votes
+    // needs an index that begins with the item.
+    index("votes_feedback_id_idx").on(table.feedbackId),
+  ],
 );

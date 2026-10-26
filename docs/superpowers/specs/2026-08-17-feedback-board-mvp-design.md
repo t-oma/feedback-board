@@ -175,7 +175,7 @@ The unique constraint on `ownerId` enforces one product per owner. The unique co
 - `hiddenAt`: nullable timestamp with timezone.
 - `createdAt`, `updatedAt`: timestamps with timezone.
 
-Indexes support public listing by product, visibility, status, and creation time, plus changelog listing by product and completion time.
+Indexes support public listing by product, visibility, and status, plus changelog listing by product and completion time. Creation time is left out of the listing index: the list sorts after counting votes, so an order kept by the index would not spare the sort, as the [reading feedback design](2026-10-26-reading-feedback-design.md) measured.
 
 A database check constraint enforces that `completedAt` is non-null exactly when status is `completed`.
 
