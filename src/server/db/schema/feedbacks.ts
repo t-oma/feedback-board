@@ -8,19 +8,17 @@ import {
   varchar,
 } from "drizzle-orm/pg-core";
 
+import {
+  FEEDBACK_STATUSES,
+  MAX_FEEDBACK_BODY_LENGTH,
+  MAX_FEEDBACK_TITLE_LENGTH,
+} from "@/entities/feedback/contracts";
+
 import { users } from "./auth";
 import { timestamptz, uuidv7 } from "./columns";
 import { products } from "./products";
 
-export const MAX_FEEDBACK_TITLE_LENGTH = 120;
-export const MAX_FEEDBACK_BODY_LENGTH = 2000;
-
-export const feedbackStatus = pgEnum("feedback_status", [
-  "open",
-  "planned",
-  "in_progress",
-  "completed",
-]);
+export const feedbackStatus = pgEnum("feedback_status", FEEDBACK_STATUSES);
 
 export const feedbacks = pgTable(
   "feedbacks",
