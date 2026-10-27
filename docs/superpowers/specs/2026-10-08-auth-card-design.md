@@ -22,8 +22,9 @@ From `sm` (640px) up, `main` itself is the card:
   `shadow-xs`. The design's shadow is `0 1px 3px rgba(26,25,23,.06)`; the tab
   indicator also takes its shadow from the Tailwind scale rather than the
   design's exact value.
-- Padding of 38px at the top, 36px at the sides and 34px at the bottom. The gap
-  between the intro and the tabs stays 20px, as on mobile.
+- Padding of 36px on every side, Tailwind's `p-9`. The design draws 38px at the
+  top and 34px at the bottom, a difference too small to read as anything but
+  drift. The gap between the intro and the tabs stays 20px, as on mobile.
 - 76px below the header and 104px above the page end. The card is as tall as
   its content and is not centred vertically. A centred card would move the tab
   strip by about 46px on every mode switch, because create-account is taller by
