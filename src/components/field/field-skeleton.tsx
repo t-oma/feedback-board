@@ -59,7 +59,7 @@ function FieldControlSkeleton({
   // a single space, since an input never wraps.
   return (
     <div className="flex flex-col rounded-lg border border-transparent bg-surface-muted">
-      <p className="invisible px-3 pt-2 font-mono text-xs/[1.4]">
+      <p className="invisible px-3 pt-2 font-mono text-xs/snug">
         {control.prefix}
       </p>
       <p

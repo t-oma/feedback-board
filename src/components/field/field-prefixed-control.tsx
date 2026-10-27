@@ -26,7 +26,7 @@ export function FieldPrefixedControl({
 }: FieldPrefixedControlProps) {
   return (
     <div className="flex flex-col rounded-lg border border-border bg-surface transition-colors has-[input:focus-visible]:border-accent has-[input:focus-visible]:ring-3 has-[input:focus-visible]:ring-accent/20 has-[input:read-only]:bg-surface-muted has-[input:read-only:not(:focus-visible)]:border-border-subtle has-[input[data-invalid]]:border-danger has-[input[data-invalid]]:bg-danger-surface">
-      <Field.Description className="px-3 pt-2 font-mono text-xs/[1.4] text-foreground-subtle">
+      <Field.Description className="px-3 pt-2 font-mono text-xs/snug text-foreground-subtle">
         {prefix}
       </Field.Description>
       <Field.Control
