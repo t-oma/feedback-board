@@ -64,7 +64,7 @@ function FieldControlSkeleton({
       </p>
       <p
         data-skeleton-control
-        className="invisible px-3 pt-0.5 pb-2.5 font-mono text-base font-medium md:text-sm"
+        className="invisible px-3 pt-0.5 pb-2 font-mono text-base font-medium md:text-sm"
       >
         &nbsp;
       </p>
