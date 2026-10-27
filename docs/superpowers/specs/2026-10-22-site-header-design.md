@@ -255,9 +255,10 @@ The MVP specification's user interface layer records these:
   Settings.
 - Menu items that depend on whether the visitor owns a board.
 - The landing page's header.
-- The board header in the board's layout, which comes with the second route
-  under the board.
-- The phone label "← Orbit CLI" for the feedback detail page.
+- The board header in the board's layout. The feedback page renders its own
+  header with a way back, as the
+  [reading feedback design](2026-10-26-reading-feedback-design.md) decided; a
+  layout fits the changelog, which shares the board's bar, intro, and tabs.
 
 ## Checking
 
