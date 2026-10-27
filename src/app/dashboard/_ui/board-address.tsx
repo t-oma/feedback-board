@@ -1,10 +1,9 @@
 import { ArrowUpRightIcon } from "lucide-react";
 import type { ReactNode } from "react";
 
+import { CopyLinkButton } from "@/components/copy-link-button";
 import { Link } from "@/components/link";
 import { SkeletonText } from "@/components/skeleton";
-
-import { CopyLinkButton } from "./copy-link-button";
 
 type BoardAddressProps = {
   productSlug: string;
