@@ -16,7 +16,7 @@ type FormPanelProps = {
 // edge instead of widening the page.
 export function FormPanel({ children }: FormPanelProps) {
   return (
-    <div className="layout-subgrid content-start gap-y-5 overflow-x-clip bg-surface py-6 sm:col-content sm:mt-19 sm:mb-26 sm:box-content sm:flex sm:w-110 sm:flex-col sm:self-start sm:justify-self-center sm:rounded-[10px] sm:border sm:border-border-subtle sm:px-9 sm:pt-9.5 sm:pb-8.5 sm:shadow-xs">
+    <div className="layout-subgrid content-start gap-y-5 overflow-x-clip bg-surface py-6 sm:col-content sm:mt-19 sm:mb-26 sm:box-content sm:flex sm:w-110 sm:flex-col sm:self-start sm:justify-self-center sm:rounded-[10px] sm:border sm:border-border-subtle sm:p-9 sm:shadow-xs">
       {children}
     </div>
   );

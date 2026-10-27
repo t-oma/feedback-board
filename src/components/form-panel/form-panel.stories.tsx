@@ -89,12 +89,17 @@ export const AtSmallestCardWidth: Story = {
   play: async ({ canvas }) => {
     const page = document.documentElement.clientWidth;
     const { panel, heading, paragraph } = boxes(canvas);
+    const panelElement = canvas.getByRole("heading").parentElement;
+    if (panelElement === null) throw new Error("The heading has no panel.");
+    const { paddingBottom, borderBottomWidth } = getComputedStyle(panelElement);
 
     await expect(page).toBe(640);
     await expect(heading.width).toBe(440);
     // The card ends with its content, its bottom padding and border below,
     // rather than reaching down the page.
-    await expect(panel.bottom - paragraph.bottom).toBe(35);
+    await expect(panel.bottom - paragraph.bottom).toBe(
+      parseFloat(paddingBottom) + parseFloat(borderBottomWidth),
+    );
     await expect(panel.left + panel.width / 2).toBe(page / 2);
     await expect(panel.left).toBeGreaterThan(0);
     await expect(panel.right).toBeLessThan(page);
