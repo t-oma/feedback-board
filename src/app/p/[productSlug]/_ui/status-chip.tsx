@@ -45,3 +45,12 @@ export function StatusChip({ status }: StatusChipProps) {
     </span>
   );
 }
+
+export function StatusChipSkeleton({ status }: StatusChipProps) {
+  return (
+    <span className="inline-flex shrink-0 items-center gap-x-1.5 rounded-md border border-transparent bg-surface-muted px-2.5 py-1 font-mono text-xs/snug font-semibold tracking-widest text-transparent uppercase select-none">
+      <span className="size-2.5 shrink-0" />
+      {feedbackStatusLabels[status]}
+    </span>
+  );
+}

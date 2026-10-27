@@ -45,6 +45,8 @@ function selectFeedback(where: SQL | undefined) {
     .groupBy(feedbacks.id, users.id);
 }
 
+export type PublicFeedback = Awaited<ReturnType<typeof selectFeedback>>[number];
+
 export async function getBoardStatusCounts(
   productId: string,
 ): Promise<Record<BoardStatusFilter, number>> {
