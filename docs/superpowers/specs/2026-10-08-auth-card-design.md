@@ -18,8 +18,9 @@ From `sm` (640px) up, `main` itself is the card:
   it. The design file sets no `box-sizing`, so it renders with the browser's
   `content-box`: its fields are 440px wide and the card, with padding and
   border, is 514px. No side gutter is needed: at 640px each side keeps 63px.
-- `surface` fill, a 1px `border-subtle` border, a 10px radius and Tailwind's
-  `shadow-xs`. The design's shadow is `0 1px 3px rgba(26,25,23,.06)`; the tab
+- `surface` fill, a 1px `border-subtle` border, an 8px radius (`rounded-lg`,
+  as the dashboard's address card has, where the design draws 10px) and
+  Tailwind's `shadow-xs`. The design's shadow is `0 1px 3px rgba(26,25,23,.06)`; the tab
   indicator also takes its shadow from the Tailwind scale rather than the
   design's exact value.
 - Padding of 36px on every side, Tailwind's `p-9`. The design draws 38px at the
