@@ -76,7 +76,7 @@ src/
 ├── app/
 │   ├── dashboard/
 │   │   ├── _ui/                 dashboard-header, owner-overview, owner-heading,
-│   │   │                        copy-link-button, and their stories
+│   │   │                        board-address, and their stories
 │   │   └── layout.tsx, loading.tsx, page.tsx
 │   └── sign-in/
 │       ├── _ui/                 auth-back-target, auth-header, auth-intro,
@@ -94,6 +94,7 @@ src/
 │   ├── sign-in/                 actions.ts, schemas.ts, ui/sign-in-form.tsx
 │   └── sign-out/                actions.ts, ui/sign-out-menu-item.tsx
 └── entities/
+    ├── feedback/                contracts.ts, queries.server.ts, schemas.ts
     ├── product/                 contracts.ts, errors.ts, queries.server.ts,
     │                            schemas.ts
     └── user/                    contracts.ts, errors.ts, navigation.ts,

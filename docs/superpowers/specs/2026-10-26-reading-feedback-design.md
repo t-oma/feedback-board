@@ -201,7 +201,9 @@ text until voting, the title as the `h1`, the status chip, above the title on
 a phone, "Marta K. · 14 August 2026", and the body with the line breaks its
 author typed. A "Copy link" button follows the body. `CopyLinkButton` moves
 from the dashboard's `_ui/` to `src/components`, now that a second route uses
-it.
+it. The mobile design draws the count only in the vote button pinned to the
+bottom of the screen, so until voting a phone shows it at the end of the line
+under the title: "Marta K. · 14 Aug 2026 · 128 votes".
 
 ### The demo board
 
@@ -259,6 +261,8 @@ The MVP specification's user interface layer records these:
 - The way back leads to the board's bare address, where the mobile design
   returns with "its filter and sort intact"; the browser's Back button keeps
   them.
+- Until voting, a phone shows an item's vote count in the line under its
+  title, where the mobile design puts it in the vote button.
 
 ### Updates to other specifications
 
@@ -307,11 +311,12 @@ Each pull request below updates what it changes:
 
 ## Delivery
 
-Three pull requests:
+Three pull requests, the feedback page before the board's list, so that every
+row links to a page that exists:
 
 1. Data: the entity's contracts, schemas, and queries with their database
    tests, the index migration, and the seed with `tsx` and its test.
-2. The board: the region with its error boundary, the filters, the rows, the
-   states, the skeleton, and the board's end-to-end tests.
-3. The feedback page: the page and its skeleton, the way back, `CopyLinkButton`
+2. The feedback page: the page and its skeleton, the way back, `CopyLinkButton`
    in `src/components`, and its end-to-end tests.
+3. The board: the region with its error boundary, the filters, the rows, the
+   states, the skeleton, and the board's end-to-end tests.
