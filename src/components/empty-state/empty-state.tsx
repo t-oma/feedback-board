@@ -21,7 +21,7 @@ export function EmptyState({
   return (
     <div className="flex flex-col items-center gap-2.5 text-center">
       {eyebrow !== undefined && (
-        <p className="font-mono text-xs font-medium tracking-[0.14em] text-foreground-subtle">
+        <p className="font-mono text-xs font-medium tracking-widest text-foreground-subtle">
           {eyebrow}
         </p>
       )}
