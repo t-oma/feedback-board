@@ -31,7 +31,7 @@ export function FieldPrefixedControl({
       </Field.Description>
       <Field.Control
         {...props}
-        className="min-w-0 bg-transparent px-3 pt-0.5 pb-2.5 font-mono text-base font-medium read-only:text-foreground-subtle focus-visible:outline-hidden md:text-sm"
+        className="min-w-0 bg-transparent px-3 pt-0.5 pb-2 font-mono text-base font-medium read-only:text-foreground-subtle focus-visible:outline-hidden md:text-sm"
       />
     </div>
   );
