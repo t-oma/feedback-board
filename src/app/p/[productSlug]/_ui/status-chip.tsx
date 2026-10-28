@@ -29,7 +29,10 @@ export function StatusDot({ status }: StatusChipProps) {
   return (
     <span
       aria-hidden="true"
-      className={clsx("size-2.5 shrink-0 rounded-full", dotClassNames[status])}
+      className={clsx(
+        "inline-block size-2.5 shrink-0 rounded-full",
+        dotClassNames[status],
+      )}
     />
   );
 }
