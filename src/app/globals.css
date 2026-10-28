@@ -107,6 +107,19 @@
     color: var(--color-foreground-subtle);
   }
 
+  /* A paragraph or a heading does not end on one short word alone, as the
+     design sets its prose and headings with `text-wrap: pretty`. A browser
+     that does not know the value wraps as it did before. */
+  p,
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    text-wrap: pretty;
+  }
+
   /* Tailwind 4 leaves buttons on the browser's default arrow, while a link
      gets a pointer from the browser. A button and a link that look the same
      would otherwise disagree. */
