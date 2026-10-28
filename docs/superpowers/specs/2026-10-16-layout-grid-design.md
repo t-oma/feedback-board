@@ -59,7 +59,7 @@ child would grow instead, so the other pages keep the rows at the top.
 `PageMain align="stretch"`. Below `sm` it is a `layout-subgrid` band of the
 surface from edge to edge and down to the bottom of the screen, with its rows
 packed at the top and 20 pixels apart; its content keeps the grid's margin.
-From `sm` up it is the card that `NarrowMain` used to be, 440 pixels of
+From `sm` up it is the card that `NarrowMain` used to be, 448 pixels of
 content, centred in the content area, as tall as what it holds. It keeps
 `overflow-x-clip` for the tab panels' sideways slide. `main` is now a page's
 frame alone, and the card a part inside it.
@@ -101,7 +101,7 @@ frame alone, and the card a part inside it.
   of the forms in `FormPanel` inside it.
 - `FormPanel`'s stories check the band on a phone, across the screen and down
   to its bottom with the heading one line tall, and the card at 640 and 1920
-  pixels, 440 pixels of content in the middle and ending with its content.
+  pixels, 448 pixels of content in the middle and ending with its content.
   Without the rows packed at the top, or with the card stretched, they fail.
 - Each of these fails when broken on purpose: a 36-pixel margin from `sm`, the
   intro band without `layout-subgrid`, and either header back on fixed padding.
