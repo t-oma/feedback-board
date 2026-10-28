@@ -52,7 +52,10 @@ In `src/components/skeleton`:
 - `Skeleton` takes a `label` and renders the shell every loading state repeats:
   `role="status"`, `aria-busy`, the label for screen readers, and an
   `aria-hidden` body. The body stacks its children with the gap `FormPanel`
-  puts between the content it stands in for.
+  puts between the content it stands in for. With `band`, the shell and the
+  body are `layout-subgrid` bands instead, so a loading state that stands in
+  for bands of the page, such as the board's filters and list on a phone, runs
+  to the edges of the screen as they do.
 - `SkeletonText`, as above.
 
 Each shared part that appears in a loading state gets a skeleton beside it,
