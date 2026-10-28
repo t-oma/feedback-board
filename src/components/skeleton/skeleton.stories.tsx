@@ -1,6 +1,7 @@
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 import { expect } from "storybook/test";
 
+import { PageMain } from "@/components/page-main";
 import { Skeleton, SkeletonText } from "@/components/skeleton";
 
 const meta = {
@@ -41,6 +42,40 @@ export const AnnouncedAsBusy: Story = {
     await expect(
       canvas.getByText(intro).closest("[aria-hidden]"),
     ).toHaveAttribute("aria-hidden", "true");
+  },
+};
+
+// As a band of the layout grid, a band it holds runs across the grid and the
+// rest keeps to the content area, as the page's own parts do.
+export const AsBand: Story = {
+  args: {
+    label: "Loading",
+    band: true,
+    children: (
+      <>
+        <div data-testid="band" className="layout-subgrid bg-surface-muted">
+          <p className="text-sm">{intro}</p>
+        </div>
+        <p data-testid="content" className="text-sm">
+          {intro}
+        </p>
+      </>
+    ),
+  },
+  render: (args) => (
+    <PageMain>
+      <Skeleton {...args} />
+    </PageMain>
+  ),
+  play: async ({ canvas }) => {
+    const main = canvas.getByRole("main").getBoundingClientRect();
+    const band = canvas.getByTestId("band").getBoundingClientRect();
+    const content = canvas.getByTestId("content").getBoundingClientRect();
+
+    await expect(band.left).toBe(main.left);
+    await expect(band.width).toBe(main.width);
+    await expect(content.left).toBeGreaterThan(main.left);
+    await expect(content.width).toBeLessThan(main.width);
   },
 };
 
