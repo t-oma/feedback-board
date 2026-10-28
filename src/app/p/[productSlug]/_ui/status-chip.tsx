@@ -10,19 +10,29 @@ export const feedbackStatusLabels = {
 } satisfies Record<FeedbackStatus, string>;
 
 // The dot's shape tells the statuses apart, not a colour, as in the design: a
-// ring, half filled, hatched, and full.
+// ring, half filled, hatched, and full. It is drawn in the text's colour, so
+// it stays visible on whatever holds it, a dark filter included.
 const dotClassNames = {
-  open: "border-[1.5px] border-foreground-muted",
+  open: "border-[1.5px] border-current",
   planned:
-    "border-[1.5px] border-foreground-muted bg-[linear-gradient(90deg,var(--color-foreground-muted)_50%,transparent_50%)]",
+    "border-[1.5px] border-current bg-[linear-gradient(90deg,currentColor_50%,transparent_50%)]",
   in_progress:
-    "border-[1.5px] border-foreground-muted bg-[repeating-linear-gradient(45deg,var(--color-foreground-muted)_0_1.5px,transparent_1.5px_3px)]",
-  completed: "bg-foreground-muted",
+    "border-[1.5px] border-current bg-[repeating-linear-gradient(45deg,currentColor_0_1.5px,transparent_1.5px_3px)]",
+  completed: "bg-current",
 } satisfies Record<FeedbackStatus, string>;
 
 type StatusChipProps = {
   status: FeedbackStatus;
 };
+
+export function StatusDot({ status }: StatusChipProps) {
+  return (
+    <span
+      aria-hidden="true"
+      className={clsx("size-2.5 shrink-0 rounded-full", dotClassNames[status])}
+    />
+  );
+}
 
 export function StatusChip({ status }: StatusChipProps) {
   return (
@@ -34,13 +44,7 @@ export function StatusChip({ status }: StatusChipProps) {
           : "border-border bg-background text-foreground-secondary",
       )}
     >
-      <span
-        aria-hidden="true"
-        className={clsx(
-          "size-2.5 shrink-0 rounded-full",
-          dotClassNames[status],
-        )}
-      />
+      <StatusDot status={status} />
       {feedbackStatusLabels[status]}
     </span>
   );
