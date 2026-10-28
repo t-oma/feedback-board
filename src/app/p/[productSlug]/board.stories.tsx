@@ -9,9 +9,36 @@ import {
 import { SignInLink } from "@/widgets/viewer/ui/sign-in-link";
 
 import { Board, BoardSkeleton, sampleBoard } from "./_ui/board";
+import { BoardEmpty, BoardNoMatches } from "./_ui/board-empty";
+import { BoardFeedbackBoundary } from "./_ui/board-feedback-boundary";
+import { BoardFilters, sampleCounts } from "./_ui/board-filters";
+import { FeedbackList, sampleFeedbackList } from "./_ui/feedback-list";
 
 // What `ViewerControl` renders for a guest, most of a board's visitors.
 const guest = <SignInLink />;
+
+// What the page's feedback region renders for a board with feedback, in the
+// default view: the filters and the list.
+const withFeedback = (
+  <>
+    <BoardFilters
+      productSlug="orbit-cli"
+      view={{ status: "all", sort: "new" }}
+      counts={sampleCounts}
+    />
+    <FeedbackList
+      productSlug="orbit-cli"
+      feedback={sampleFeedbackList.map((item, index) => ({
+        ...item,
+        id: `019a1b2c-3d4e-7f80-9a1b-2c3d4e5f6a7${String(index)}`,
+      }))}
+    />
+  </>
+);
+
+function FailingRead(): never {
+  throw new Error("The feedback could not be read.");
+}
 
 const meta = {
   title: "Board/Page",
@@ -24,6 +51,7 @@ const meta = {
     description:
       "Orbit CLI is a deploy tool for small teams.\n\nTell us what is missing.",
     viewer: guest,
+    feedback: <BoardEmpty productName="Orbit CLI" />,
   },
 } satisfies Meta<typeof Board>;
 
@@ -124,6 +152,80 @@ export const LongWordsOnPhone: Story = {
   },
 };
 
+// The filters and the rows follow the intro, and the empty state is gone.
+export const WithFeedback: Story = {
+  args: { feedback: withFeedback },
+  play: async ({ canvas }) => {
+    await expect(canvas.getByRole("list", { name: "Status" })).toBeVisible();
+    await expect(
+      canvas.getByRole("link", {
+        name: "Watch mode that survives a failed build",
+      }),
+    ).toBeVisible();
+    await expect(
+      canvas.queryByRole("heading", { name: "No feedback yet" }),
+    ).toBeNull();
+  },
+};
+
+// A status without items keeps the filters, says how many items the board
+// holds, and leads back to the bare address.
+export const NoMatches: Story = {
+  args: {
+    feedback: (
+      <>
+        <BoardFilters
+          productSlug="orbit-cli"
+          view={{ status: "in-progress", sort: "new" }}
+          counts={{ ...sampleCounts, "in-progress": 0 }}
+        />
+        <BoardNoMatches productSlug="orbit-cli" total={24} />
+      </>
+    ),
+  },
+  play: async ({ canvas }) => {
+    await expect(
+      canvas.getByRole("heading", {
+        level: 2,
+        name: "Nothing matches this filter",
+      }),
+    ).toBeVisible();
+    await expect(
+      canvas.getByText("There are 24 items on the board under other statuses."),
+    ).toBeVisible();
+    await expect(
+      canvas.getByRole("link", { name: "Reset filters" }),
+    ).toHaveAttribute("href", "/p/orbit-cli");
+  },
+};
+
+// A failed read replaces the feedback alone, under the board's intro.
+export const FeedbackFailed: Story = {
+  args: {
+    feedback: (
+      <BoardFeedbackBoundary>
+        <FailingRead />
+      </BoardFeedbackBoundary>
+    ),
+  },
+  play: async ({ canvas }) => {
+    const alert = await canvas.findByRole("alert");
+
+    await expect(alert).toHaveTextContent(
+      "We couldn’t load the feedback. Please try again.",
+    );
+    await expect(
+      within(alert).getByRole("button", { name: "Retry" }),
+    ).toBeVisible();
+    await expect(
+      canvas.getByRole("heading", {
+        level: 1,
+        name: "What should we build next?",
+      }),
+    ).toBeVisible();
+  },
+};
+
 export const Loading: Story = {
   render: () => <BoardSkeleton />,
   play: async ({ canvas }) => {
@@ -138,7 +240,7 @@ export const Loading: Story = {
 // landmarks on one page fail axe, so the a11y test is off here; `Loading`
 // checks the loading state on its own.
 const loadingLinesUp = {
-  args: { ...sampleBoard, viewer: guest },
+  args: { ...sampleBoard, viewer: guest, feedback: withFeedback },
   parameters: {
     a11y: { test: "off" },
   },

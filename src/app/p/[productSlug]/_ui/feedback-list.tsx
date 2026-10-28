@@ -6,7 +6,7 @@ import { FeedbackRow, FeedbackRowSkeleton } from "./feedback-row";
 // between its rows across the screen, as the mobile design draws it; from
 // `sm` up it is a card in the content area.
 const listClassName =
-  "layout-subgrid divide-y divide-border-subtle border-y border-border-subtle bg-surface sm:col-content sm:flex sm:flex-col sm:overflow-hidden sm:rounded-lg sm:border";
+  "layout-subgrid divide-y divide-border-subtle border-y border-border-subtle bg-surface sm:col-content sm:mb-12 sm:flex sm:flex-col sm:overflow-hidden sm:rounded-lg sm:border";
 
 type FeedbackListProps = {
   productSlug: string;
