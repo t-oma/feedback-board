@@ -6,6 +6,7 @@ import { Pool } from "pg";
 import { users } from "@/server/db/schema/auth";
 import { feedbacks } from "@/server/db/schema/feedbacks";
 import { products } from "@/server/db/schema/products";
+import { votes } from "@/server/db/schema/votes";
 
 import { testEnvironment } from "../test/load-environment";
 
@@ -69,5 +70,15 @@ export function insertFeedback(productId: string, values: FeedbackValues) {
       throw new Error("The feedback was not inserted");
     }
     return { ...feedback, authorName: author.name };
+  });
+}
+
+// Each vote needs a voter of its own, since a user votes once per item.
+export function insertVotes(feedbackId: string, count: number) {
+  return withDatabase(async (database) => {
+    for (let voter = 0; voter < count; voter += 1) {
+      const user = await insertUser(database);
+      await database.insert(votes).values({ userId: user.id, feedbackId });
+    }
   });
 }
