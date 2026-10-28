@@ -25,8 +25,11 @@ skeleton line up.
 `SkeletonText` renders the real string, transparent, inside an element with the
 real typography. The browser lays it out like the text it stands for, with the
 same line breaks at every width. The span's background paints each line
-separately, and `box-decoration-clone` gives every line its own rounded bar, as
-wide as the words on it. A bar is as tall as the font's content area, 16px for
+separately, as wide as the words on it, rounded where the string starts and
+ends. `box-decoration-clone` would round every line's bar, but Chromium does not
+wrap a paragraph `pretty` around a cloned inline box, and paragraphs wrap
+`pretty`, so the bars would break their lines where the text does not. A bar is
+as tall as the font's content area, 16px for
 14px text on a 20px line, so lines keep a small gap between them.
 
 This covers the static copy of both loading states: headings, intros, labels,
