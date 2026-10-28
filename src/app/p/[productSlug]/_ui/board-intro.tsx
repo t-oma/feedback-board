@@ -16,7 +16,7 @@ type BoardIntroProps = {
 export function BoardIntro({ description }: BoardIntroProps) {
   return (
     <div className="layout-subgrid border-b border-border-subtle bg-surface py-6 sm:border-b-0 sm:bg-transparent sm:pt-11 sm:pb-0">
-      <div className="flex max-w-140 flex-col gap-y-2.5">
+      <div className="flex max-w-xl flex-col gap-y-2.5">
         <h1 className="font-serif text-2xl font-semibold sm:text-3xl">
           {heading}
         </h1>
@@ -38,7 +38,7 @@ export function BoardIntroSkeleton({ description }: BoardIntroProps) {
       aria-hidden="true"
       className="layout-subgrid border-b border-border-subtle bg-surface py-6 sm:border-b-0 sm:bg-transparent sm:pt-11 sm:pb-0"
     >
-      <div className="flex max-w-140 flex-col gap-y-2.5">
+      <div className="flex max-w-xl flex-col gap-y-2.5">
         <p className="font-serif text-2xl font-semibold sm:text-3xl">
           <SkeletonText>{heading}</SkeletonText>
         </p>
