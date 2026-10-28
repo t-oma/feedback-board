@@ -263,6 +263,10 @@ The MVP specification's user interface layer records these:
   them.
 - Until voting, a phone shows an item's vote count in the line under its
   title, where the mobile design puts it in the vote button.
+- A row leaves out the grey circle the design draws before the author's name,
+  which stands for a picture the app does not have.
+- A status dot is drawn in its text's colour, on a chip and on a filter, so
+  it shows on the dark current filter too.
 
 ### Updates to other specifications
 
