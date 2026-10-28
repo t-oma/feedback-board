@@ -1,7 +1,7 @@
 import { SkeletonText } from "@/components/skeleton";
 import { formatLongDate, formatShortDate } from "@/shared/format-date";
 
-import { votesLabel } from "./feedback-votes";
+import { votesLabel } from "../../../_ui/votes-label";
 
 type FeedbackBylineProps = {
   authorName: string;
