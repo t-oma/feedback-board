@@ -24,7 +24,7 @@ export function OwnerOverview({
 }: OwnerOverviewProps) {
   return (
     <div className="flex flex-col gap-y-5 py-6 sm:py-9">
-      <div className="flex max-w-140 flex-col gap-y-5">
+      <div className="flex max-w-xl flex-col gap-y-5">
         <OwnerHeading productName={productName} />
         <BoardAddress productSlug={productSlug} origin={origin} />
       </div>
@@ -53,7 +53,7 @@ export function OwnerOverviewSkeleton({
   return (
     <div className="py-6 sm:py-9">
       <Skeleton label="Loading your dashboard">
-        <div className="flex max-w-140 flex-col gap-y-5">
+        <div className="flex max-w-xl flex-col gap-y-5">
           <p className="font-serif text-2xl font-semibold wrap-anywhere">
             <SkeletonText>{sampleOwnerBoard.productName}</SkeletonText>
           </p>

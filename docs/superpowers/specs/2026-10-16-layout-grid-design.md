@@ -68,7 +68,7 @@ frame alone, and the card a part inside it.
 
 - The owner dashboard: `/dashboard` and its loading state render `PageMain`,
   and `OwnerOverview` and its skeleton are only the content. The heading, the
-  notice, and the address keep a 560-pixel measure inside the content area,
+  notice, and the address keep a 576-pixel measure (`max-w-xl`) inside the content area,
   and the empty state centres in it.
 - The public board: `Board` renders its header and `PageMain`. The intro is a
   `layout-subgrid` band, white below `sm`. In the loading state the band stands
