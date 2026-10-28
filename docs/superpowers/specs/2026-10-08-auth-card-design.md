@@ -14,10 +14,12 @@ the viewport under the header.
 
 From `sm` (640px) up, `main` itself is the card:
 
-- 440px of content, centred horizontally, with the page `background` around
-  it. The design file sets no `box-sizing`, so it renders with the browser's
-  `content-box`: its fields are 440px wide and the card, with padding and
-  border, is 514px. No side gutter is needed: at 640px each side keeps 63px.
+- 448px of content (`w-md` from Tailwind's container scale, where the design
+  draws 440px), centred horizontally, with the page `background` around it.
+  The design file sets no `box-sizing`, so it renders with the browser's
+  `content-box` and measures the card by its fields; the card keeps
+  `content-box`, so with padding and border it is 522px. No side gutter is
+  needed: at 640px each side keeps 59px.
 - `surface` fill, a 1px `border-subtle` border, an 8px radius (`rounded-lg`,
   as the dashboard's address card has, where the design draws 10px) and
   Tailwind's `shadow-xs`. The design's shadow is `0 1px 3px rgba(26,25,23,.06)`; the tab
@@ -82,7 +84,7 @@ and no variable.
 ## Verification
 
 - A `Features/Auth/SignIn` story at an iPad mini viewport (744px, between `sm`
-  and `md`) checks that the tab strip, which spans the card's content, is 440px
+  and `md`) checks that the tab strip, which spans the card's content, is 448px
   wide, that `main` is centred and that the header shows the brand link. A
   story at `mobile1` (320px) checks that `main` spans the viewport and that the
   brand link is absent. axe runs on both.

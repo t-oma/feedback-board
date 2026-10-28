@@ -92,7 +92,7 @@ Hidden controls, such as the inactive tab panel's, are skipped.
 
 Each feature skeleton has stories that render the content and the skeleton one
 under the other, each in its own `FormPanel` inside `PageMain`, at 320px and at the tablet
-viewport, where the content sits in the 440px card. Two `main` landmarks on one
+viewport, where the content sits in the 448px card. Two `main` landmarks on one
 page fail axe, so these stories turn the a11y test off; the skeleton's own
 accessibility is checked by the stories that render it on its own. Shared parts
 with a skeleton check it the same way in their own stories.

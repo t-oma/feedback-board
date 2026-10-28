@@ -94,7 +94,7 @@ export const AtSmallestCardWidth: Story = {
     const { paddingBottom, borderBottomWidth } = getComputedStyle(panelElement);
 
     await expect(page).toBe(640);
-    await expect(heading.width).toBe(440);
+    await expect(heading.width).toBe(448);
     // The card ends with its content, its bottom padding and border below,
     // rather than reaching down the page.
     await expect(panel.bottom - paragraph.bottom).toBe(
@@ -106,7 +106,7 @@ export const AtSmallestCardWidth: Story = {
   },
 };
 
-// The card stays 440 pixels of content in the middle of a wide screen.
+// The card stays 448 pixels of content in the middle of a wide screen.
 export const OnWideScreen: Story = {
   globals: {
     viewport: { value: "wide" },
@@ -115,7 +115,7 @@ export const OnWideScreen: Story = {
     const page = document.documentElement.clientWidth;
     const { panel, heading } = boxes(canvas);
 
-    await expect(heading.width).toBe(440);
+    await expect(heading.width).toBe(448);
     await expect(panel.left + panel.width / 2).toBe(page / 2);
   },
 };

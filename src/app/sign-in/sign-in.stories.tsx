@@ -78,7 +78,7 @@ export const OnTablet: Story = {
   play: async ({ canvas }) => {
     const tabStrip = canvas.getByRole("tablist").getBoundingClientRect();
 
-    await expect(tabStrip.width).toBe(440);
+    await expect(tabStrip.width).toBe(448);
     await expect(tabStrip.left + tabStrip.width / 2).toBe(
       document.documentElement.clientWidth / 2,
     );
