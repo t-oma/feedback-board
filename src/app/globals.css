@@ -92,6 +92,20 @@
   }
 }
 
+/* For a link stretched over the box around it with `after:absolute
+   after:inset-0`: the ring goes around that box, inside its edge, where the
+   boxes beside it cannot cover it. */
+@utility focus-ring-stretched {
+  &:focus-visible {
+    outline: none;
+  }
+
+  &:focus-visible::after {
+    outline: 2px solid var(--color-accent);
+    outline-offset: -2px;
+  }
+}
+
 @layer base {
   :root {
     color-scheme: light;
