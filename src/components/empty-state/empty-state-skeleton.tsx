@@ -16,7 +16,7 @@ export function EmptyStateSkeleton({
       <p className="font-serif text-lg font-semibold">
         <SkeletonText>{title}</SkeletonText>
       </p>
-      <p className="max-w-72 text-sm wrap-anywhere">
+      <p className="max-w-2xs text-sm wrap-anywhere">
         <SkeletonText>{description}</SkeletonText>
       </p>
     </div>

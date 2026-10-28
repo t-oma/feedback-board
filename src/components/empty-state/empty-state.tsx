@@ -26,7 +26,7 @@ export function EmptyState({
         </p>
       )}
       <Heading className="font-serif text-lg font-semibold">{title}</Heading>
-      <p className="max-w-72 text-sm wrap-anywhere text-foreground-muted">
+      <p className="max-w-2xs text-sm wrap-anywhere text-foreground-muted">
         {description}
       </p>
       {children !== undefined && (

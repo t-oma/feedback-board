@@ -62,7 +62,7 @@ Props: `eyebrow` (optional, such as `"404"`), `title`, `description`, `headingLe
 - Everything is centred.
 - The eyebrow uses the mono font with wide letter spacing in `text-foreground-subtle`. The design colours it `#8c877c`, the `foreground-faint` token, but axe measures that at 3.28:1 on `background` for 12 px text, below the 4.5:1 AA minimum.
 - The title is `font-serif text-lg font-semibold`. The design uses 19 px on mobile and 17 px on desktop, and 18 px sits between them.
-- The description is `text-sm text-foreground-muted`, limited to `max-w-72`.
+- The description is `text-sm text-foreground-muted`, limited to `max-w-2xs` (288px).
 - Actions stack and stretch to full width on mobile. From `sm`, they sit in a centred row at their natural width.
 
 ## ErrorState
