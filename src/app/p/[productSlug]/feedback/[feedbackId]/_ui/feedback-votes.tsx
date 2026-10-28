@@ -1,6 +1,4 @@
-export function votesLabel(count: number) {
-  return count === 1 ? "vote" : "votes";
-}
+import { votesLabel } from "../../../_ui/votes-label";
 
 type FeedbackVotesProps = {
   count: number;
