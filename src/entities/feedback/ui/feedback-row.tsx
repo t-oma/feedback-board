@@ -3,6 +3,7 @@ import Link from "next/link";
 import { SkeletonText } from "@/components/skeleton";
 import { formatShortDate } from "@/shared/format-date";
 
+import { feedbackHref } from "../feedback-href";
 import type { PublicFeedback } from "../queries.server";
 import { StatusChip, StatusChipSkeleton } from "./status-chip";
 import { votesLabel } from "./votes-label";
@@ -39,7 +40,7 @@ export function FeedbackRow({ productSlug, feedback }: FeedbackRowProps) {
         <div className="flex min-w-0 flex-1 flex-col gap-y-2 sm:gap-y-0">
           <h2 className="font-serif text-base/snug font-semibold wrap-anywhere sm:text-lg/snug">
             <Link
-              href={`/p/${productSlug}/feedback/${id}` as const}
+              href={feedbackHref(productSlug, id)}
               className="focus-ring-stretched after:absolute after:inset-0"
             >
               {/* The title wraps in an inline block of its own: Chromium

@@ -139,11 +139,12 @@ The list is an ordered list, since its order is the sort. A row holds:
 
 - The vote count at the start, "▲ 128". Until the voting slice it is text,
   read as "128 votes", not a control.
-- The title, a link to `/p/{slug}/feedback/{id}` stretched over the whole row,
-  so a click anywhere on the row, the count included, opens the item, and the
-  focus ring goes around the row. The voting slice lifts its control above the
-  stretched link, as the design has it: "the vote control is a separate
-  button inside it".
+- The title, a link to `/p/{slug}/feedback/{id}` stretched over the whole row.
+  `feedbackHref(slug, id)` writes that address, here and for the item page's
+  Copy link. A click anywhere on the row, the count included, opens the item,
+  and the focus ring goes around the row. The voting slice lifts its control
+  above the stretched link, as the design has it: "the vote control is a
+  separate button inside it".
 - The body, cut to two lines from `sm` up, and left out on a phone, as in the
   mobile design.
 - The author's name and the date, in mono: "Marta K. · 14 Aug 2026".
