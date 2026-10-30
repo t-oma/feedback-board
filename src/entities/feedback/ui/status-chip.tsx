@@ -1,6 +1,6 @@
 import { clsx } from "clsx";
 
-import type { FeedbackStatus } from "@/entities/feedback/contracts";
+import type { FeedbackStatus } from "../contracts";
 
 export const feedbackStatusLabels = {
   open: "Open",

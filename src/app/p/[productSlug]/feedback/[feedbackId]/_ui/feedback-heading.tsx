@@ -1,7 +1,9 @@
 import { SkeletonText } from "@/components/skeleton";
 import type { FeedbackStatus } from "@/entities/feedback/contracts";
-
-import { StatusChip, StatusChipSkeleton } from "../../../_ui/status-chip";
+import {
+  StatusChip,
+  StatusChipSkeleton,
+} from "@/entities/feedback/ui/status-chip";
 
 type FeedbackHeadingProps = {
   title: string;

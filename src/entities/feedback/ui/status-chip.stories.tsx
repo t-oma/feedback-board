@@ -1,12 +1,11 @@
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 import { expect } from "storybook/test";
 
-import { FEEDBACK_STATUSES } from "@/entities/feedback/contracts";
-
+import { FEEDBACK_STATUSES } from "../contracts";
 import { feedbackStatusLabels, StatusChip } from "./status-chip";
 
 const meta = {
-  title: "Board/Status Chip",
+  title: "Feedback/Status Chip",
   component: StatusChip,
   parameters: {
     layout: "padded",
