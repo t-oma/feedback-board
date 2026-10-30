@@ -38,14 +38,17 @@ type BoardFiltersProps = {
 //
 // Below `sm` the statuses scroll sideways in a band from edge to edge, fading
 // at the end, without their dots, and every target is 44px tall, as the mobile
-// design draws them; from `sm` up the filters and the sort share a line.
+// design draws them; from `sm` up the filters and the sort share a line. The
+// space under the statuses is mostly the band's own padding, since an overlay
+// scrollbar lies over the bottom of what it scrolls: there it falls under the
+// statuses, not across them, and a margin below keeps it off the sort.
 export function BoardFilters({ productSlug, view, counts }: BoardFiltersProps) {
   return (
-    <div className="layout-subgrid gap-y-2.5 py-3.5 sm:col-content sm:flex sm:flex-wrap sm:items-center sm:justify-between sm:gap-5 sm:py-5">
+    <div className="layout-subgrid py-3.5 sm:col-content sm:flex sm:flex-wrap sm:items-center sm:justify-between sm:gap-5 sm:py-5">
       <div className="relative col-full sm:col-auto">
         <ul
           aria-label="Status"
-          className="flex gap-x-1.5 overflow-x-auto px-5 sm:flex-wrap sm:gap-2 sm:overflow-visible sm:px-0"
+          className="mb-1 flex gap-x-1.5 overflow-x-auto px-5 pb-2 sm:mb-0 sm:flex-wrap sm:gap-2 sm:overflow-visible sm:px-0 sm:pb-0"
         >
           {BOARD_STATUS_FILTERS.map((filter) => {
             const current = filter === view.status;
@@ -138,9 +141,9 @@ export const sampleCounts = {
 
 export function BoardFiltersSkeleton() {
   return (
-    <div className="layout-subgrid gap-y-2.5 py-3.5 sm:col-content sm:flex sm:flex-wrap sm:items-center sm:justify-between sm:gap-5 sm:py-5">
+    <div className="layout-subgrid py-3.5 sm:col-content sm:flex sm:flex-wrap sm:items-center sm:justify-between sm:gap-5 sm:py-5">
       <div className="col-full sm:col-auto">
-        <ul className="flex gap-x-1.5 overflow-hidden px-5 sm:flex-wrap sm:gap-2 sm:px-0">
+        <ul className="mb-1 flex gap-x-1.5 overflow-hidden px-5 pb-2 sm:mb-0 sm:flex-wrap sm:gap-2 sm:px-0 sm:pb-0">
           {BOARD_STATUS_FILTERS.map((filter) => {
             const status = FEEDBACK_STATUS_BY_FILTER[filter];
 
