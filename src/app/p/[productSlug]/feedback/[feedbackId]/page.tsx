@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 
+import { feedbackHref } from "@/entities/feedback/feedback-href";
 import { getVisibleFeedback } from "@/entities/feedback/queries.server";
 import { getProductBySlug } from "@/entities/product/queries.server";
 import { appOrigin } from "@/server/env";
@@ -34,7 +35,7 @@ export async function generateMetadata({
 
 export default async function FeedbackPage({ params }: FeedbackPageProps) {
   const { product, feedback } = await getPageFeedback(params);
-  const path = `/p/${product.slug}/feedback/${feedback.id}`;
+  const path = feedbackHref(product.slug, feedback.id);
 
   return (
     <FeedbackDetail

@@ -94,9 +94,10 @@ src/
 │   ├── sign-in/                 actions.ts, schemas.ts, ui/sign-in-form.tsx
 │   └── sign-out/                actions.ts, ui/sign-out-menu-item.tsx
 └── entities/
-    ├── feedback/                contracts.ts, board-href.ts, queries.server.ts,
-    │                            schemas.ts, ui/: the status chip, the feedback
-    │                            row and list, and their stories
+    ├── feedback/                contracts.ts, board-href.ts, feedback-href.ts,
+    │                            queries.server.ts, schemas.ts, ui/: the status
+    │                            chip, the feedback row and list, and their
+    │                            stories
     ├── product/                 contracts.ts, errors.ts, queries.server.ts,
     │                            schemas.ts
     └── user/                    contracts.ts, errors.ts, navigation.ts,
