@@ -2,11 +2,11 @@ import type { ReactNode } from "react";
 
 import { PageMain } from "@/components/page-main";
 import { Skeleton } from "@/components/skeleton";
+import { FeedbackListSkeleton } from "@/entities/feedback/ui/feedback-list";
 
 import { BoardFiltersSkeleton } from "./board-filters";
 import { BoardHeader, BoardHeaderSkeleton } from "./board-header";
 import { BoardIntro, BoardIntroSkeleton } from "./board-intro";
-import { FeedbackListSkeleton } from "./feedback-list";
 
 type BoardProps = {
   productName: string;

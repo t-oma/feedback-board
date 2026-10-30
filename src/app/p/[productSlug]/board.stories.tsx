@@ -6,13 +6,16 @@ import {
   expectSkeletonGeometry,
   SkeletonGeometry,
 } from "@/components/skeleton/skeleton.testing";
+import {
+  FeedbackList,
+  sampleFeedbackList,
+} from "@/entities/feedback/ui/feedback-list";
 import { SignInLink } from "@/widgets/viewer/ui/sign-in-link";
 
 import { Board, BoardSkeleton, sampleBoard } from "./_ui/board";
 import { BoardEmpty, BoardNoMatches } from "./_ui/board-empty";
 import { BoardFeedbackBoundary } from "./_ui/board-feedback-boundary";
 import { BoardFilters, sampleCounts } from "./_ui/board-filters";
-import { FeedbackList, sampleFeedbackList } from "./_ui/feedback-list";
 
 // What `ViewerControl` renders for a guest, most of a board's visitors.
 const guest = <SignInLink />;

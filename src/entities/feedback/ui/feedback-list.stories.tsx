@@ -38,7 +38,7 @@ const feedback = [
 ] as const;
 
 const meta = {
-  title: "Board/Feedback List",
+  title: "Feedback/List",
   component: FeedbackList,
   parameters: {
     layout: "fullscreen",

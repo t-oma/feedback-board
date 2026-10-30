@@ -9,6 +9,10 @@ import {
   getBoardStatusCounts,
 } from "@/entities/feedback/queries.server";
 import { parseBoardView } from "@/entities/feedback/schemas";
+import {
+  FeedbackList,
+  FeedbackListSkeleton,
+} from "@/entities/feedback/ui/feedback-list";
 import { getProductBySlug } from "@/entities/product/queries.server";
 import { ViewerControl } from "@/widgets/viewer/ui/viewer-control";
 
@@ -16,7 +20,6 @@ import { Board } from "./_ui/board";
 import { BoardEmpty, BoardNoMatches } from "./_ui/board-empty";
 import { BoardFeedbackBoundary } from "./_ui/board-feedback-boundary";
 import { BoardFilters } from "./_ui/board-filters";
-import { FeedbackList, FeedbackListSkeleton } from "./_ui/feedback-list";
 
 type BoardPageProps = PageProps<"/p/[productSlug]">;
 

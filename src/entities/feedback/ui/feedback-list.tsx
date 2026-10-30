@@ -1,5 +1,4 @@
-import type { PublicFeedback } from "@/entities/feedback/queries.server";
-
+import type { PublicFeedback } from "../queries.server";
 import { FeedbackRow, FeedbackRowSkeleton } from "./feedback-row";
 
 // Below `sm` the list is a band of the surface from edge to edge, with lines
@@ -13,7 +12,7 @@ type FeedbackListProps = {
   feedback: PublicFeedback[];
 };
 
-// Ordered, since its order is the board's sort.
+// Ordered, since the items come in the order of the sort they were read in.
 export function FeedbackList({ productSlug, feedback }: FeedbackListProps) {
   return (
     <ol className={listClassName}>

@@ -1,13 +1,11 @@
 import Link from "next/link";
 
 import { SkeletonText } from "@/components/skeleton";
-import type { PublicFeedback } from "@/entities/feedback/queries.server";
-import {
-  StatusChip,
-  StatusChipSkeleton,
-} from "@/entities/feedback/ui/status-chip";
-import { votesLabel } from "@/entities/feedback/ui/votes-label";
 import { formatShortDate } from "@/shared/format-date";
+
+import type { PublicFeedback } from "../queries.server";
+import { StatusChip, StatusChipSkeleton } from "./status-chip";
+import { votesLabel } from "./votes-label";
 
 type FeedbackRowProps = {
   productSlug: string;
