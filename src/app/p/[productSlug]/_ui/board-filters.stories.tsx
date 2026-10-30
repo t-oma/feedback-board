@@ -89,15 +89,26 @@ export const KeepsTheOtherHalf: Story = {
 };
 
 // The statuses scroll sideways from the content's edge, without their dots,
-// and every target is 44 pixels tall.
+// and every target is 44 pixels tall. An overlay scrollbar over the bottom of
+// the band stays clear of the statuses above it and of the sort below.
 export const OnPhone: Story = {
   globals: { viewport: { value: "mobile1" } },
   play: async ({ canvas }) => {
     const list = canvas.getByRole("list", { name: "Status" });
     const links = within(list).getAllByRole("link");
     const newest = sorts(canvas).getByRole("link", { name: "Newest" });
+    // The bottom of the band's padding box, where an overlay scrollbar lies;
+    // a classic one takes room of its own below it.
+    const bandBottom =
+      list.getBoundingClientRect().top + list.clientTop + list.clientHeight;
 
     await expect(list.scrollWidth).toBeGreaterThan(list.clientWidth);
+    await expect(bandBottom).toBeGreaterThan(
+      links[0]?.getBoundingClientRect().bottom ?? Infinity,
+    );
+    await expect(bandBottom).toBeLessThan(
+      canvas.getByRole("list", { name: "Sort" }).getBoundingClientRect().top,
+    );
     await expect(links[0]?.getBoundingClientRect().left).toBe(contentEdge());
     for (const link of [...links, newest]) {
       await expect(link.getBoundingClientRect().height).toBeGreaterThanOrEqual(
