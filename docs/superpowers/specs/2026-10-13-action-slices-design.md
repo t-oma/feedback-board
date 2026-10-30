@@ -94,7 +94,9 @@ src/
 │   ├── sign-in/                 actions.ts, schemas.ts, ui/sign-in-form.tsx
 │   └── sign-out/                actions.ts, ui/sign-out-menu-item.tsx
 └── entities/
-    ├── feedback/                contracts.ts, queries.server.ts, schemas.ts
+    ├── feedback/                contracts.ts, board-href.ts, queries.server.ts,
+    │                            schemas.ts, ui/: the status chip, the feedback
+    │                            row and list, and their stories
     ├── product/                 contracts.ts, errors.ts, queries.server.ts,
     │                            schemas.ts
     └── user/                    contracts.ts, errors.ts, navigation.ts,
@@ -123,12 +125,23 @@ signed in, and the way to the sign-in page.
 
 ## Pages
 
-UI that one route renders sits in a private folder of that route, `_ui/`,
-which Next.js leaves out of routing. The name repeats the `ui/` of a slice. A
-route may use the `_ui/` of its own segment and of the segments above it, so a
-page under `/dashboard` can render the dashboard header. When a second route
-needs a component, it moves down to `widgets`, `features`, `entities` or
-`src/components`.
+What a component draws decides its layer, just as what an action does decides
+its feature. The number of routes that render it does not. A component that
+draws a domain object or one of its attributes, the same way wherever it
+appears, sits in that entity's `ui/` from the start. Examples are a feedback
+item's row and its status chip.
+
+What a route decides itself sits in a private folder of that route, `_ui/`,
+which Next.js leaves out of routing: how its page is composed, its states, its
+navigation, its heading levels, and what it shows at each width. The name
+repeats the `ui/` of a slice. A route may use the `_ui/` of its own segment and
+of the segments above it, so a page under `/dashboard` can render the dashboard
+header. When a second route needs a component from a route's `_ui/`, the
+component moves down to `widgets`, `features`, `entities` or `src/components`.
+
+An entity's UI cannot import a feature. When an action's control belongs inside
+an entity's component, such as a vote button in a feedback row, the component
+takes the control as a prop from the route.
 
 When a story needs a page's whole composition, the page reads the request,
 such as its `searchParams`, and hands what it read to a component in `_ui/`

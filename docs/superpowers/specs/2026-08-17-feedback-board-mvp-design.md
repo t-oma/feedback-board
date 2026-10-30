@@ -52,9 +52,9 @@ The code is organized in layers taken from Feature-Sliced Design. Each layer imp
 - `src/server/auth.ts` owns the Better Auth configuration.
 - `src/server/env.ts` owns validated server environment variables.
 - `src/shared/action-result.ts` owns the client-safe expected-error contract for forms and interactive controls.
-- `src/entities` holds one slice per domain concept. `user` owns the account's field rules, the session, and the way to the sign-in page; `product` owns product validation, normalization, and queries; `feedback` will own public and owner queries; `vote` will own viewer vote reads.
+- `src/entities` holds one slice per domain concept. `user` owns the account's field rules, the session, and the way to the sign-in page; `product` owns product validation, normalization, and queries; `feedback` owns the public queries and the UI that draws an item the same way wherever it appears, and will own the owner queries; `vote` will own viewer vote reads.
 - `src/features` holds one slice per user action, with its Server Action, its input schema, and its UI: signing in, creating an account, signing out, and creating a product now; changing product settings, creating, editing, and hiding or restoring feedback, changing its status, and idempotently adding or removing a vote later.
-- `src/app` owns routing, Server Component composition, loading boundaries, error boundaries, and not-found UI, and keeps UI that only one route renders in that route's `_ui/`.
+- `src/app` owns routing, Server Component composition, loading boundaries, error boundaries, and not-found UI. It keeps what a route decides itself in that route's `_ui/`: the page's composition, its states and its navigation. What a component draws, not how many routes render it, decides its layer, as the [action slices specification](2026-10-13-action-slices-design.md) sets out.
 
 Slices use file names to communicate their allowed import direction. The suffix is a project convention rather than special Next.js syntax:
 
@@ -65,13 +65,14 @@ Slices use file names to communicate their allowed import direction. The suffix 
 
 Both are client-safe and must not import server-only dependencies. A schema that depends on server-only code uses the `*.server.ts` suffix instead. The dependency between the two runs one way: `schemas.ts` may import `contracts.ts`, never the reverse. Without that rule the two files form a cycle, because schemas need the shared constants while inferred types need the schemas.
 
-A representative entity and action remain flat at the MVP scale, apart from the action's `ui/`:
+A representative entity and action remain flat at the MVP scale, apart from their `ui/`:
 
 ```text
 src/entities/feedback/
 ├── contracts.ts
 ├── queries.server.ts
-└── schemas.ts
+├── schemas.ts
+└── ui/
 
 src/features/create-feedback/
 ├── actions.ts

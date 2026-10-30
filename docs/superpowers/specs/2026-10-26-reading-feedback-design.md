@@ -150,8 +150,8 @@ The list is an ordered list, since its order is the sort. A row holds:
 - The status chip, at the end of the row from `sm` up and under the title on a
   phone. It is monochrome, as the design draws it: the dot's shape, empty,
   half, hatched, or full, tells the statuses apart, not a colour.
-  `StatusChip` sits in the board's `_ui/`, which the feedback page below it
-  may use; it moves to `entities/feedback/ui/` when the dashboard needs it.
+  `StatusChip`, the row and the list sit in `entities/feedback/ui/`, since
+  they draw an item the same way wherever it appears.
 
 A title or a name with no space in it breaks rather than widening the page,
 as the board's name already does.
