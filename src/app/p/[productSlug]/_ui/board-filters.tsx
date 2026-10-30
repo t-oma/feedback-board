@@ -11,8 +11,10 @@ import {
   type BoardView,
   FEEDBACK_STATUS_BY_FILTER,
 } from "@/entities/feedback/contracts";
-
-import { feedbackStatusLabels, StatusDot } from "./status-chip";
+import {
+  feedbackStatusLabels,
+  StatusDot,
+} from "@/entities/feedback/ui/status-chip";
 
 function statusLabel(filter: BoardStatusFilter) {
   const status = FEEDBACK_STATUS_BY_FILTER[filter];

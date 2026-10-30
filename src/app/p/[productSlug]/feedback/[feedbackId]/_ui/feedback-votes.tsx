@@ -1,4 +1,4 @@
-import { votesLabel } from "../../../_ui/votes-label";
+import { votesLabel } from "@/entities/feedback/ui/votes-label";
 
 type FeedbackVotesProps = {
   count: number;
